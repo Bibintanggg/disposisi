@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId("surat_id")->constrained("surat_masuk")->onDelete("cascade");
             $table->foreignId("pengirim_id")->constrained("users")->onDelete("cascade");
             $table->dateTime("tanggal_disposisi");
-            $table->string("konten");
+            $table->string("isi_surat");
             $table->string("catatan_tambahan")->nullable();
             $table->timestamps();
         });
