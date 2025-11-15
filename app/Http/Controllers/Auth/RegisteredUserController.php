@@ -31,15 +31,21 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
+            'username' => 'required|string|max:100|unique:users,username',
+            'email' => 'required|string|lowercase|email|max:255|unique:users,email',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'nip' => 'required|string|max:50|unique:users,nip',
+            'nama_lengkap' => 'required|string|max:200',
+            'jabatan' => 'required|string|max:255',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'nip' => $request->nip,
+            'nama_lengkap' => $request->nama_lengkap,
+            'jabatan' => $request->jabatan,
         ]);
 
         event(new Registered($user));

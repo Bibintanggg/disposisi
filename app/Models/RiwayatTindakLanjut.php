@@ -9,6 +9,8 @@ class RiwayatTindakLanjut extends Model
 {
     use HasFactory;
 
+    protected $table = 'riwayat_tindak_lanjut';
+
     protected $fillable = [
         'tujuan_id',
         'tanggal_laporan',

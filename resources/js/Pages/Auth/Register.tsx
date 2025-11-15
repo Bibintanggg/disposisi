@@ -8,8 +8,11 @@ import { FormEventHandler } from 'react';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
+        username: '',
         email: '',
+        nip: '',
+        nama_lengkap: '',
+        jabatan: '',
         password: '',
         password_confirmation: '',
     });
@@ -27,23 +30,25 @@ export default function Register() {
             <Head title="Register" />
 
             <form onSubmit={submit}>
+                {/* USERNAME */}
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
+                    <InputLabel htmlFor="username" value="Username" />
 
                     <TextInput
-                        id="name"
-                        name="name"
-                        value={data.name}
+                        id="username"
+                        name="username"
+                        value={data.username}
                         className="mt-1 block w-full"
-                        autoComplete="name"
+                        autoComplete="username"
                         isFocused={true}
-                        onChange={(e) => setData('name', e.target.value)}
+                        onChange={(e) => setData('username', e.target.value)}
                         required
                     />
 
-                    <InputError message={errors.name} className="mt-2" />
+                    <InputError message={errors.username} className="mt-2" />
                 </div>
 
+                {/* EMAIL */}
                 <div className="mt-4">
                     <InputLabel htmlFor="email" value="Email" />
 
@@ -53,7 +58,7 @@ export default function Register() {
                         name="email"
                         value={data.email}
                         className="mt-1 block w-full"
-                        autoComplete="username"
+                        autoComplete="email"
                         onChange={(e) => setData('email', e.target.value)}
                         required
                     />
@@ -61,6 +66,60 @@ export default function Register() {
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
+                {/* NIP */}
+                <div className="mt-4">
+                    <InputLabel htmlFor="nip" value="NIP" />
+
+                    <TextInput
+                        id="nip"
+                        name="nip"
+                        value={data.nip}
+                        className="mt-1 block w-full"
+                        onChange={(e) => setData('nip', e.target.value)}
+                        required
+                    />
+
+                    <InputError message={errors.nip} className="mt-2" />
+                </div>
+
+                {/* NAMA LENGKAP */}
+                <div className="mt-4">
+                    <InputLabel htmlFor="nama_lengkap" value="Nama Lengkap" />
+
+                    <TextInput
+                        id="nama_lengkap"
+                        name="nama_lengkap"
+                        value={data.nama_lengkap}
+                        className="mt-1 block w-full"
+                        onChange={(e) =>
+                            setData('nama_lengkap', e.target.value)
+                        }
+                        required
+                    />
+
+                    <InputError
+                        message={errors.nama_lengkap}
+                        className="mt-2"
+                    />
+                </div>
+
+                {/* JABATAN */}
+                <div className="mt-4">
+                    <InputLabel htmlFor="jabatan" value="Jabatan" />
+
+                    <TextInput
+                        id="jabatan"
+                        name="jabatan"
+                        value={data.jabatan}
+                        className="mt-1 block w-full"
+                        onChange={(e) => setData('jabatan', e.target.value)}
+                        required
+                    />
+
+                    <InputError message={errors.jabatan} className="mt-2" />
+                </div>
+
+                {/* PASSWORD */}
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
 
@@ -78,6 +137,7 @@ export default function Register() {
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
+                {/* PASSWORD CONFIRMATION */}
                 <div className="mt-4">
                     <InputLabel
                         htmlFor="password_confirmation"
@@ -92,7 +152,10 @@ export default function Register() {
                         className="mt-1 block w-full"
                         autoComplete="new-password"
                         onChange={(e) =>
-                            setData('password_confirmation', e.target.value)
+                            setData(
+                                'password_confirmation',
+                                e.target.value
+                            )
                         }
                         required
                     />

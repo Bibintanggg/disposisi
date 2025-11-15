@@ -10,6 +10,8 @@ class SuratKeluar extends Model
 {
     use HasFactory;
 
+    protected $table = 'surat_keluar';
+
     protected $fillable = [
         'unit_pengirim_id',
         'user_penanda_tangan_id',
