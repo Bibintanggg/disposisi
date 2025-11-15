@@ -1,6 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardAdminController;
+use App\Http\Controllers\Kepala\DashboardKepalaController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Staf\DashboardStafController;
+use App\Http\Controllers\Verif\DashboardVerifController;
+use App\Http\Enum\Jabatan;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -14,9 +19,27 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return Inertia::render('Dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware(['auth', 'verified'])->group(function() {
+    Route::middleware(['jabatan:'.Jabatan::ADMIN->value])->group(function() {
+        Route::get('/admin/dashboard', [DashboardAdminController::class, 'index'])->name('admin.dashboard');
+    });
+
+    Route::middleware(['jabatan:'.Jabatan::KEPALA->value])->group(function() {
+        Route::get('kepala/dashboard', [DashboardKepalaController::class, 'index'])->name('kepala.dashboard');
+    });
+
+    Route::middleware(['jabatan:'.Jabatan::STAF->value])->group(function() {
+        Route::get('staf/dashboard', [DashboardStafController::class, 'index'])->name('staf.dashboard');
+    });
+
+    Route::middleware(['jabatan:'.Jabatan::VERIFIKATOR->value])->group(function() {
+        Route::get('verif/dashboard', [DashboardVerifController::class, 'index'])->name('verif.dashboard');
+    });
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

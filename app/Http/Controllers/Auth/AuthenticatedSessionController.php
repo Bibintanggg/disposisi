@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Enum\Jabatan;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,7 +34,17 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        if($request->user()->jabatan === Jabatan::ADMIN) {
+            return redirect()->route('admin.dashboard');
+        } else if ($request->user()->jabatan === Jabatan::KEPALA) {
+            return redirect()->route('kepala.dashboard');
+        } else if ($request->user()->jabatan === Jabatan::STAF) {
+            return redirect()->route('staf.dashboard');
+        } else if ($request->user()->jabatan === Jabatan::VERIFIKATOR) {
+            return redirect()->route('verif.dashboard');
+        }
+
+        return redirect()->route('/');
     }
 
     /**
