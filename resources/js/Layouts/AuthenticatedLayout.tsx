@@ -22,9 +22,20 @@ export default function Authenticated({
     children,
 }: PropsWithChildren<{ header?: ReactNode }>) {
     const user = usePage().props.auth.user;
+    const page = usePage().component;
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+
+    const breadcrumpMap: Record<string, string[]> = {
+        'Dashboard': ['Home', 'Dashboard'],
+        'Admin/Users/Index': ['Home', 'Admin', 'Users'],
+        'Admin/Users/Edit': ['Home', 'Admin', 'Users', 'Edit User'],
+        'Admin/Reports': ['Home', 'Admin', 'Reports'],
+        'Kepala/Dashboard': ['Home', 'Kepala', 'Dashboard'],
+    }
+
+    const crumbs = breadcrumpMap[page] || ['Dashboard']
 
     return (
         <SidebarProvider className="p-6">
@@ -39,20 +50,29 @@ export default function Authenticated({
                         />
                         <Breadcrumb>
                             <BreadcrumbList>
-                                <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="#">
-                                        Building Your Application
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator className="hidden md:block" />
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                                </BreadcrumbItem>
+                                {crumbs.map((crumb, idx) => (
+                                    <span key={idx} className="flex items-center">
+                                        {idx < crumbs.length - 1 ? (
+                                            <>
+                                                <BreadcrumbItem>
+                                                    <BreadcrumbLink href="#">{crumb}</BreadcrumbLink>
+                                                </BreadcrumbItem>
+                                                <BreadcrumbSeparator className="hidden md:block" />
+                                            </>
+                                        ) : (
+                                            <BreadcrumbItem>
+                                                <BreadcrumbPage>{crumb}</BreadcrumbPage>
+                                            </BreadcrumbItem>
+                                        )}
+                                    </span>
+                                ))}
                             </BreadcrumbList>
                         </Breadcrumb>
                     </div>
                 </header>
+            {children}
             </SidebarInset>
         </SidebarProvider>
+
     );
 }
