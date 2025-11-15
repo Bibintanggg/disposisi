@@ -31,5 +31,35 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'bidang_id' => $bidang->id
         ]);
+
+        User::factory()->create([
+            'email' => 'staf@example.com',
+            'username' => 'staf ganteng',
+            'nip' => '931983123',
+            'nama_lengkap' => "Staf IF'27",
+            'jabatan' => Jabatan::STAF,
+            'password' => Hash::make('password'),
+            'bidang_id' => $bidang->id
+        ]);
+
+        User::factory()->create([
+            'email' => 'verif@example.com',
+            'username' => 'verif ganteng',
+            'nip' => '02930131231',
+            'nama_lengkap' => "Verifikator",
+            'jabatan' => Jabatan::VERIFIKATOR,
+            'password' => Hash::make('password'),
+            'bidang_id' => $bidang->id
+        ]);
+
+        User::factory()->create([
+            'email' => 'kepala@example.com',
+            'username' => 'kepala ganteng',
+            'nip' => '1832013123',
+            'nama_lengkap' => "Kepala",
+            'jabatan' => Jabatan::KEPALA,
+            'password' => Hash::make('password'),
+            'bidang_id' => $bidang->id
+        ]);
     }
 }

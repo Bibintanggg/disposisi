@@ -29,12 +29,21 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { usePage } from "@inertiajs/react"
+import { router, usePage } from "@inertiajs/react"
 
-export function NavUser() {
+interface NavUserProps {
+  user: {
+    nama_lengkap: string,
+    email: string
+  }
+}
+
+export function NavUser({ user }: NavUserProps) {
   const { isMobile } = useSidebar()
-  const {props} = usePage()
-  const user = props.auth.user
+
+  const handleLogout = () => {
+    router.post("/logout")
+  }
 
   return (
     <SidebarMenu>
@@ -97,7 +106,7 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

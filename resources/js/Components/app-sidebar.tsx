@@ -3,12 +3,16 @@
 import * as React from "react"
 import {
   AudioWaveform,
+  Book,
   BookOpen,
   Bot,
+  Calendar,
   Command,
   Frame,
   GalleryVerticalEnd,
+  LayoutGrid,
   Map,
+  Monitor,
   PieChart,
   Settings2,
   SquareTerminal,
@@ -24,14 +28,18 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { usePage } from "@inertiajs/react"
+import { TeamSwitcher } from "./team-switcher"
 
-// This is sample data.
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
+const USER_JABATAN = {
+  ADMIN: 1,
+  KEPALA: 2,
+  STAF: 3,
+  VERIFIKATOR: 4
+}
+
+
+const navTeam = {
   teams: [
     {
       name: "Acme Inc",
@@ -49,121 +57,94 @@ const data = {
       plan: "Free",
     },
   ],
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { props: page } = usePage()
+  const { auth } = page
+  const userRole = auth.user.jabatan
+
+  function MainNavItem() {
+    if (userRole === USER_JABATAN.ADMIN) {
+      return [
+        {
+          title: 'Dashboard', url: '/admin/dashboard', icon: LayoutGrid
+        },
+        {
+          title: 'Manajemen Pengguna', url: '/logbook', icon: Book, items:
+            [
+              { title: "Kelola Pengguna", url: "/admin/kelola-user" },
+              { title: "Master Data Bidang", url: "/admin/master-data" },
+            ]
+        },
+        { title: 'Arsip Global', url: '/admin/permits', icon: Calendar },
+        { title: 'Laporan & Audit', url: '/admin/users', icon: Monitor },
+      ]
+    } else if (userRole === USER_JABATAN.STAF) {
+      return [
+        { title: 'Dashboard', url: '/staf/dashboard', icon: LayoutGrid },
+        {
+          title: 'Tugas Saya', url: '/staf/tugas-saya', icon: Book, items:
+            [
+              { title: "Tugas Masuk (Inbox)", url: "/staf/tugas-masuk" },
+              { title: "Tugas Sedang Diproses", url: "/staf/tugas-sedang-diproses" },
+            ]
+        },
+        { title: 'Laporan Tindak Lanjut', url: '/staf/laporan-tindak', icon: Calendar },
+        { title: 'Riwayat Tugas Selesai', url: '/staf/riwayat-tugas', icon: Monitor },
+      ]
+    } else if (userRole === USER_JABATAN.KEPALA) {
+      return [
+        { title: 'Dashboard', url: '/kepala/dashboard', icon: LayoutGrid },
+        {
+          title: 'Disposisi', url: '/kepala/disposisi', icon: Book, items:
+            [
+              { title: "Surat Menunggu Disposisi", url: "/kepala/surat-menunggu" },
+              { title: "Lacak Disposisi Terkirim", url: "/kepala/lacak-disposisi" },
+            ]
+        },
+        { title: 'Arsip Surat Masuk', url: '/kepala/arsip-surat', icon: Calendar },
+        { title: 'Laporan Kinerja Staf', url: '/kepala/laporan-kinerja', icon: Monitor },
+      ]
+    } else if (userRole === USER_JABATAN.VERIFIKATOR) {
+      return [
+        { title: 'Dashboard', url: '/verif/dashboard', icon: LayoutGrid },
+        {
+          title: 'Surat Masuk', url: '/verif/surat-masuk', icon: Book, items:
+            [
+              { title: "Input Surat Masuk", url: "/verif/input-surat-masuk" },
+              { title: "Daftar Surat Masuk", url: "/verif/surat-masuk" },
+            ]
+        },
+        {
+          title: 'Surat Keluar', url: '/verif/surat-masuk', icon: Book, items:
+            [
+              { title: "Input Surat Keluar", url: "/verif/input-surat-keluar" },
+              { title: "Daftar Surat Keluar", url: "/verif/surat-keluar" },
+            ]
+        },
+        { title: 'Cetak & Verifikasi', url: '/verif/cetak', icon: Monitor },
+      ]
+    }
+    return []
+  }
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <TeamSwitcher teams={navTeam.teams} />
+        <NavMain items={MainNavItem()} />
+        {/* <NavProjects projects={MainNavItem}/> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        {auth.user ? (
+          <NavUser user={{
+            nama_lengkap: auth.user.nama_lengkap,
+            email: auth.user.email
+          }} />
+        ) : (
+          <p>yessir</p>
+        )}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
