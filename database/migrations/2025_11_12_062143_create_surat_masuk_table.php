@@ -18,7 +18,7 @@ return new class extends Migration
             $table->date("tanggal_surat");
             $table->dateTime("tanggal_terima");
             $table->string("pengirim", 250);
-            $table->string("konten");
+            $table->string("isi_surat");
             $table->integer("sifat_surat");
             $table->string("gambar")->nullable();
             $table->integer("status_akhir");

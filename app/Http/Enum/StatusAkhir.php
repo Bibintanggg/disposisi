@@ -7,13 +7,15 @@ enum StatusAkhir: int
     case BARU = 1;
     case DISPOSISI = 2;
     case SELESAI = 3;
+    case ARSIP = 4;
 
     public function label(): string
     {
         return match($this) {
             self::BARU => "Baru",
             self::DISPOSISI => "Disposisi",
-            self::SELESAI => "Selesai,"
+            self::SELESAI => "Selesai,",
+            self::ARSIP => "Arsip"
         };
     }
 }
