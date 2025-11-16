@@ -9,8 +9,8 @@ interface RightBarprops {
 
 export default function RightBar({ title, total, subtitle, icon }: RightBarprops) {
     return (
-        <div>
-            <div className="max-w-xs h-80 bg-[#fafafa] rounded-xl">
+        <div className="fixed right-[4rem]"> 
+            <div className="max-w-xs h-[25rem] bg-[#fafafa] rounded-xl">
                 <div className="p-5">
 
                     <div className="flex items-center justify-between">
@@ -19,20 +19,28 @@ export default function RightBar({ title, total, subtitle, icon }: RightBarprops
                         </h3>
 
                         <div className="bg-black/10 w-10 rounded-full h-10 flex items-center justify-center">
-                            <div className=" opacity-45">
+                            <div className="opacity-45">
                                 {icon}
                             </div>
                         </div>
-                    </div>  
+                    </div>
 
-                    <h4 className="scroll-m-20 text-sm border-b font-normal tracking-tight mt-2">
-                        Tugas Masuk
-                    </h4>
+                    {/* Konten tugas */}
+                    <div className="flex flex-col mt-4 space-y-2">
 
-                    <DemoPage/>
-                    
+                        <h4 className="scroll-m-20 text-sm border-b font-normal tracking-tight">
+                            Tugas Masuk
+                        </h4>
+                        <DemoPage />
+
+                        <h4 className="scroll-m-20 text-sm border-b font-normal tracking-tight mt-2">
+                            Tugas Keluar
+                        </h4>
+                        <DemoPage />
+
+                    </div>
+
                 </div>
-
             </div>
         </div>
     )
