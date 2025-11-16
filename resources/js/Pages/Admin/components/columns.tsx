@@ -3,7 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal, Trash2Icon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -23,6 +23,9 @@ export type Payment = {
     nama_lengkap: string
     jabatan: number
     bidang_id: number
+    bidang?: {
+        nama_bidang: string
+    }
 }
 
 const getRoleName = (jabatan: number) => {
@@ -65,7 +68,7 @@ export const columns: ColumnDef<Payment>[] = [
         header: "NIP",
     },
     {
-        accessorKey: "bidang_id",
+        accessorKey: "bidang.nama_bidang",
         header: "Bidang",
     },
     {
@@ -98,15 +101,12 @@ export const columns: ColumnDef<Payment>[] = [
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
+                        <DropdownMenuItem className="text-red-500"
                             onClick={() => navigator.clipboard.writeText(payment.id)}
                         >
-                            Copy payment ID
+                            <Trash2Icon/>
+                            Hapus Akun
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>View customer</DropdownMenuItem>
-                        <DropdownMenuItem>View payment details</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             )

@@ -32,11 +32,14 @@ export default function ManageUser() {
     const { props } = usePage<UserManageProps>();
     const users = props.users;
     const bidang = props.bidang
+    const activeUsers = props.active_users
+    const newUsers = props.new_users
 
     const totalAdmin = users.filter(u => u.jabatan === 1).length
     const totalKepala = users.filter(u => u.jabatan === 2).length
     const totalStaf = users.filter(u => u.jabatan === 3).length
     const totalVerifikator = users.filter(u => u.jabatan === 4).length
+    const totalUsers = users.length
 
     return (
         <Authenticated>
@@ -63,7 +66,7 @@ export default function ManageUser() {
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium text-gray-600">Total Pengguna</p>
-                                    <p className="text-2xl font-bold text-gray-900">1,234</p>
+                                    <p className="text-2xl font-bold text-gray-900">{totalUsers}</p>
                                     <p className="text-xs text-green-600 flex items-center gap-1">
                                         <TrendingUp size={12} />
                                         +12% dari bulan lalu
@@ -79,7 +82,7 @@ export default function ManageUser() {
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium text-gray-600">Pengguna Aktif</p>
-                                    <p className="text-2xl font-bold text-gray-900">1,180</p>
+                                    <p className="text-2xl font-bold text-gray-900">{activeUsers}</p>
                                     <p className="text-xs text-green-600 flex items-center gap-1">
                                         <TrendingUp size={12} />
                                         +8% dari bulan lalu
@@ -95,7 +98,7 @@ export default function ManageUser() {
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium text-gray-600">Pengguna Baru</p>
-                                    <p className="text-2xl font-bold text-gray-900">89</p>
+                                    <p className="text-2xl font-bold text-gray-900">{newUsers}</p>
                                     <p className="text-xs text-gray-500">
                                         Bulan ini
                                     </p>
