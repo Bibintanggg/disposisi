@@ -1,6 +1,7 @@
 export interface Bidang {
     id: number;
     nama_bidang: string;
+    users: User[]
 }
 
 export interface User {

@@ -31,6 +31,7 @@ Route::middleware(['auth', 'verified'])->group(function() {
         Route::post('/admin/manage-user', [ManageUserController::class, 'store'])->name('admin.manage-user.store');
         
         Route::get('/admin/master-data', [ManageUserController::class, 'masterBidang'])->name('admin.master-bidang');
+        Route::post('/admin/master-data', [ManageUserController::class, 'storeBidang'])->name('admin.master-bidang.store');
     });
 
     Route::middleware(['jabatan:'.Jabatan::KEPALA->value])->group(function() {

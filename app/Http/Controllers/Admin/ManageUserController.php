@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\BidangRequest;
 use App\Http\Requests\User\UserRequest;
 use App\Models\Bidang;
 use App\Models\User;
@@ -53,6 +54,17 @@ class ManageUserController extends Controller
 
     public function masterBidang() 
     {
-        return Inertia::render('Admin/MasterBidang');
+        $bidang = Bidang::with('users')->get();
+
+        return Inertia::render('Admin/MasterBidang', [
+            'bidang' => $bidang
+        ]);
+    }
+
+    public function storeBidang(BidangRequest $request)
+    {
+        Bidang::create($request->validated());
+
+        return redirect()->route('admin.master-bidang')->with('success', 'Data bidang berhasil dibuat');
     }
 }
