@@ -22,6 +22,7 @@ export type Payment = {
     username: string
     nama_lengkap: string
     jabatan: number
+    bidang_id: number
 }
 
 const getRoleName = (jabatan: number) => {
@@ -62,6 +63,10 @@ export const columns: ColumnDef<Payment>[] = [
     {
         accessorKey: "nip",
         header: "NIP",
+    },
+    {
+        accessorKey: "bidang_id",
+        header: "Bidang",
     },
     {
         accessorKey: "username",

@@ -6,6 +6,19 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { Payment } from "./components/columns";
 import type { PageProps } from "@/types";
 import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import UserForm from "./components/UserForm";
 
 interface UserManageProps extends PageProps {
     users: Payment[];
@@ -26,19 +39,16 @@ export default function ManageUser() {
 
                 <div className="flex justify-between items-center">
 
-                <div className="space-y-2">
-                    <h1 className="scroll-m-20 text-start text-4xl font-extrabold tracking-tight text-balance">
-                        Kelola Pengguna
-                    </h1>
-                    <p className="text-muted-foreground text-sm">
-                        Kelola dan pantau semua pengguna sistem Anda
-                    </p>
-                </div>
+                    <div className="space-y-2">
+                        <h1 className="scroll-m-20 text-start text-4xl font-extrabold tracking-tight text-balance">
+                            Kelola Pengguna
+                        </h1>
+                        <p className="text-muted-foreground text-sm">
+                            Kelola dan pantau semua pengguna sistem Anda
+                        </p>
+                    </div>
 
-                <Button variant="secondary">
-                    <Plus />
-                    Tambah Pengguna
-                </Button>
+                   <UserForm/>
                 </div>
 
                 <div>

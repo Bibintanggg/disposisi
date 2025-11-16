@@ -13,7 +13,8 @@ async function getData(): Promise<Payment[]> {
       nip: '1029301312',
       username: "Admin IF'26",
       nama_lengkap: "Bintang Yudha Putra Purnomo",
-      jabatan: 2
+      jabatan: 2,
+      bidang_id: 10
     },
     // ...
   ]

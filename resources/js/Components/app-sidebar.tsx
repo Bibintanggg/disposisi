@@ -143,7 +143,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             email: auth.user.email
           }} />
         ) : (
-          <p>yessir</p>
+          <p>Login Ulang</p>
         )}
       </SidebarFooter>
       <SidebarRail />
