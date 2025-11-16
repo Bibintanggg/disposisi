@@ -18,4 +18,14 @@ enum Jabatan: int
             self::VERIFIKATOR => "Verifikator"
         };
     }
+
+    public static function options(): array
+    {
+        return [
+            self::ADMIN->value => self::ADMIN->label(),
+            self::KEPALA->value => self::KEPALA->label(),
+            self::STAF->value => self::STAF->label(),
+            self::VERIFIKATOR->value => self::VERIFIKATOR->label(),
+        ];
+    }
 }

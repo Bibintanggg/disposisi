@@ -28,6 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function() {
     Route::middleware(['jabatan:'.Jabatan::ADMIN->value])->group(function() {
         Route::get('/admin/dashboard', [DashboardAdminController::class, 'index'])->name('admin.dashboard');
         Route::get('/admin/manage-user', [ManageUserController::class, 'index'])->name('admin.manage-user');
+        Route::post('/admin/manage-user', [ManageUserController::class, 'store'])->name('admin.manage-user.store');
     });
 
     Route::middleware(['jabatan:'.Jabatan::KEPALA->value])->group(function() {

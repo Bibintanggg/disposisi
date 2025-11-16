@@ -22,11 +22,16 @@ import UserForm from "./components/UserForm";
 
 interface UserManageProps extends PageProps {
     users: Payment[];
+    bidang: {
+        id: number,
+        nama_bidang: string
+    }[]
 }
 
 export default function ManageUser() {
     const { props } = usePage<UserManageProps>();
     const users = props.users;
+    const bidang = props.bidang
 
     const totalAdmin = users.filter(u => u.jabatan === 1).length
     const totalKepala = users.filter(u => u.jabatan === 2).length
@@ -48,7 +53,7 @@ export default function ManageUser() {
                         </p>
                     </div>
 
-                   <UserForm/>
+                   <UserForm bidang={bidang}/>
                 </div>
 
                 <div>
