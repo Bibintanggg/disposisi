@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardAdminController;
+use App\Http\Controllers\Admin\ManageUserController;
 use App\Http\Controllers\Kepala\DashboardKepalaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Staf\DashboardStafController;
@@ -26,6 +27,7 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function() {
     Route::middleware(['jabatan:'.Jabatan::ADMIN->value])->group(function() {
         Route::get('/admin/dashboard', [DashboardAdminController::class, 'index'])->name('admin.dashboard');
+        Route::get('/admin/manage-user', [ManageUserController::class, 'index'])->name('admin.manage-user');
     });
 
     Route::middleware(['jabatan:'.Jabatan::KEPALA->value])->group(function() {

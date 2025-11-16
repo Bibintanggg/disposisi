@@ -71,9 +71,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           title: 'Dashboard', url: '/admin/dashboard', icon: LayoutGrid
         },
         {
-          title: 'Manajemen Pengguna', url: '/logbook', icon: Book, items:
+          title: 'Manajemen Pengguna', url: '/admin/manage-user', icon: Book, items:
             [
-              { title: "Kelola Pengguna", url: "/admin/kelola-user" },
+              { title: "Kelola Pengguna", url: "/admin/manage-user" },
               { title: "Master Data Bidang", url: "/admin/master-data" },
             ]
         },

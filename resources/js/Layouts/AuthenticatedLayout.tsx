@@ -29,7 +29,7 @@ export default function Authenticated({
 
     const breadcrumpMap: Record<string, string[]> = {
         'Dashboard': ['Home', 'Dashboard'],
-        'Admin/Users/Index': ['Home', 'Admin', 'Users'],
+        'Admin/ManageUser': ['Home', 'Manajemen Pengguna', 'Kelola Pengguna'],
         'Admin/Users/Edit': ['Home', 'Admin', 'Users', 'Edit User'],
         'Admin/Reports': ['Home', 'Admin', 'Reports'],
         'Kepala/Dashboard': ['Home', 'Kepala', 'Dashboard'],
