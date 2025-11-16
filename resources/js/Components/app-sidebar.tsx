@@ -42,9 +42,9 @@ const USER_JABATAN = {
 const navTeam = {
   teams: [
     {
-      name: "Acme Inc",
+      name: "SIDISPOSISI",
       logo: GalleryVerticalEnd,
-      plan: "Enterprise",
+      plan: "Pengelola Surat",
     },
     {
       name: "Acme Corp.",

@@ -26,7 +26,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@example.com',
             'username' => 'admin ganteng',
             'nip' => '123456789',
-            'nama_lengkap' => "Bintang IF'26",
+            'nama_lengkap' => "Bintang Mau ITB",
             'jabatan' => Jabatan::ADMIN,
             'password' => Hash::make('password'),
             'bidang_id' => $bidang->id

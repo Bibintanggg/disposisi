@@ -1,11 +1,31 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import Table from "./components/table";
-import { Users, UserCheck, Shield, TrendingUp, UserCog, UserX, User2Icon } from "lucide-react";
+import { Users, UserCheck, Shield, TrendingUp, UserCog, UserX, User2Icon, Plus } from "lucide-react";
+import { usePage } from "@inertiajs/react";
+import { useSidebar } from "@/components/ui/sidebar";
+import { Payment } from "./components/columns";
+import type { PageProps } from "@/types";
+import { Button } from "@/components/ui/button";
+
+interface UserManageProps extends PageProps {
+    users: Payment[];
+}
 
 export default function ManageUser() {
+    const { props } = usePage<UserManageProps>();
+    const users = props.users;
+
+    const totalAdmin = users.filter(u => u.jabatan === 1).length
+    const totalKepala = users.filter(u => u.jabatan === 2).length
+    const totalStaf = users.filter(u => u.jabatan === 3).length
+    const totalVerifikator = users.filter(u => u.jabatan === 4).length
+
     return (
         <Authenticated>
             <div className="p-4 sm:p-6 space-y-6">
+
+                <div className="flex justify-between items-center">
+
                 <div className="space-y-2">
                     <h1 className="scroll-m-20 text-start text-4xl font-extrabold tracking-tight text-balance">
                         Kelola Pengguna
@@ -13,6 +33,12 @@ export default function ManageUser() {
                     <p className="text-muted-foreground text-sm">
                         Kelola dan pantau semua pengguna sistem Anda
                     </p>
+                </div>
+
+                <Button variant="secondary">
+                    <Plus />
+                    Tambah Pengguna
+                </Button>
                 </div>
 
                 <div>
@@ -66,7 +92,7 @@ export default function ManageUser() {
                         </div>
                     </div>
                 </div>
-                
+
                 <div>
                     <h2 className="text-sm font-semibold text-gray-700 mb-3">Berdasarkan Jabatan</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -74,7 +100,7 @@ export default function ManageUser() {
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium text-gray-600">Admin</p>
-                                    <p className="text-2xl font-bold text-gray-900">8</p>
+                                    <p className="text-2xl font-bold text-gray-900">{totalAdmin}</p>
                                     <p className="text-xs text-gray-500">
                                         0.6% dari total
                                     </p>
@@ -89,7 +115,7 @@ export default function ManageUser() {
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium text-gray-600">Kepala</p>
-                                    <p className="text-2xl font-bold text-gray-900">8</p>
+                                    <p className="text-2xl font-bold text-gray-900">{totalKepala}</p>
                                     <p className="text-xs text-gray-500">
                                         0.6% dari total
                                     </p>
@@ -104,7 +130,7 @@ export default function ManageUser() {
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium text-gray-600">Staf</p>
-                                    <p className="text-2xl font-bold text-gray-900">1,180</p>
+                                    <p className="text-2xl font-bold text-gray-900">{totalStaf}</p>
                                     <p className="text-xs text-gray-500">
                                         95.6% dari total
                                     </p>
@@ -119,7 +145,7 @@ export default function ManageUser() {
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
                                     <p className="text-sm font-medium text-gray-600">Verifikator</p>
-                                    <p className="text-2xl font-bold text-gray-900">46</p>
+                                    <p className="text-2xl font-bold text-gray-900">{totalVerifikator}</p>
                                     <p className="text-xs text-gray-500">
                                         3.7% dari total
                                     </p>
