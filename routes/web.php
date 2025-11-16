@@ -48,6 +48,10 @@ Route::middleware(['auth', 'verified'])->group(function() {
         Route::get('verif/surat-masuk', function() {
             return Inertia::render('Staf/SuratMasuk');
         });
+
+        Route::get('verif/daftar-surat-masuk', function() {
+            return Inertia::render('Staf/DaftarSuratMasuk');
+        });
     });
 });
 

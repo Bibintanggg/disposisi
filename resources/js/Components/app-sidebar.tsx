@@ -113,7 +113,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           title: 'Surat Masuk', url: '/verif/surat-masuk', icon: Book, items:
             [
               { title: "Input Surat Masuk", url: "/verif/input-surat-masuk" },
-              { title: "Daftar Surat Masuk", url: "/verif/surat-masuk" },
+              { title: "Daftar Surat Masuk", url: "/verif/daftar-surat-masuk" },
             ]
         },
         {
