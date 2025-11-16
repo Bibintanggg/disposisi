@@ -50,4 +50,9 @@ class ManageUserController extends Controller
 
         return redirect()->route('admin.manage-user')->with('success', 'User berhasil dibuat');
     }
+
+    public function masterBidang() 
+    {
+        return Inertia::render('Admin/MasterBidang');
+    }
 }
