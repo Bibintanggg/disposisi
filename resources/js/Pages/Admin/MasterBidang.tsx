@@ -182,7 +182,7 @@ export default function MasterBidang({ bidang }: UserFormProps) {
                     </div>
                 </div>
 
-                <div className="w-80 bg-white border-l">
+                <div className="w-96 bg-white border-l">
                     <div className="p-4 border-b flex items-center gap-2">
                         <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
                         <h3 className="font-semibold">{selectedBidang?.nama_bidang || "Pilih Bidang"}</h3>

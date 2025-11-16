@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string("isi_surat");
             $table->integer("sifat_surat");
             $table->string("gambar")->nullable();
-            $table->integer("status_akhir");
+            $table->integer("status_akhir")->default(1);
             $table->timestamps();
         });
     }

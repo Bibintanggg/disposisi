@@ -44,6 +44,10 @@ Route::middleware(['auth', 'verified'])->group(function() {
 
     Route::middleware(['jabatan:'.Jabatan::VERIFIKATOR->value])->group(function() {
         Route::get('verif/dashboard', [DashboardVerifController::class, 'index'])->name('verif.dashboard');
+
+        Route::get('verif/surat-masuk', function() {
+            return Inertia::render('Staf/SuratMasuk');
+        });
     });
 });
 
