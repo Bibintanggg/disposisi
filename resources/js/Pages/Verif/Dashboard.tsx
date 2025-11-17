@@ -49,28 +49,24 @@ export default function Dashboard() {
 
     return (
         <Authenticated>
-            <div className="flex h-screen overflow-hidden bg-[#fafafa]">
-                {/* Main Content */}
+            <div className="flex h-screen overflow-hidden bg-white">
                 <div className="flex-1 overflow-y-auto">
                     <div className="p-8 space-y-8">
-                        {/* Header */}
                         <div className="flex items-center justify-between">
                             <div>
-                                <h1 className="text-4xl font-bold text-white mb-2">Dashboard</h1>
+                                <h1 className="text-4xl font-bold text-black mb-2">Dashboard</h1>
                                 <p className="text-gray-400 text-base">Real-time overview of your mail system</p>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="flex items-center gap-2 bg-[#1A1F2E] px-4 py-3 rounded-xl border border-gray-800">
+                                <div className="flex items-center gap-2 bg-[#fafafa] px-4 py-3 rounded-xl border ">
                                     <Calendar size={18} className="text-gray-400" />
                                     <span className="text-sm font-medium text-gray-300">Januari 2024</span>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Big Stats Cards */}
                         <div className="grid grid-cols-4 gap-6">
-                            {/* Surat Masuk */}
-                            <div className="bg-[#1A1F2E] rounded-2xl border border-gray-800 p-8 hover:border-blue-500 transition-all duration-300">
+                            <div className="bg-[#fafafa] rounded-2xl border  p-8 hover:border-blue-500 transition-all duration-300">
                                 <div className="flex items-start justify-between mb-6">
                                     <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center ring-2 ring-blue-500/20">
                                         <Mail className="text-blue-500" size={28} />
@@ -81,12 +77,11 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                                 <p className="text-gray-400 text-xs font-semibold mb-3 uppercase tracking-wider">Surat Masuk</p>
-                                <p className="text-5xl font-bold text-white mb-2">324</p>
+                                <p className="text-5xl font-bold text-black mb-2">324</p>
                                 <p className="text-sm text-gray-500">Total bulan ini</p>
                             </div>
 
-                            {/* Surat Keluar */}
-                            <div className="bg-[#1A1F2E] rounded-2xl border border-gray-800 p-8 hover:border-purple-500 transition-all duration-300">
+                            <div className="bg-[#fafafa] rounded-2xl border  p-8 hover:border-purple-500 transition-all duration-300">
                                 <div className="flex items-start justify-between mb-6">
                                     <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center ring-2 ring-purple-500/20">
                                         <Send className="text-purple-500" size={28} />
@@ -97,12 +92,11 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                                 <p className="text-gray-400 text-xs font-semibold mb-3 uppercase tracking-wider">Surat Keluar</p>
-                                <p className="text-5xl font-bold text-white mb-2">287</p>
+                                <p className="text-5xl font-bold text-black mb-2">287</p>
                                 <p className="text-sm text-gray-500">Total bulan ini</p>
                             </div>
 
-                            {/* Pending */}
-                            <div className="bg-[#1A1F2E] rounded-2xl border border-gray-800 p-8 hover:border-orange-500 transition-all duration-300">
+                            <div className="bg-[#fafafa] rounded-2xl border  p-8 hover:border-orange-500 transition-all duration-300">
                                 <div className="flex items-start justify-between mb-6">
                                     <div className="w-14 h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center ring-2 ring-orange-500/20">
                                         <Clock className="text-orange-500" size={28} />
@@ -113,12 +107,11 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                                 <p className="text-gray-400 text-xs font-semibold mb-3 uppercase tracking-wider">Pending</p>
-                                <p className="text-5xl font-bold text-white mb-2">23</p>
+                                <p className="text-5xl font-bold text-black mb-2">23</p>
                                 <p className="text-sm text-gray-500">Perlu verifikasi</p>
                             </div>
 
-                            {/* Terverifikasi */}
-                            <div className="bg-[#1A1F2E] rounded-2xl border border-gray-800 p-8 hover:border-emerald-500 transition-all duration-300">
+                            <div className="bg-[#fafafa] rounded-2xl border  p-8 hover:border-emerald-500 transition-all duration-300">
                                 <div className="flex items-start justify-between mb-6">
                                     <div className="w-14 h-14 bg-emerald-500/10 rounded-2xl flex items-center justify-center ring-2 ring-emerald-500/20">
                                         <CheckCircle className="text-emerald-500" size={28} />
@@ -129,28 +122,26 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                                 <p className="text-gray-400 text-xs font-semibold mb-3 uppercase tracking-wider">Terverifikasi</p>
-                                <p className="text-5xl font-bold text-white mb-2">588</p>
+                                <p className="text-5xl font-bold text-black mb-2">588</p>
                                 <p className="text-sm text-gray-500">Total bulan ini</p>
                             </div>
                         </div>
 
-                        {/* Charts Section */}
                         <div className="grid grid-cols-3 gap-6">
-                            {/* Main Chart */}
-                            <div className="col-span-2 bg-[#1A1F2E] rounded-2xl border border-gray-800 p-8">
+                            <div className="col-span-2 bg-[#fafafa] rounded-2xl border  p-8">
                                 <div className="flex items-center justify-between mb-8">
                                     <div>
-                                        <h3 className="text-2xl font-bold text-white">Volume Surat</h3>
+                                        <h3 className="text-2xl font-bold text-black">Volume Surat</h3>
                                         <p className="text-gray-400 mt-2">7 bulan terakhir</p>
                                     </div>
                                     <div className="flex gap-2">
-                                        <button className="px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg">
+                                        <button className="px-4 py-2 bg-blue-500 text-black text-sm font-semibold rounded-lg">
                                             7D
                                         </button>
-                                        <button className="px-4 py-2 bg-[#0F1419] text-gray-400 text-sm font-semibold rounded-lg hover:bg-gray-800">
+                                        <button className="px-4 py-2  bg-[#fafafa] text-gray-400 text-sm font-semibold rounded-lg">
                                             1M
                                         </button>
-                                        <button className="px-4 py-2 bg-[#0F1419] text-gray-400 text-sm font-semibold rounded-lg hover:bg-gray-800">
+                                        <button className="px-4 py-2  bg-[#fafafa] text-gray-400 text-sm font-semibold rounded-lg">
                                             3M
                                         </button>
                                     </div>
@@ -201,9 +192,9 @@ export default function Dashboard() {
                             </div>
 
                             {/* Distribution */}
-                            <div className="bg-[#1A1F2E] rounded-2xl border border-gray-800 p-8">
+                            <div className="bg-[#fafafa] rounded-2xl border  p-8">
                                 <div className="mb-8">
-                                    <h3 className="text-xl font-bold text-white">Distribusi Sifat</h3>
+                                    <h3 className="text-xl font-bold text-black">Distribusi Sifat</h3>
                                     <p className="text-gray-400 mt-1">Total 309 surat</p>
                                 </div>
                                 <div className="space-y-4">
@@ -215,11 +206,11 @@ export default function Dashboard() {
                                                     <span className="text-sm font-medium text-gray-300">{item.name}</span>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-lg font-bold text-white">{item.value}</p>
+                                                    <p className="text-lg font-bold text-black">{item.value}</p>
                                                     <p className="text-xs text-gray-500">{item.percentage}%</p>
                                                 </div>
                                             </div>
-                                            <div className="w-full bg-[#0F1419] rounded-full h-2.5 overflow-hidden">
+                                            <div className="w-full  bg-[#fafafa] rounded-full h-2.5 overflow-hidden">
                                                 <div 
                                                     className="h-2.5 rounded-full transition-all duration-500" 
                                                     style={{ 
@@ -235,10 +226,10 @@ export default function Dashboard() {
                         </div>
 
                         {/* Verifikasi Chart */}
-                        <div className="bg-[#1A1F2E] rounded-2xl border border-gray-800 p-8">
+                        <div className="bg-[#fafafa] rounded-2xl border  p-8">
                             <div className="flex items-center justify-between mb-8">
                                 <div>
-                                    <h3 className="text-2xl font-bold text-white">Aktivitas Verifikasi</h3>
+                                    <h3 className="text-2xl font-bold text-black">Aktivitas Verifikasi</h3>
                                     <p className="text-gray-400 mt-2">7 hari terakhir</p>
                                 </div>
                             </div>
@@ -278,41 +269,41 @@ export default function Dashboard() {
                 </div>
 
                 {/* Right Sidebar */}
-                <div className="w-96 bg-[#1A1F2E] border-l border-gray-800 flex flex-col overflow-y-auto">
+                <div className="w-96 bg-[#fafafa] border-l  flex flex-col overflow-y-auto">
                     {/* Performance */}
-                    <div className="p-6 border-b border-gray-800">
+                    <div className="p-6 border-b ">
                         <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-6">System Performance</h4>
                         <div className="space-y-4">
-                            <div className="bg-[#0F1419] rounded-xl p-5 border border-gray-800">
+                            <div className=" bg-[#fafafa] rounded-xl p-5 border ">
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-sm text-gray-400">Response Time</span>
                                     <Zap className="text-blue-500" size={18} />
                                 </div>
-                                <p className="text-3xl font-bold text-white">2.4h</p>
+                                <p className="text-3xl font-bold text-black">2.4h</p>
                                 <div className="flex items-center gap-1 mt-2">
                                     <ArrowDown size={12} className="text-green-500" strokeWidth={3} />
                                     <span className="text-xs text-green-500 font-semibold">12% faster</span>
                                 </div>
                             </div>
 
-                            <div className="bg-[#0F1419] rounded-xl p-5 border border-gray-800">
+                            <div className=" bg-[#fafafa] rounded-xl p-5 border ">
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-sm text-gray-400">Approval Rate</span>
                                     <Target className="text-emerald-500" size={18} />
                                 </div>
-                                <p className="text-3xl font-bold text-white">96.2%</p>
+                                <p className="text-3xl font-bold text-black">96.2%</p>
                                 <div className="flex items-center gap-1 mt-2">
                                     <ArrowUp size={12} className="text-green-500" strokeWidth={3} />
                                     <span className="text-xs text-green-500 font-semibold">+2.4%</span>
                                 </div>
                             </div>
 
-                            <div className="bg-[#0F1419] rounded-xl p-5 border border-gray-800">
+                            <div className=" bg-[#fafafa] rounded-xl p-5 border ">
                                 <div className="flex items-center justify-between mb-2">
                                     <span className="text-sm text-gray-400">Active Users</span>
                                     <Users className="text-purple-500" size={18} />
                                 </div>
-                                <p className="text-3xl font-bold text-white">156</p>
+                                <p className="text-3xl font-bold text-black">156</p>
                                 <div className="flex items-center gap-1 mt-2">
                                     <Minus size={12} className="text-gray-500" strokeWidth={3} />
                                     <span className="text-xs text-gray-500 font-semibold">No change</span>
@@ -322,7 +313,7 @@ export default function Dashboard() {
                     </div>
 
                     {/* Top Bidang */}
-                    <div className="p-6 border-b border-gray-800">
+                    <div className="p-6 border-b ">
                         <div className="flex items-center justify-between mb-6">
                             <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Top Departments</h4>
                             <Button variant="ghost" size="sm" className="text-xs text-blue-500 hover:text-blue-400 h-auto p-0">
@@ -331,14 +322,14 @@ export default function Dashboard() {
                         </div>
                         <div className="space-y-3">
                             {topBidangData.map((bidang, index) => (
-                                <div key={index} className="bg-[#0F1419] rounded-xl p-4 border border-gray-800 hover:border-gray-700 transition-colors">
+                                <div key={index} className=" bg-[#fafafa] rounded-xl p-4 border  hover:border-gray-700 transition-colors">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
                                                 <span className="text-sm font-bold text-blue-500">#{index + 1}</span>
                                             </div>
                                             <div>
-                                                <p className="text-sm font-semibold text-white">{bidang.bidang}</p>
+                                                <p className="text-sm font-semibold text-black">{bidang.bidang}</p>
                                                 <p className="text-xs text-gray-500">{bidang.total} surat</p>
                                             </div>
                                         </div>
@@ -368,7 +359,7 @@ export default function Dashboard() {
                         </div>
                         <div className="space-y-3">
                             {recentSurat.map((surat) => (
-                                <div key={surat.id} className="bg-[#0F1419] rounded-xl p-4 border border-gray-800 hover:border-gray-700 transition-colors">
+                                <div key={surat.id} className=" bg-[#fafafa] rounded-xl p-4 border  hover:border-gray-700 transition-colors">
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex items-center gap-2">
                                             <span className={`px-2 py-1 rounded-md text-xs font-bold ${
@@ -378,7 +369,7 @@ export default function Dashboard() {
                                             }`}>
                                                 {surat.jenis === 'masuk' ? 'IN' : 'OUT'}
                                             </span>
-                                            <p className="text-sm font-bold text-white">{surat.nomor}</p>
+                                            <p className="text-sm font-bold text-black">{surat.nomor}</p>
                                         </div>
                                         <span className="text-xs text-gray-500 font-medium">{surat.waktu}</span>
                                     </div>
