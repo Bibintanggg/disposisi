@@ -45,12 +45,25 @@ Route::middleware(['auth', 'verified'])->group(function() {
     Route::middleware(['jabatan:'.Jabatan::VERIFIKATOR->value])->group(function() {
         Route::get('verif/dashboard', [DashboardVerifController::class, 'index'])->name('verif.dashboard');
 
-        Route::get('verif/surat-masuk', function() {
-            return Inertia::render('Staf/SuratMasuk');
+        Route::get('verif/input-surat-masuk', function() {
+            return Inertia::render('Verif/SuratMasuk');
+        });
+        
+        
+        Route::get('verif/daftar-surat-masuk', function() {
+            return Inertia::render('Verif/DaftarSuratMasuk');
+        });
+        
+        Route::get('verif/daftar-surat-keluar', function() {
+            return Inertia::render('Verif/DaftarSuratKeluar');
         });
 
-        Route::get('verif/daftar-surat-masuk', function() {
-            return Inertia::render('Staf/DaftarSuratMasuk');
+        Route::get('verif/input-surat-keluar', function() {
+            return Inertia::render('Verif/SuratKeluar');
+        });
+
+        Route::get('verif/cetak-verifikasi', function() {
+            return Inertia::render('Verif/CetakVerifikasi');
         });
     });
 });

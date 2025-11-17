@@ -120,10 +120,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           title: 'Surat Keluar', url: '/verif/surat-masuk', icon: Book, items:
             [
               { title: "Input Surat Keluar", url: "/verif/input-surat-keluar" },
-              { title: "Daftar Surat Keluar", url: "/verif/surat-keluar" },
+              { title: "Daftar Surat Keluar", url: "/verif/daftar-surat-keluar" },
             ]
         },
-        { title: 'Cetak & Verifikasi', url: '/verif/cetak', icon: Monitor },
+        { title: 'Cetak & Verifikasi', url: '/verif/cetak-verifikasi', icon: Monitor },
       ]
     }
     return []
