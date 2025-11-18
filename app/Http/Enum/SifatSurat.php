@@ -18,4 +18,14 @@ enum SifatSurat: int
             self::SEGERA => "Segera"
         };
     }
+
+    public static function options(): array 
+    {
+        return [
+            self::BIASA->value => self::BIASA->label(),
+            self::PENTING->value => self::PENTING->label(),
+            self::RAHASIA->value => self::RAHASIA->label(),
+            self::SEGERA->value => self::SEGERA->label()
+        ];
+    }
 }

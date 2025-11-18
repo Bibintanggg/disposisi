@@ -6,6 +6,7 @@ use App\Http\Controllers\Kepala\DashboardKepalaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Staf\DashboardStafController;
 use App\Http\Controllers\Verif\DashboardVerifController;
+use App\Http\Controllers\Verif\SuratMasukController;
 use App\Http\Enum\Jabatan;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -44,11 +45,8 @@ Route::middleware(['auth', 'verified'])->group(function() {
 
     Route::middleware(['jabatan:'.Jabatan::VERIFIKATOR->value])->group(function() {
         Route::get('verif/dashboard', [DashboardVerifController::class, 'index'])->name('verif.dashboard');
-
-        Route::get('verif/input-surat-masuk', function() {
-            return Inertia::render('Verif/SuratMasuk');
-        });
-        
+        Route::get('verif/input-surat-masuk', [SuratMasukController::class, 'index'])->name('verif.input-surat-masuk');
+        Route::post('verif/input-surat-masuk', [SuratMasukController::class, 'store'])->name('verif.input-surat-masuk.store');
         
         Route::get('verif/daftar-surat-masuk', function() {
             return Inertia::render('Verif/DaftarSuratMasuk');

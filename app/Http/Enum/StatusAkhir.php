@@ -18,4 +18,14 @@ enum StatusAkhir: int
             self::ARSIP => "Arsip"
         };
     }
+
+    public static function options():array
+    {
+        return [
+            self::BARU->value => self::BARU->label(),
+            self::DISPOSISI->value => self::DISPOSISI->label(),
+            self::BARU->value => self::BARU->label(),
+            self::ARSIP->value => self::ARSIP->label(),
+        ];
+    }
 }
