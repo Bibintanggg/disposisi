@@ -344,7 +344,6 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                     </div>
                 </div>
 
-                {/* SIDEBAR LIST SURAT */}
                 <div className="w-96 bg-white border-l border-gray-200 flex flex-col">
                     <div className="p-6 border-b border-gray-200">
                         <h3 className="text-lg font-bold text-gray-900 mb-4">Surat Terakhir</h3>
@@ -358,7 +357,6 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                         </div>
                     </div>
 
-                    {/* LIST */}
                     <div className="flex-1 overflow-y-auto p-4">
                         <div className="space-y-2">
                             {surat.map((s) => {
@@ -409,7 +407,6 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                         </div>
                     </div>
 
-                    {/* PREVIEW */}
                     {selectedSurat && (
                         <div className="p-4 border-t border-gray-200">
                             <p className="text-xs font-bold text-gray-700 mb-3">Quick Preview</p>
@@ -417,7 +414,7 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Penginput:</span>
                                     <span className="font-bold text-gray-900">
-                                        {selectedSurat.users[0]?.nama_lengkap ?? "-"}
+                                        {selectedSurat.users?.nama_lengkap ?? "-"}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">

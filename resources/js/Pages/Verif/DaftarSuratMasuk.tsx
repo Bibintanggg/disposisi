@@ -10,84 +10,13 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { usePage } from "@inertiajs/react";
 
 export default function DaftarSuratMasuk() {
-    const [suratMasuk] = useState([
-        {
-            id: 1,
-            nomor_surat: "001/SM/2024",
-            tanggal_surat: "2024-01-15",
-            tanggal_terima: "2024-01-16T10:30:00",
-            pengirim: "Dinas Pendidikan Kota",
-            isi_surat: "Permohonan data siswa untuk keperluan akreditasi sekolah tahun 2024 yang akan dilaksanakan pada bulan Februari mendatang",
-            sifat_surat: 1,
-            status_akhir: 2,
-            gambar: "surat1.pdf",
-            user_input: "Ahmad Rizki"
-        },
-        {
-            id: 2,
-            nomor_surat: "002/SM/2024",
-            tanggal_surat: "2024-01-14",
-            tanggal_terima: "2024-01-15T14:20:00",
-            pengirim: "Kementerian Keuangan RI",
-            isi_surat: "Pemberitahuan pencairan dana BOS triwulan 1 tahun 2024 untuk seluruh sekolah negeri dan swasta",
-            sifat_surat: 3,
-            status_akhir: 3,
-            gambar: "surat2.pdf",
-            user_input: "Budi Santoso"
-        },
-        {
-            id: 3,
-            nomor_surat: "003/SM/2024",
-            tanggal_surat: "2024-01-16",
-            tanggal_terima: "2024-01-16T09:15:00",
-            pengirim: "Kepala Daerah",
-            isi_surat: "Undangan rapat koordinasi kepala sekolah se-kota untuk membahas program kerja tahun ajaran baru",
-            sifat_surat: 2,
-            status_akhir: 2,
-            gambar: null,
-            user_input: "Citra Dewi"
-        },
-        {
-            id: 4,
-            nomor_surat: "004/SM/2024",
-            tanggal_surat: "2024-01-12",
-            tanggal_terima: "2024-01-13T08:45:00",
-            pengirim: "Badan Kepegawaian Negara",
-            isi_surat: "Informasi kenaikan pangkat PNS periode Januari 2024 beserta persyaratan dan dokumen yang harus dilengkapi",
-            sifat_surat: 4,
-            status_akhir: 3,
-            gambar: "surat4.pdf",
-            user_input: "Diana Putri"
-        },
-        {
-            id: 5,
-            nomor_surat: "005/SM/2024",
-            tanggal_surat: "2024-01-17",
-            tanggal_terima: "2024-01-17T11:00:00",
-            pengirim: "Inspektorat Jenderal",
-            isi_surat: "Pemberitahuan audit internal untuk periode semester 1 tahun 2024",
-            sifat_surat: 2,
-            status_akhir: 1,
-            gambar: "surat5.pdf",
-            user_input: "Eko Prasetyo"
-        },
-        {
-            id: 6,
-            nomor_surat: "006/SM/2024",
-            tanggal_surat: "2024-01-10",
-            tanggal_terima: "2024-01-11T15:30:00",
-            pengirim: "Dinas Kesehatan",
-            isi_surat: "Sosialisasi program vaksinasi booster untuk tenaga pendidik",
-            sifat_surat: 1,
-            status_akhir: 2,
-            gambar: null,
-            user_input: "Fitri Handayani"
-        },
-    ]);
+    const { surat } = usePage().props
+    const [suratMasuk, setSuratMasuk] = useState(surat)
 
-    const [selectedSurat, setSelectedSurat] = useState(suratMasuk[0]);
+    const [selectedSurat, setSelectedSurat] = useState(surat?.[0] ?? null);
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
 
     const sifatSuratOptions = [
