@@ -7,7 +7,7 @@ use App\Http\Enum\StatusAkhir;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SuratMasuk extends Model
+class   SuratMasuk extends Model
 {
     use HasFactory;
     

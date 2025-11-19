@@ -1,5 +1,5 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Mail, Search, Filter, Download, Eye, Edit2, Trash2, MoreVertical, Calendar, User, FileText, AlertCircle, Clock, CheckCircle, XCircle, Paperclip, SlidersHorizontal, Grid3X3, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,14 +10,31 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { usePage } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
+import { SuratMasuk } from "@/types/surat-masuk";
 
-export default function DaftarSuratMasuk() {
-    const { surat } = usePage().props
+interface DaftarSuratMasukProps {
+    surat: SuratMasuk[]
+}
+
+export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
     const [suratMasuk, setSuratMasuk] = useState(surat)
+    const [search, setSearch] = useState('')
 
     const [selectedSurat, setSelectedSurat] = useState(surat?.[0] ?? null);
-    const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
+    const [viewMode, setViewMode] = useState('list');
+
+    const handleSearch = (e) => {
+        e.preventDefault();
+        router.get('/verif/daftar-surat-masuk', { nomor_surat: search }, {
+            preserveScroll: true,
+            preserveState: true
+        });
+    };
+
+    useEffect(() => {
+        setSuratMasuk(surat);
+    }, [surat]);
 
     const sifatSuratOptions = [
         { value: 1, label: 'Biasa', color: 'bg-gray-500', textColor: 'text-gray-700', bgLight: 'bg-gray-100' },
@@ -31,6 +48,16 @@ export default function DaftarSuratMasuk() {
         { value: 2, label: 'Terkirim', icon: CheckCircle, color: 'text-green-600 bg-green-100' },
         { value: 3, label: 'Diproses', icon: AlertCircle, color: 'text-blue-600 bg-blue-100' }
     ];
+
+    const getJabatanRole = (jabatan: number) => {
+        switch (jabatan) {
+            case 1: return "ADMIN"
+            case 2: return "KEPALA"
+            case 3: return "STAF"
+            case 4: return "VERIFIKATOR"
+            default: "VERIFIKATOR"
+        }
+    }
 
     const getSifatInfo = (sifat) => {
         return sifatSuratOptions.find(s => s.value === sifat) || sifatSuratOptions[0];
@@ -118,10 +145,16 @@ export default function DaftarSuratMasuk() {
                         <div className="flex items-center gap-3">
                             <div className="flex-1 relative">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                                <Input
-                                    placeholder="Cari nomor surat, pengirim, atau isi surat..."
-                                    className="pl-10 h-11"
-                                />
+
+                                <form onSubmit={handleSearch}>
+
+                                    <Input
+                                        placeholder="Cari nomor surat, pengirim, atau isi surat..."
+                                        className="pl-10 h-11"
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                    />
+                                </form>
                             </div>
                             <Select defaultValue="all">
                                 <SelectTrigger className="w-40 h-11">
@@ -179,11 +212,10 @@ export default function DaftarSuratMasuk() {
                                     <div
                                         key={surat.id}
                                         onClick={() => setSelectedSurat(surat)}
-                                        className={`bg-white rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 group hover:shadow-lg ${
-                                            selectedSurat?.id === surat.id
-                                                ? 'border-blue-500 shadow-lg ring-4 ring-blue-50'
-                                                : 'border-gray-200 hover:border-gray-300'
-                                        }`}
+                                        className={`bg-white rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 group hover:shadow-lg ${selectedSurat?.id === surat.id
+                                            ? 'border-blue-500 shadow-lg ring-4 ring-blue-50'
+                                            : 'border-gray-200 hover:border-gray-300'
+                                            }`}
                                     >
                                         <div className="flex items-start gap-4">
                                             {/* Icon */}
@@ -347,11 +379,11 @@ export default function DaftarSuratMasuk() {
                                 <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Diinput Oleh</p>
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-sm font-bold text-white">
-                                        {selectedSurat.user_input.split(' ').map(n => n[0]).join('')}
+                                        {selectedSurat.users?.nama_lengkap.split(' ').map(n => n[0]).join('')}
                                     </div>
                                     <div>
-                                        <p className="text-sm font-semibold text-gray-900">{selectedSurat.user_input}</p>
-                                        <p className="text-xs text-gray-500">Administrator</p>
+                                        <p className="text-sm font-semibold text-gray-900">{selectedSurat.users?.nama_lengkap}</p>
+                                        <p className="text-xs text-gray-500">{getJabatanRole(selectedSurat.users?.jabatan)}</p>
                                     </div>
                                 </div>
                             </div>

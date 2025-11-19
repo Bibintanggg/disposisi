@@ -47,16 +47,14 @@ Route::middleware(['auth', 'verified'])->group(function() {
         Route::get('verif/dashboard', [DashboardVerifController::class, 'index'])->name('verif.dashboard');
         Route::get('verif/input-surat-masuk', [SuratMasukController::class, 'index'])->name('verif.input-surat-masuk');
         Route::post('verif/input-surat-masuk', [SuratMasukController::class, 'store'])->name('verif.input-surat-masuk.store');
-        
-        Route::get('verif/daftar-surat-masuk', function() {
-            return Inertia::render('Verif/DaftarSuratMasuk');
-        });
+
+        Route::get('verif/daftar-surat-masuk', [SuratMasukController::class, 'daftarSurat'])->name('verif.daftar-surat-masuk');
         
         Route::get('verif/daftar-surat-keluar', function() {
             return Inertia::render('Verif/DaftarSuratKeluar');
         });
 
-        Route::get('verif/input-surat-keluar', function() {
+        Route::get('verif/input-surat-keluar', action: function() {
             return Inertia::render('Verif/SuratKeluar');
         });
 
