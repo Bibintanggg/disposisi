@@ -12,6 +12,14 @@ import {
 } from "@/components/ui/select";
 import { router, usePage } from "@inertiajs/react";
 import { SuratMasuk } from "@/types/surat-masuk";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog";
 
 interface DaftarSuratMasukProps {
     surat: SuratMasuk[]
@@ -20,6 +28,10 @@ interface DaftarSuratMasukProps {
 export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
     const [suratMasuk, setSuratMasuk] = useState(surat)
     const [search, setSearch] = useState('')
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState<number | null>(null);
+    const [filterSifat, setFilterSifat] = useState('all');
+    const [filterStatus, setFilterStatus] = useState("all");
 
     const [selectedSurat, setSelectedSurat] = useState(surat?.[0] ?? null);
     const [viewMode, setViewMode] = useState('list');
@@ -35,6 +47,19 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
     useEffect(() => {
         setSuratMasuk(surat);
     }, [surat]);
+
+    useEffect(() => {
+        router.get('/verif/daftar-surat-masuk', {
+            nomor_surat: search,
+            sifat: filterSifat,
+            status: filterStatus,
+        }, {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        });
+    }, [filterSifat, filterStatus]);
+
 
     const sifatSuratOptions = [
         { value: 1, label: 'Biasa', color: 'bg-gray-500', textColor: 'text-gray-700', bgLight: 'bg-gray-100' },
@@ -58,6 +83,18 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
             default: "VERIFIKATOR"
         }
     }
+
+    const handleDelete = () => {
+        if (!deleteId) return;
+
+        router.delete(`/verif/daftar-surat-masuk/${deleteId}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setDeleteModalOpen(false);
+                setSelectedSurat(null);
+            }
+        });
+    };
 
     const getSifatInfo = (sifat) => {
         return sifatSuratOptions.find(s => s.value === sifat) || sifatSuratOptions[0];
@@ -105,12 +142,12 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                                 </div>
                             </div>
 
-                            <div className="flex gap-2">
+                            {/* <div className="flex gap-2">
                                 <Button variant="outline" size="lg" className="gap-2">
                                     <Download size={18} />
                                     Export
                                 </Button>
-                            </div>
+                            </div> */}
                         </div>
 
                         {/* Stats */}
@@ -156,7 +193,10 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                                     />
                                 </form>
                             </div>
-                            <Select defaultValue="all">
+                            <Select
+                                value={filterSifat}
+                                onValueChange={(value) => setFilterSifat(value)}
+                            >
                                 <SelectTrigger className="w-40 h-11">
                                     <SelectValue placeholder="Sifat Surat" />
                                 </SelectTrigger>
@@ -168,7 +208,11 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                                     <SelectItem value="4">Rahasia</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <Select defaultValue="all">
+
+                            <Select
+                                value={filterStatus}
+                                onValueChange={(value) => setFilterStatus(value)}
+                            >
                                 <SelectTrigger className="w-40 h-11">
                                     <SelectValue placeholder="Status" />
                                 </SelectTrigger>
@@ -179,24 +223,6 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                                     <SelectItem value="3">Diproses</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <div className="flex gap-1 border border-gray-200 rounded-lg p-1">
-                                <Button
-                                    variant={viewMode === 'list' ? 'default' : 'ghost'}
-                                    size="sm"
-                                    onClick={() => setViewMode('list')}
-                                    className="h-9 w-9 p-0"
-                                >
-                                    <List size={16} />
-                                </Button>
-                                <Button
-                                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                                    size="sm"
-                                    onClick={() => setViewMode('grid')}
-                                    className="h-9 w-9 p-0"
-                                >
-                                    <Grid3X3 size={16} />
-                                </Button>
-                            </div>
                         </div>
                     </div>
 
@@ -291,10 +317,15 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-bold text-gray-900">Detail Surat</h3>
                                 <div className="flex gap-1">
-                                    <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
-                                        <Edit2 size={16} />
-                                    </Button>
-                                    <Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                        onClick={() => {
+                                            setDeleteId(selectedSurat.id);
+                                            setDeleteModalOpen(true);
+                                        }}
+                                    >
                                         <Trash2 size={16} />
                                     </Button>
                                 </div>
@@ -326,6 +357,33 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                             </div>
                         </div>
 
+                        <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+                            <DialogContent className="max-w-sm">
+                                <DialogHeader>
+                                    <DialogTitle>Hapus Surat?</DialogTitle>
+                                    <DialogDescription>
+                                        Surat yang dihapus tidak dapat dikembalikan. Yakin ingin melanjutkan?
+                                    </DialogDescription>
+                                </DialogHeader>
+
+                                <DialogFooter>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setDeleteModalOpen(false)}
+                                    >
+                                        Batal
+                                    </Button>
+
+                                    <Button
+                                        variant="destructive"
+                                        onClick={handleDelete}
+                                    >
+                                        Hapus
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+
                         {/* Content */}
                         <div className="flex-1 overflow-y-auto p-6 space-y-6">
                             <div>
@@ -350,12 +408,21 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                                 </div>
                             </div>
 
-                            <div>
-                                <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Isi/Perihal Surat</p>
-                                <p className="text-sm text-gray-700 leading-relaxed">
-                                    {selectedSurat.isi_surat}
-                                </p>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Isi/Perihal Surat</p>
+                                    <p className="text-sm text-gray-700 leading-relaxed">
+                                        {selectedSurat.isi_surat}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Sifat Surat</p>
+                                    <p className="text-sm text-gray-700 leading-relaxed">
+                                        {getSifatInfo(selectedSurat.sifat_surat).label}
+                                    </p>
+                                </div>
                             </div>
+
 
                             {selectedSurat.gambar && (
                                 <div>
@@ -368,7 +435,12 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                                             <p className="text-sm font-semibold text-gray-900">{selectedSurat.gambar}</p>
                                             <p className="text-xs text-gray-500">PDF Document</p>
                                         </div>
-                                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => window.location.href = `/surat/download/${selectedSurat.id}`}
+                                            className="h-9 w-9 p-0"
+                                        >
                                             <Download size={16} />
                                         </Button>
                                     </div>
