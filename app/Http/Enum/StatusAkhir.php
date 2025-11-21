@@ -28,4 +28,5 @@ enum StatusAkhir: int
             self::ARSIP->value => self::ARSIP->label(),
         ];
     }
+    
 }
