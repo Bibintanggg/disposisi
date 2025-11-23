@@ -1,6 +1,6 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { useState } from "react";
-import { Send, Upload, Calendar, User, FileText, AlertCircle, Clock, CheckCircle, XCircle, Search, MoreHorizontal, Paperclip, Eye, Building2, PenTool, ArrowUpRight } from "lucide-react";
+import { Send, Upload, Calendar, FileText, AlertCircle, Clock, CheckCircle, XCircle, Search, MoreHorizontal, Paperclip, Eye, Building2, PenTool, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,67 +12,31 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useForm, usePage } from "@inertiajs/react";
+import { SuratKeluarProps } from "@/types/surat-keluar";
+import { User } from "@/types/user";
 
-export default function SuratKeluar() {
-    const [suratKeluar] = useState([
-        {
-            id: 1,
-            nomor_surat: "001/SK/2024",
-            tanggal_surat: "2024-01-15",
-            tanggal_kirim: "2024-01-16T10:30:00",
-            penerima: "Kementerian Pendidikan dan Kebudayaan",
-            isi_surat: "Laporan pelaksanaan program literasi sekolah tahun ajaran 2023/2024",
-            unit_pengirim: {
-                id: 1,
-                nama: "IT & Development"
-            },
-            user_penanda_tangan: {
-                id: 1,
-                nama: "Dr. Ahmad Rizki, M.Pd",
-                jabatan: "Kepala Sekolah"
-            },
-            status_arsip: 2,
-            gambar: "surat1.pdf"
-        },
-        {
-            id: 2,
-            nomor_surat: "002/SK/2024",
-            tanggal_surat: "2024-01-14",
-            tanggal_kirim: "2024-01-15T14:20:00",
-            penerima: "Dinas Pendidikan Provinsi",
-            isi_surat: "Permohonan bantuan sarana dan prasarana laboratorium komputer",
-            unit_pengirim: {
-                id: 2,
-                nama: "Human Resources"
-            },
-            user_penanda_tangan: {
-                id: 2,
-                nama: "Budi Santoso, S.Kom",
-                jabatan: "Wakil Kepala Sekolah"
-            },
-            status_arsip: 2,
-            gambar: "surat2.pdf"
-        },
-        {
-            id: 3,
-            nomor_surat: "003/SK/2024",
-            tanggal_surat: "2024-01-16",
-            tanggal_kirim: "2024-01-16T09:15:00",
-            penerima: "Badan Akreditasi Nasional",
-            isi_surat: "Pengajuan perpanjangan masa berlaku akreditasi sekolah",
-            unit_pengirim: {
-                id: 1,
-                nama: "IT & Development"
-            },
-            user_penanda_tangan: {
-                id: 1,
-                nama: "Dr. Ahmad Rizki, M.Pd",
-                jabatan: "Kepala Sekolah"
-            },
-            status_arsip: 1,
-            gambar: null
-        },
-    ]);
+interface SuratKeluarPageProps {
+    suratKeluar: SuratKeluarProps[]
+    auth: {
+        user: User
+    }
+}
+
+export default function SuratKeluar({ suratKeluar, auth }: SuratKeluarPageProps) {
+    const { user } = auth
+
+    const { data, setData, post, processing, errors, reset } = useForm({
+        unit_pengirim_id: user.bidang?.id || 0,
+        user_penanda_tangan_id: user.id || 0,
+        nomor_surat: '',
+        tanggal_surat: '',
+        penerima: '',
+        isi_surat: '',
+        gambar: '',
+        tanggal_kirim: '',
+        status_arsip: 1
+    })
 
     const [selectedSurat, setSelectedSurat] = useState(suratKeluar[0]);
 
@@ -135,7 +99,7 @@ export default function SuratKeluar() {
                                     </div>
                                     <h2 className="text-2xl font-bold text-gray-900">Form Input Surat Keluar</h2>
                                 </div>
-                                
+
                                 <div className="space-y-6">
                                     <div className="grid grid-cols-2 gap-6">
                                         <div className="space-y-3">
@@ -146,6 +110,8 @@ export default function SuratKeluar() {
                                                 id="nomor_surat"
                                                 placeholder="Contoh: 001/SK/2024"
                                                 className="h-12 text-base"
+                                                value={data.nomor_surat}
+                                                onChange={(e) => setData("nomor_surat", e.target.value)}
                                             />
                                         </div>
 
@@ -157,6 +123,8 @@ export default function SuratKeluar() {
                                                 id="penerima"
                                                 placeholder="Nama instansi/perorangan penerima"
                                                 className="h-12 text-base"
+                                                value={data.penerima}
+                                                onChange={(e) => setData("penerima", e.target.value)}
                                             />
                                         </div>
                                     </div>
@@ -166,7 +134,10 @@ export default function SuratKeluar() {
                                             <Label htmlFor="unit_pengirim" className="text-sm font-semibold text-gray-700">
                                                 Unit Pengirim <span className="text-red-500">*</span>
                                             </Label>
-                                            <Select>
+                                            <Select
+                                                value={String(data.unit_pengirim_id)}
+                                                onValueChange={(value) => setData("unit_pengirim_id", Number(value))}
+                                            >
                                                 <SelectTrigger className="h-12 text-base">
                                                     <SelectValue placeholder="Pilih unit pengirim" />
                                                 </SelectTrigger>
@@ -177,6 +148,7 @@ export default function SuratKeluar() {
                                                     <SelectItem value="4">Marketing</SelectItem>
                                                 </SelectContent>
                                             </Select>
+
                                         </div>
 
                                         <div className="space-y-3">
@@ -205,6 +177,8 @@ export default function SuratKeluar() {
                                                 id="tanggal_surat"
                                                 type="date"
                                                 className="h-12 text-base"
+                                                value={data.tanggal_surat}
+                                                onChange={(e) => setData("tanggal_surat", e.target.value)}
                                             />
                                         </div>
 
@@ -216,6 +190,8 @@ export default function SuratKeluar() {
                                                 id="tanggal_kirim"
                                                 type="datetime-local"
                                                 className="h-12 text-base"
+                                                value={data.tanggal_kirim}
+                                                onChange={(e) => setData("tanggal_kirim", e.target.value)}
                                             />
                                         </div>
                                     </div>
@@ -226,10 +202,13 @@ export default function SuratKeluar() {
                                         </Label>
                                         <Textarea
                                             id="isi_surat"
-                                            placeholder="Tuliskan isi atau perihal surat secara singkat dan jelas..."
+                                            placeholder="Tuliskan isi atau perihal surat..."
                                             rows={5}
                                             className="resize-none text-base"
+                                            value={data.isi_surat}
+                                            onChange={(e) => setData("isi_surat", e.target.value)}
                                         />
+
                                     </div>
 
                                     <div className="space-y-3">
@@ -285,7 +264,7 @@ export default function SuratKeluar() {
                 <div className="w-96 bg-white border-l border-gray-200 flex flex-col">
                     <div className="p-6 border-b border-gray-200 bg-gradient-to-b from-gray-50 to-white">
                         <h3 className="text-lg font-bold text-gray-900 mb-4">Surat Terakhir</h3>
-                        
+
                         <div className="relative">
                             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                             <Input
@@ -300,16 +279,15 @@ export default function SuratKeluar() {
                             {suratKeluar.map((surat) => {
                                 const statusInfo = getStatusArsipInfo(surat.status_arsip);
                                 const StatusIcon = statusInfo.icon;
-                                
+
                                 return (
                                     <div
                                         key={surat.id}
                                         onClick={() => setSelectedSurat(surat)}
-                                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 group ${
-                                            selectedSurat?.id === surat.id
-                                                ? 'border-purple-500 bg-purple-50 shadow-md'
-                                                : 'border-gray-200 hover:border-gray-300 hover:shadow-sm bg-white'
-                                        }`}
+                                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 group ${selectedSurat?.id === surat.id
+                                            ? 'border-purple-500 bg-purple-50 shadow-md'
+                                            : 'border-gray-200 hover:border-gray-300 hover:shadow-sm bg-white'
+                                            }`}
                                     >
                                         <div className="flex items-start justify-between mb-2">
                                             <div className="flex-1">

@@ -1,4 +1,4 @@
-import { User } from "."
+import { User } from "./user"
 
 export interface SuratMasuk {
     id: number
