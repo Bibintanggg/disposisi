@@ -37,7 +37,7 @@ class SuratKeluarRequest extends FormRequest
             'tanggal_surat' => ['required', 'date'],
             'penerima' => ['required', 'string'],
             'isi_surat' => ['required', 'string'],
-            'gambar' => ['nullable', 'file', 'mimes: pdf', 'max:5120'],
+            'gambar' => ['nullable', 'file', 'mimes:pdf', 'max:5120'],
             'tanggal_kirim' => ['required', 'date'],
             'status_arsip' => ['required', 'integer', Rule::in($statusArsip)]
         ];

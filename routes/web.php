@@ -6,6 +6,7 @@ use App\Http\Controllers\Kepala\DashboardKepalaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Staf\DashboardStafController;
 use App\Http\Controllers\Verif\DashboardVerifController;
+use App\Http\Controllers\Verif\SuratKeluarController;
 use App\Http\Controllers\Verif\SuratMasukController;
 use App\Http\Enum\Jabatan;
 use Illuminate\Foundation\Application;
@@ -54,14 +55,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/surat/download/{id}', [SuratMasukController::class, 'download'])
             ->name('surat.download');
 
+        Route::get('verif/input-surat-keluar', [SuratKeluarController::class, 'index'])->name('verif.surat-keluar');
+        Route::post('verif/input-surat-keluar', [SuratKeluarController::class, 'store'])->name('verif.surat-keluar.store');
+        Route::get('verif/surat-keluar/file/{filename}', [SuratKeluarController::class, 'previewFile'])
+        ->name('verif.surat-keluar.file');
 
         Route::get('verif/daftar-surat-keluar', function () {
             return Inertia::render('Verif/DaftarSuratKeluar');
         });
 
-        Route::get('verif/input-surat-keluar', action: function () {
-            return Inertia::render('Verif/SuratKeluar');
-        });
 
         Route::get('verif/cetak-verifikasi', function () {
             return Inertia::render('Verif/CetakVerifikasi');

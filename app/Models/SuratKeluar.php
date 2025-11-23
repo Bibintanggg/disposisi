@@ -28,12 +28,12 @@ class SuratKeluar extends Model
         'status_arsip' => StatusArsip::class
     ];
 
-    public function unitPengirim() 
+    public function unit_pengirim() 
     {
         return $this->belongsTo(Bidang::class, 'unit_pengirim_id');
     }
 
-    public function penandaTangan()
+    public function user_penanda_tangan()
     {
         return $this->belongsTo(User::class, 'user_penanda_tangan_id');
     }
