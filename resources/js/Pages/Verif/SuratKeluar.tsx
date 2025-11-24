@@ -12,7 +12,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { useForm, usePage } from "@inertiajs/react";
+import { router, useForm, usePage } from "@inertiajs/react";
 import { SuratKeluarProps } from "@/types/surat-keluar";
 import { User } from "@/types/user";
 import { Bidang } from "@/types/bidang";
@@ -28,6 +28,9 @@ interface SuratKeluarPageProps {
 
 export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: SuratKeluarPageProps) {
     const { user } = auth
+    const { filters } = usePage().props
+
+    const [search, setSearch] = useState('')
 
     const { data, setData, post, processing, errors, reset } = useForm({
         unit_pengirim_id: user.bidang?.id || 0,
@@ -81,7 +84,7 @@ export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: Surat
 
     return (
         <Authenticated>
-            <div className="flex h-screen overflow-hidden bg-gray-50">
+            <div className="flex min-h-screen overflow-hidden bg-gray-50">
                 <div className="flex-1 flex flex-col overflow-hidden">
                     <div className="bg-white border-b border-gray-200 p-6">
                         <div className="flex items-center justify-between mb-6">
@@ -358,7 +361,17 @@ export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: Surat
                             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                             <Input
                                 placeholder="Cari nomor/penerima..."
+                                value={search}
                                 className="pl-10 bg-white border-gray-200 h-11 rounded-xl"
+                                onChange={(e) => {
+                                    setSearch(e.target.value)
+                                    router.get(route('verif.surat-keluar.search'), {
+                                        search: e.target.value
+                                    }, {
+                                        preserveState: true,
+                                        replace: true
+                                    })
+                                }}
                             />
                         </div>
                     </div>

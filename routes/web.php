@@ -59,11 +59,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('verif/input-surat-keluar', [SuratKeluarController::class, 'store'])->name('verif.surat-keluar.store');
         Route::get('verif/surat-keluar/file/{filename}', [SuratKeluarController::class, 'previewFile'])
         ->name('verif.surat-keluar.file');
-
-        Route::get('verif/daftar-surat-keluar', function () {
-            return Inertia::render('Verif/DaftarSuratKeluar');
-        });
-
+        Route::get('verif/input-surat-keluar', [SuratKeluarController::class, 'suratTerakhir'])->name('verif.surat-keluar.search');
+        
+        Route::get('verif/daftar-surat-keluar', [SuratKeluarController::class, 'daftarSuratKeluar'])->name('verif.daftar-surat-keluar');
 
         Route::get('verif/cetak-verifikasi', function () {
             return Inertia::render('Verif/CetakVerifikasi');
