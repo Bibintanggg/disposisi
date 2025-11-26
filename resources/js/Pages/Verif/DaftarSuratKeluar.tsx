@@ -47,6 +47,16 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
         });
     };
 
+    const getJabatanRole = (jabatan: number) => {
+        switch (jabatan) {
+            case 1 : return "ADMIN"
+            case 2 : return "KEPALA"
+            case 3 : return "STAF"
+            case 4 : return "VERIFIKATOR"
+            default: return "STAF"
+        }
+    }
+
     const formatDateTime = (dateString) => {
         if (!dateString) return '-';
         return new Date(dateString).toLocaleString('id-ID', {
@@ -288,9 +298,6 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                             <div className="flex items-center justify-between mb-4">
                                 <h3 className="text-lg font-bold text-gray-900">Detail Surat</h3>
                                 <div className="flex gap-1">
-                                    <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
-                                        <Edit2 size={16} />
-                                    </Button>
                                     <Button
                                         variant="ghost"
                                         size="sm"
@@ -351,7 +358,7 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                                         </div>
                                         <div>
                                             <p className="text-sm font-semibold text-gray-900">{selectedSurat.user_penanda_tangan.nama_lengkap}</p>
-                                            <p className="text-xs text-gray-500">{selectedSurat.user_penanda_tangan.jabatan}</p>
+                                            <p className="text-xs text-gray-500">{getJabatanRole(selectedSurat.user_penanda_tangan.jabatan)}</p>
                                         </div>
                                     </div>
                                 </div>

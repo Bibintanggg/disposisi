@@ -18,107 +18,27 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs";
+import { usePage } from "@inertiajs/react";
+import { SuratKeluarProps } from "@/types/surat-keluar";
+import { SuratMasuk } from "@/types/surat-masuk";
 
 export default function CetakVerifikasi() {
-    const [suratList] = useState([
-        {
-            id: 1,
-            jenis: "masuk",
-            nomor_surat: "001/SM/2024",
-            tanggal_surat: "2024-01-15",
-            pengirim_penerima: "Dinas Pendidikan",
-            isi_surat: "Permohonan data siswa untuk keperluan akreditasi sekolah tahun 2024",
-            status_verifikasi: "pending", // pending, approved, rejected
-            status_cetak: "belum", // belum, sudah
-            diajukan_oleh: "Ahmad Rizki",
-            tanggal_pengajuan: "2024-01-16T10:30:00",
-            catatan_verifikasi: null,
-            diverifikasi_oleh: null,
-            tanggal_verifikasi: null,
-            dicetak_oleh: null,
-            tanggal_cetak: null
-        },
-        {
-            id: 2,
-            jenis: "keluar",
-            nomor_surat: "002/SK/2024",
-            tanggal_surat: "2024-01-14",
-            pengirim_penerima: "Kementerian Keuangan",
-            isi_surat: "Laporan pertanggungjawaban penggunaan dana BOS triwulan 1",
-            status_verifikasi: "approved",
-            status_cetak: "belum",
-            diajukan_oleh: "Budi Santoso",
-            tanggal_pengajuan: "2024-01-15T14:20:00",
-            catatan_verifikasi: "Dokumen lengkap, siap untuk dicetak",
-            diverifikasi_oleh: "Dr. Ahmad Rizki",
-            tanggal_verifikasi: "2024-01-15T15:00:00",
-            dicetak_oleh: null,
-            tanggal_cetak: null
-        },
-        {
-            id: 3,
-            jenis: "masuk",
-            nomor_surat: "003/SM/2024",
-            tanggal_surat: "2024-01-16",
-            pengirim_penerima: "Kepala Daerah",
-            isi_surat: "Undangan rapat koordinasi kepala sekolah se-kota",
-            status_verifikasi: "approved",
-            status_cetak: "sudah",
-            diajukan_oleh: "Citra Dewi",
-            tanggal_pengajuan: "2024-01-16T09:15:00",
-            catatan_verifikasi: "Approved untuk keperluan arsip",
-            diverifikasi_oleh: "Budi Santoso",
-            tanggal_verifikasi: "2024-01-16T10:00:00",
-            dicetak_oleh: "Diana Putri",
-            tanggal_cetak: "2024-01-16T11:30:00"
-        },
-        {
-            id: 4,
-            jenis: "keluar",
-            nomor_surat: "004/SK/2024",
-            tanggal_surat: "2024-01-12",
-            pengirim_penerima: "Badan Kepegawaian",
-            isi_surat: "Permohonan kenaikan pangkat PNS periode Januari 2024",
-            status_verifikasi: "rejected",
-            status_cetak: "belum",
-            diajukan_oleh: "Diana Putri",
-            tanggal_pengajuan: "2024-01-13T08:45:00",
-            catatan_verifikasi: "Dokumen lampiran kurang lengkap, mohon dilengkapi terlebih dahulu",
-            diverifikasi_oleh: "Dr. Ahmad Rizki",
-            tanggal_verifikasi: "2024-01-13T10:00:00",
-            dicetak_oleh: null,
-            tanggal_cetak: null
-        },
-        {
-            id: 5,
-            jenis: "masuk",
-            nomor_surat: "005/SM/2024",
-            tanggal_surat: "2024-01-17",
-            pengirim_penerima: "Inspektorat Jenderal",
-            isi_surat: "Pemberitahuan audit internal semester 1 tahun 2024",
-            status_verifikasi: "pending",
-            status_cetak: "belum",
-            diajukan_oleh: "Eko Prasetyo",
-            tanggal_pengajuan: "2024-01-17T11:00:00",
-            catatan_verifikasi: null,
-            diverifikasi_oleh: null,
-            tanggal_verifikasi: null,
-            dicetak_oleh: null,
-            tanggal_cetak: null
-        },
-    ]);
+    const { suratMasuk } = usePage().props
+    // console.log("suratMasuk:", suratMasuk);
 
-    const [selectedSurat, setSelectedSurat] = useState(suratList[0]);
+    const [selectedSurat, setSelectedSurat] = useState(
+        suratMasuk.length > 0 ? suratMasuk[0] : null
+    );
     const [activeTab, setActiveTab] = useState("pending");
     const [catatanVerifikasi, setCatatanVerifikasi] = useState("");
 
     const getStatusVerifikasiInfo = (status) => {
         const statusMap = {
-            pending: { label: "Menunggu Verifikasi", icon: Clock, color: "text-yellow-600 bg-yellow-100", badgeColor: "bg-yellow-500" },
-            approved: { label: "Terverifikasi", icon: CheckCircle2, color: "text-green-600 bg-green-100", badgeColor: "bg-green-500" },
-            rejected: { label: "Ditolak", icon: XCircle, color: "text-red-600 bg-red-100", badgeColor: "bg-red-500" }
+            PENDING: { label: "Menunggu Verifikasi", icon: Clock, color: "text-yellow-600 bg-yellow-100", badgeColor: "bg-yellow-500" },
+            TERVERIFIKASI: { label: "Terverifikasi", icon: CheckCircle2, color: "text-green-600 bg-green-100", badgeColor: "bg-green-500" },
+            DITOLAK: { label: "Ditolak", icon: XCircle, color: "text-red-600 bg-red-100", badgeColor: "bg-red-500" }
         };
-        return statusMap[status] || statusMap.pending;
+        return statusMap[status] || statusMap.PENDING;
     };
 
     const getStatusCetakInfo = (status) => {
@@ -129,13 +49,14 @@ export default function CetakVerifikasi() {
         return statusMap[status] || statusMap.belum;
     };
 
-    const filteredSurat = suratList.filter(surat => {
+    const filteredSurat = suratMasuk.filter((surat) => {
         if (activeTab === "pending") return surat.status_verifikasi === "pending";
         if (activeTab === "approved") return surat.status_verifikasi === "approved" && surat.status_cetak === "belum";
         if (activeTab === "printed") return surat.status_cetak === "sudah";
         if (activeTab === "rejected") return surat.status_verifikasi === "rejected";
         return true;
     });
+
 
     const formatDateTime = (dateString) => {
         if (!dateString) return "-";
@@ -185,25 +106,25 @@ export default function CetakVerifikasi() {
                             <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border border-yellow-200">
                                 <p className="text-xs font-medium text-yellow-600 mb-1">Menunggu Verifikasi</p>
                                 <p className="text-2xl font-bold text-yellow-900">
-                                    {suratList.filter(s => s.status_verifikasi === "pending").length}
+                                    {suratMasuk.filter(s => s.status_verifikasi === 1).length}
                                 </p>
                             </div>
                             <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4 border border-emerald-200">
                                 <p className="text-xs font-medium text-emerald-600 mb-1">Siap Cetak</p>
                                 <p className="text-2xl font-bold text-emerald-900">
-                                    {suratList.filter(s => s.status_verifikasi === "approved" && s.status_cetak === "belum").length}
+                                    {suratMasuk.filter(s => s.status_verifikasi === "approved" && s.status_cetak === "belum").length}
                                 </p>
                             </div>
                             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
                                 <p className="text-xs font-medium text-blue-600 mb-1">Sudah Dicetak</p>
                                 <p className="text-2xl font-bold text-blue-900">
-                                    {suratList.filter(s => s.status_cetak === "sudah").length}
+                                    {suratMasuk.filter(s => s.status_cetak === "sudah").length}
                                 </p>
                             </div>
                             <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border border-red-200">
                                 <p className="text-xs font-medium text-red-600 mb-1">Ditolak</p>
                                 <p className="text-2xl font-bold text-red-900">
-                                    {suratList.filter(s => s.status_verifikasi === "rejected").length}
+                                    {suratMasuk.filter(s => s.status_verifikasi === "rejected").length}
                                 </p>
                             </div>
                         </div>
@@ -272,16 +193,14 @@ export default function CetakVerifikasi() {
                                         <div
                                             key={surat.id}
                                             onClick={() => setSelectedSurat(surat)}
-                                            className={`bg-white rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 group hover:shadow-lg ${
-                                                selectedSurat?.id === surat.id
-                                                    ? 'border-emerald-500 shadow-lg ring-4 ring-emerald-50'
-                                                    : 'border-gray-200 hover:border-gray-300'
-                                            }`}
+                                            className={`bg-white rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 group hover:shadow-lg ${selectedSurat?.id === surat.id
+                                                ? 'border-emerald-500 shadow-lg ring-4 ring-emerald-50'
+                                                : 'border-gray-200 hover:border-gray-300'
+                                                }`}
                                         >
                                             <div className="flex items-start gap-4">
-                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                                                    surat.jenis === 'masuk' ? 'bg-blue-100' : 'bg-purple-100'
-                                                }`}>
+                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${surat.jenis === 'masuk' ? 'bg-blue-100' : 'bg-purple-100'
+                                                    }`}>
                                                     {surat.jenis === 'masuk' ? (
                                                         <Mail className="text-blue-600" size={20} />
                                                     ) : (
@@ -296,9 +215,8 @@ export default function CetakVerifikasi() {
                                                                 <h3 className="font-bold text-gray-900 text-base">
                                                                     {surat.nomor_surat}
                                                                 </h3>
-                                                                <span className={`px-2 py-0.5 rounded text-xs font-semibold text-white ${
-                                                                    surat.jenis === 'masuk' ? 'bg-blue-500' : 'bg-purple-500'
-                                                                }`}>
+                                                                <span className={`px-2 py-0.5 rounded text-xs font-semibold text-white ${surat.jenis === 'masuk' ? 'bg-blue-500' : 'bg-purple-500'
+                                                                    }`}>
                                                                     {surat.jenis === 'masuk' ? 'Masuk' : 'Keluar'}
                                                                 </span>
                                                             </div>
@@ -348,7 +266,7 @@ export default function CetakVerifikasi() {
                     <div className="w-96 bg-white border-l border-gray-200 flex flex-col">
                         <div className="p-6 border-b border-gray-200 bg-gradient-to-b from-gray-50 to-white">
                             <h3 className="text-lg font-bold text-gray-900 mb-4">Detail & Verifikasi</h3>
-                            
+
                             <div className="space-y-3">
                                 <div>
                                     <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Nomor Surat</p>
@@ -365,9 +283,8 @@ export default function CetakVerifikasi() {
                                             </span>
                                         );
                                     })()}
-                                    <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold text-white ${
-                                        selectedSurat.jenis === 'masuk' ? 'bg-blue-500' : 'bg-purple-500'
-                                    }`}>
+                                    <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold text-white ${selectedSurat.jenis === 'masuk' ? 'bg-blue-500' : 'bg-purple-500'
+                                        }`}>
                                         {selectedSurat.jenis === 'masuk' ? 'Surat Masuk' : 'Surat Keluar'}
                                     </span>
                                 </div>
@@ -405,9 +322,8 @@ export default function CetakVerifikasi() {
                                     <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Timeline Verifikasi</p>
                                     <div className="space-y-3">
                                         <div className="flex gap-3">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                                selectedSurat.status_verifikasi === 'approved' ? 'bg-green-100' : 'bg-red-100'
-                                            }`}>
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${selectedSurat.status_verifikasi === 'approved' ? 'bg-green-100' : 'bg-red-100'
+                                                }`}>
                                                 {selectedSurat.status_verifikasi === 'approved' ? (
                                                     <Check className="text-green-600" size={16} />
                                                 ) : (
@@ -469,17 +385,17 @@ export default function CetakVerifikasi() {
                         <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-3">
                             {selectedSurat.status_verifikasi === 'pending' && (
                                 <>
-                                    <Button 
-                                        size="lg" 
+                                    <Button
+                                        size="lg"
                                         className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700"
                                         onClick={handleApprove}
                                     >
                                         <Check size={18} />
                                         Setujui & Verifikasi
                                     </Button>
-                                    <Button 
-                                        size="lg" 
-                                        variant="outline" 
+                                    <Button
+                                        size="lg"
+                                        variant="outline"
                                         className="w-full gap-2 text-red-600 hover:bg-red-50 border-red-200"
                                         onClick={handleReject}
                                     >
@@ -491,17 +407,17 @@ export default function CetakVerifikasi() {
 
                             {selectedSurat.status_verifikasi === 'approved' && selectedSurat.status_cetak === 'belum' && (
                                 <>
-                                    <Button 
-                                        size="lg" 
+                                    <Button
+                                        size="lg"
                                         className="w-full gap-2 bg-blue-600 hover:bg-blue-700"
                                         onClick={handlePrint}
                                     >
                                         <Printer size={18} />
                                         Cetak Surat
                                     </Button>
-                                    <Button 
-                                        size="lg" 
-                                        variant="outline" 
+                                    <Button
+                                        size="lg"
+                                        variant="outline"
                                         className="w-full gap-2"
                                     >
                                         <Eye size={18} />
@@ -511,9 +427,9 @@ export default function CetakVerifikasi() {
                             )}
 
                             {selectedSurat.status_cetak === 'sudah' && (
-                                <Button 
-                                    size="lg" 
-                                    variant="outline" 
+                                <Button
+                                    size="lg"
+                                    variant="outline"
                                     className="w-full gap-2"
                                 >
                                     <Download size={18} />
@@ -522,9 +438,9 @@ export default function CetakVerifikasi() {
                             )}
 
                             {selectedSurat.status_verifikasi === 'rejected' && (
-                                <Button 
-                                    size="lg" 
-                                    variant="outline" 
+                                <Button
+                                    size="lg"
+                                    variant="outline"
                                     className="w-full gap-2"
                                 >
                                     <Eye size={18} />

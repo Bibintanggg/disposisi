@@ -8,6 +8,7 @@ use App\Http\Controllers\Staf\DashboardStafController;
 use App\Http\Controllers\Verif\DashboardVerifController;
 use App\Http\Controllers\Verif\SuratKeluarController;
 use App\Http\Controllers\Verif\SuratMasukController;
+use App\Http\Controllers\Verif\VerifikasiController;
 use App\Http\Enum\Jabatan;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -63,9 +64,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('verif/daftar-surat-keluar', [SuratKeluarController::class, 'daftarSuratKeluar'])->name('verif.daftar-surat-keluar');
         Route::delete('verif/input-surat-keluar/{id}', [SuratKeluarController::class, 'destroy'])->name('verif.surat-keluar.destroy');
 
-        Route::get('verif/cetak-verifikasi', function () {
-            return Inertia::render('Verif/CetakVerifikasi');
-        });
+        Route::get('verif/cetak-verifikasi', [VerifikasiController::class, 'index'])->name('verif.cetak-verifikasi');
     });
 });
 

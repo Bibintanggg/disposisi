@@ -11,5 +11,6 @@ export interface SuratMasuk {
     isi_surat: string
     sifat_surat: number
     gambar: string
-    status_akhir: number
+    status_verifikasi: number
+    status_cetak: number
 }

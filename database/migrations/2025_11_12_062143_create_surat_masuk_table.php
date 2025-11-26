@@ -22,6 +22,8 @@ return new class extends Migration
             $table->integer("sifat_surat");
             $table->string("gambar")->nullable();
             $table->integer("status_akhir")->default(1);
+            $table->integer("status_verifikasi")->default(1);
+            $table->integer("status_cetak")->default(1);
             $table->timestamps();
         });
     }

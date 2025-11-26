@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Http\Enum\SifatSurat;
 use App\Http\Enum\StatusAkhir;
+use App\Http\Enum\StatusCetak;
+use App\Http\Enum\StatusVerifikasi;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,12 +24,16 @@ class   SuratMasuk extends Model
         'isi_surat',
         'sifat_surat',
         'gambar',
-        'status_akhir'
+        'status_akhir',
+        'status_verifikasi',
+        'status_cetak'
     ];
 
     protected $casts = [
         'sifat_surat' => SifatSurat::class,
-        'status_akhir' => StatusAkhir::class
+        'status_akhir' => StatusAkhir::class,
+        'status_verifikasi' => StatusVerifikasi::class,
+        'status_cetak' => StatusCetak::class
     ];
 
     public function users() 
