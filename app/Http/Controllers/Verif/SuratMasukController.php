@@ -69,7 +69,7 @@ class SuratMasukController extends Controller
         if ($surat->gambar && file_exists(storage_path('app/public/' . $surat->gambar))) {
             unlink(storage_path('app/public/' . $surat->gambar));
         }
-
+        
         $surat->delete();
 
         return redirect()->back()->with('success', 'Surat berhasil dihapus');

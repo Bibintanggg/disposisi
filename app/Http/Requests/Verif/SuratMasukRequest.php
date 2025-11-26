@@ -41,7 +41,7 @@ class SuratMasukRequest extends FormRequest
             ],
             'tanggal_surat' => ['required', 'date'], 
             'tanggal_terima' => ["required", 'date'],
-            'pengirim' => ['required', 'string', 'max: 250'],
+        'pengirim' => ['required', 'string', 'max: 250'],
             'isi_surat' => ['required', 'string'],
             'sifat_surat' => [
                 'required', 'integer', Rule::in($sifatSurat)

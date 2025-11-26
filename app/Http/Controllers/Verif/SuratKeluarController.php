@@ -120,4 +120,17 @@ class SuratKeluarController extends Controller
             'filters' => $request->only(['search', 'unit_pengirim_id', 'status_arsip', 'tanggal_dari', 'tanggal_sampai'])
         ]);
     }
+
+    public function destroy($id)
+    {
+        $surat = SuratKeluar::findOrFail($id);
+
+        if ($surat->gambar && file_exists(storage_path('app/public/' . $surat->gambar))) {
+            unlink(storage_path('app/public/' . $surat->gambar));
+        }
+
+        $surat->delete();
+
+        return redirect()->back()->with('success', 'Surat berhasil dihapus');
+    }
 }

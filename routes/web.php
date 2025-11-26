@@ -50,8 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('verif/input-surat-masuk', [SuratMasukController::class, 'store'])->name('verif.input-surat-masuk.store');
 
         Route::get('verif/daftar-surat-masuk', [SuratMasukController::class, 'daftarSurat'])->name('verif.daftar-surat-masuk');
-        Route::delete('/verif/daftar-surat-masuk/{id}', [SuratMasukController::class, 'destroy'])
-            ->name('verif.surat-masuk.destroy');
+        Route::delete('/verif/daftar-surat-masuk/{id}', [SuratMasukController::class, 'destroy'])->name('verif.surat-masuk.destroy');
         Route::get('/surat/download/{id}', [SuratMasukController::class, 'download'])
             ->name('surat.download');
 
@@ -62,6 +61,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('verif/input-surat-keluar', [SuratKeluarController::class, 'suratTerakhir'])->name('verif.surat-keluar.search');
         
         Route::get('verif/daftar-surat-keluar', [SuratKeluarController::class, 'daftarSuratKeluar'])->name('verif.daftar-surat-keluar');
+        Route::delete('verif/input-surat-keluar/{id}', [SuratKeluarController::class, 'destroy'])->name('verif.surat-keluar.destroy');
 
         Route::get('verif/cetak-verifikasi', function () {
             return Inertia::render('Verif/CetakVerifikasi');

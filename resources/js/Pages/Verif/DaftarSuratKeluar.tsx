@@ -11,10 +11,13 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { router } from '@inertiajs/react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/Components/ui/dialog";
 
 export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bidangs, users }) {
     const [suratKeluar, setSuratKeluar] = useState(initialSuratKeluar || []);
     const [selectedSurat, setSelectedSurat] = useState(initialSuratKeluar?.[0] || null);
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState<number | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [filterUnit, setFilterUnit] = useState('all');
     const [filterStatus, setFilterStatus] = useState('all');
@@ -57,7 +60,7 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
 
     // Filter surat keluar berdasarkan search dan filter
     const filteredSuratKeluar = suratKeluar.filter(surat => {
-        const matchSearch = searchQuery === '' || 
+        const matchSearch = searchQuery === '' ||
             surat.nomor_surat.toLowerCase().includes(searchQuery.toLowerCase()) ||
             surat.penerima.toLowerCase().includes(searchQuery.toLowerCase()) ||
             surat.isi_surat.toLowerCase().includes(searchQuery.toLowerCase());
@@ -86,9 +89,22 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
         }
     };
 
+
     const handleExport = () => {
         // Implementasi export jika diperlukan
         console.log('Export data');
+    };
+
+    const handleDelete = () => {
+        if (!deleteId) return;
+
+        router.delete(`/verif/input-surat-keluar/${deleteId}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setDeleteModalOpen(false);
+                setSelectedSurat(null);
+            }
+        });
     };
 
     return (
@@ -191,11 +207,10 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                                         <div
                                             key={surat.id}
                                             onClick={() => setSelectedSurat(surat)}
-                                            className={`bg-white rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 group hover:shadow-lg ${
-                                                selectedSurat?.id === surat.id
-                                                    ? 'border-purple-500 shadow-lg ring-4 ring-purple-50'
-                                                    : 'border-gray-200 hover:border-gray-300'
-                                            }`}
+                                            className={`bg-white rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 group hover:shadow-lg ${selectedSurat?.id === surat.id
+                                                ? 'border-purple-500 shadow-lg ring-4 ring-purple-50'
+                                                : 'border-gray-200 hover:border-gray-300'
+                                                }`}
                                         >
                                             <div className="flex items-start gap-4">
                                                 <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
@@ -276,7 +291,15 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                                     <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
                                         <Edit2 size={16} />
                                     </Button>
-                                    <Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-9 w-9 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                        onClick={() => {
+                                            setDeleteId(selectedSurat.id);
+                                            setDeleteModalOpen(true);
+                                        }}
+                                    >
                                         <Trash2 size={16} />
                                     </Button>
                                 </div>
@@ -361,7 +384,7 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                             {selectedSurat.gambar && (
                                 <div>
                                     <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Lampiran</p>
-                                    <div 
+                                    <div
                                         className="bg-gray-50 rounded-xl p-4 border border-gray-200 flex items-center gap-3 hover:bg-gray-100 transition-colors cursor-pointer"
                                         onClick={() => handlePreviewFile(selectedSurat.gambar.split('/').pop())}
                                     >
@@ -388,6 +411,33 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                         </div>
                     </div>
                 )}
+
+                 <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+                            <DialogContent className="max-w-sm">
+                                <DialogHeader>
+                                    <DialogTitle>Hapus Surat?</DialogTitle>
+                                    <DialogDescription>
+                                        Surat yang dihapus tidak dapat dikembalikan. Yakin ingin melanjutkan?
+                                    </DialogDescription>
+                                </DialogHeader>
+
+                                <DialogFooter>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setDeleteModalOpen(false)}
+                                    >
+                                        Batal
+                                    </Button>
+
+                                    <Button
+                                        variant="destructive"
+                                        onClick={handleDelete}
+                                    >
+                                        Hapus
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
             </div>
         </Authenticated>
     );
