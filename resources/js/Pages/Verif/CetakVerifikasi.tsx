@@ -21,6 +21,7 @@ import {
 import { usePage } from "@inertiajs/react";
 import { SuratKeluarProps } from "@/types/surat-keluar";
 import { SuratMasuk } from "@/types/surat-masuk";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/Components/ui/dialog";
 
 export default function CetakVerifikasi() {
     const { suratMasuk } = usePage().props
@@ -31,6 +32,9 @@ export default function CetakVerifikasi() {
     );
     const [activeTab, setActiveTab] = useState("pending");
     const [catatanVerifikasi, setCatatanVerifikasi] = useState("");
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+    const [approvedModalOpen, setApprovedModalOpen] = useState(false)
+
 
     const getStatusVerifikasiInfo = (status) => {
         const statusMap = {
@@ -70,7 +74,7 @@ export default function CetakVerifikasi() {
     };
 
     const handleApprove = () => {
-        console.log("Approved:", selectedSurat.id, catatanVerifikasi);
+        // console.log("Approved:", selectedSurat.id, catatanVerifikasi);
     };
 
     const handleReject = () => {
@@ -106,7 +110,7 @@ export default function CetakVerifikasi() {
                             <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border border-yellow-200">
                                 <p className="text-xs font-medium text-yellow-600 mb-1">Menunggu Verifikasi</p>
                                 <p className="text-2xl font-bold text-yellow-900">
-                                    {suratMasuk.filter(s => s.status_verifikasi === 1).length}
+                                    {suratMasuk.filter(s => s.status_verifikasi === "pending").length}
                                 </p>
                             </div>
                             <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4 border border-emerald-200">
@@ -313,7 +317,7 @@ export default function CetakVerifikasi() {
                                 </div>
                                 <div>
                                     <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Diajukan Oleh</p>
-                                    <p className="text-sm text-gray-900">{selectedSurat.diajukan_oleh}</p>
+                                    <p className="text-sm text-gray-900">{String(selectedSurat.diajukan_oleh)}</p>
                                 </div>
                             </div>
 
@@ -388,7 +392,7 @@ export default function CetakVerifikasi() {
                                     <Button
                                         size="lg"
                                         className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700"
-                                        onClick={handleApprove}
+                                        onClick={() => setApprovedModalOpen(true)}
                                     >
                                         <Check size={18} />
                                         Setujui & Verifikasi
@@ -397,7 +401,7 @@ export default function CetakVerifikasi() {
                                         size="lg"
                                         variant="outline"
                                         className="w-full gap-2 text-red-600 hover:bg-red-50 border-red-200"
-                                        onClick={handleReject}
+                                        onClick={() => setDeleteModalOpen(true)}
                                     >
                                         <X size={18} />
                                         Tolak Surat
@@ -448,6 +452,58 @@ export default function CetakVerifikasi() {
                                 </Button>
                             )}
                         </div>
+
+                        <Dialog open={approvedModalOpen} onOpenChange={setApprovedModalOpen}>
+                            <DialogContent className="max-w-sm">
+                                <DialogHeader>
+                                    <DialogTitle>Hapus Surat?</DialogTitle>
+                                    <DialogDescription>
+                                        Surat yang dihapus tidak dapat dikembalikan. Yakin ingin melanjutkan?
+                                    </DialogDescription>
+                                </DialogHeader>
+
+                                <DialogFooter>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setApprovedModalOpen(false)}
+                                    >
+                                        Batal
+                                    </Button>
+
+                                    <Button
+                                        variant="destructive"
+                                    >
+                                        Hapus
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                        
+                        <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+                            <DialogContent className="max-w-sm">
+                                <DialogHeader>
+                                    <DialogTitle>Tolak Surat?</DialogTitle>
+                                    <DialogDescription>
+                                        Surat yang dihapus tidak dapat dikembalikan. Yakin ingin melanjutkan?
+                                    </DialogDescription>
+                                </DialogHeader>
+
+                                <DialogFooter>
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => setDeleteModalOpen(false)}
+                                    >
+                                        Batal
+                                    </Button>
+
+                                    <Button
+                                        variant="destructive"
+                                    >
+                                        Hapus
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 )}
             </div>
