@@ -41,7 +41,7 @@ class SuratKeluarController extends Controller
 
         SuratKeluar::create($data);
 
-        return redirect()->route('verif.surat-keluar')->with('success', 'Surat keluar berhasil dibuat');
+        return back()->with('success', 'Surat keluar berhasil dibuat');
     }
 
     public function suratTerakhir(Request $request)

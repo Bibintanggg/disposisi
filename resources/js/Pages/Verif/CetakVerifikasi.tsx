@@ -1,6 +1,6 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { useState } from "react";
-import { Printer, Check, X, Clock, FileCheck, Search, Filter, Eye, Download, AlertCircle, CheckCircle2, XCircle, Calendar, User, Building2, MessageSquare, FileText, Mail, Send } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Printer, Check, X, Clock, FileCheck, Search, Eye, Download, AlertCircle, CheckCircle2, XCircle, Calendar, User, Building2, FileText, Mail, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,51 +18,148 @@ import {
     TabsList,
     TabsTrigger,
 } from "@/components/ui/tabs";
-import { usePage } from "@inertiajs/react";
-import { SuratKeluarProps } from "@/types/surat-keluar";
-import { SuratMasuk } from "@/types/surat-masuk";
+import { usePage, router } from "@inertiajs/react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/Components/ui/dialog";
+// import { toast } from "sonner";
+
+interface SuratItem {
+    id: number;
+    nomor_surat: string;
+    tanggal_surat: string;
+    tanggal_pengajuan: string;
+    pengirim_penerima: string;
+    penerima?: string;
+    isi_surat: string;
+    jenis: "masuk" | "keluar";
+    status_verifikasi: "pending" | "approved" | "review" | "rejected";
+    status_cetak: "belum" | "sudah";
+    status_arsip?: "belum" | "sudah";
+    diajukan_oleh: string;
+    diverifikasi_oleh: string | null;
+    tanggal_verifikasi: string | null;
+    catatan_verifikasi: string | null;
+    dicetak_oleh: string | null;
+    tanggal_cetak: string | null;
+    unit_pengirim?: {
+        id: number;
+        nama_bidang: string;
+    };
+    user_penanda_tangan?: {
+        id: number;
+        nama_lengkap: string;
+        jabatan?: string | null;
+    };
+    gambar?: string | null;
+    tanggal_kirim?: string;
+}
+
+interface PageProps {
+    suratMasuk: SuratItem[];
+    suratKeluar: SuratItem[];
+}
 
 export default function CetakVerifikasi() {
-    const { suratMasuk } = usePage().props
-    // console.log("suratMasuk:", suratMasuk);
-
-    const [selectedSurat, setSelectedSurat] = useState(
-        suratMasuk.length > 0 ? suratMasuk[0] : null
+    const { suratMasuk, suratKeluar } = usePage<PageProps>().props;
+    
+    // Gabungkan surat masuk dan keluar
+    const allSurat = [...suratMasuk, ...suratKeluar];
+    
+    const [selectedSurat, setSelectedSurat] = useState<SuratItem | null>(
+        allSurat.length > 0 ? allSurat[0] : null
     );
     const [activeTab, setActiveTab] = useState("pending");
+    const [jenisFilter, setJenisFilter] = useState("all");
+    const [searchQuery, setSearchQuery] = useState("");
     const [catatanVerifikasi, setCatatanVerifikasi] = useState("");
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-    const [approvedModalOpen, setApprovedModalOpen] = useState(false)
+    const [approvedModalOpen, setApprovedModalOpen] = useState(false);
+    const [processing, setProcessing] = useState(false);
 
+    // Update selected surat jika allSurat berubah
+    useEffect(() => {
+        if (allSurat.length > 0 && !selectedSurat) {
+            setSelectedSurat(allSurat[0]);
+        }
+    }, [allSurat, selectedSurat]);
 
-    const getStatusVerifikasiInfo = (status) => {
+    const getStatusVerifikasiInfo = (status: string) => {
         const statusMap = {
-            PENDING: { label: "Menunggu Verifikasi", icon: Clock, color: "text-yellow-600 bg-yellow-100", badgeColor: "bg-yellow-500" },
-            TERVERIFIKASI: { label: "Terverifikasi", icon: CheckCircle2, color: "text-green-600 bg-green-100", badgeColor: "bg-green-500" },
-            DITOLAK: { label: "Ditolak", icon: XCircle, color: "text-red-600 bg-red-100", badgeColor: "bg-red-500" }
+            pending: {
+                label: "Menunggu Verifikasi",
+                icon: Clock,
+                color: "text-yellow-600 bg-yellow-100",
+            },
+            approved: {
+                label: "Terverifikasi",
+                icon: CheckCircle2,
+                color: "text-green-600 bg-green-100",
+            },
+            review: {
+                label: "Perlu Revisi",
+                icon: AlertCircle,
+                color: "text-blue-600 bg-blue-100",
+            },
+            rejected: {
+                label: "Ditolak",
+                icon: XCircle,
+                color: "text-red-600 bg-red-100",
+            },
         };
-        return statusMap[status] || statusMap.PENDING;
+
+        return statusMap[status as keyof typeof statusMap] || statusMap.pending;
     };
 
-    const getStatusCetakInfo = (status) => {
+    const getStatusCetakInfo = (status: string) => {
         const statusMap = {
             belum: { label: "Belum Dicetak", icon: Printer, color: "text-gray-600 bg-gray-100" },
             sudah: { label: "Sudah Dicetak", icon: CheckCircle2, color: "text-blue-600 bg-blue-100" }
         };
-        return statusMap[status] || statusMap.belum;
+        return statusMap[status as keyof typeof statusMap] || statusMap.belum;
     };
 
-    const filteredSurat = suratMasuk.filter((surat) => {
-        if (activeTab === "pending") return surat.status_verifikasi === "pending";
-        if (activeTab === "approved") return surat.status_verifikasi === "approved" && surat.status_cetak === "belum";
-        if (activeTab === "printed") return surat.status_cetak === "sudah";
-        if (activeTab === "rejected") return surat.status_verifikasi === "rejected";
-        return true;
+    const getStatusArsipInfo = (status?: string) => {
+        const statusMap = {
+            belum: { label: "Belum Diarsip", icon: Clock, color: "text-orange-600 bg-orange-100" },
+            sudah: { label: "Sudah Diarsip", icon: CheckCircle2, color: "text-green-600 bg-green-100" }
+        };
+        return statusMap[status as keyof typeof statusMap] || statusMap.belum;
+    };
+
+    // Filter surat berdasarkan tab aktif, jenis filter, dan pencarian
+    const filteredSurat = allSurat.filter((surat) => {
+        // Filter berdasarkan tab status
+        let statusFilter = true;
+        if (activeTab === "pending") {
+            statusFilter = surat.status_verifikasi === "pending";
+        } else if (activeTab === "approved") {
+            statusFilter = surat.status_verifikasi === "approved" && surat.status_cetak === "belum";
+        } else if (activeTab === "printed") {
+            statusFilter = surat.status_cetak === "sudah";
+        } else if (activeTab === "rejected") {
+            statusFilter = surat.status_verifikasi === "rejected";
+        }
+
+        // Filter berdasarkan jenis surat
+        let jenisFilterPass = true;
+        if (jenisFilter !== "all") {
+            jenisFilterPass = surat.jenis === jenisFilter;
+        }
+
+        // Filter berdasarkan pencarian
+        let searchFilter = true;
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            searchFilter = 
+                surat.nomor_surat.toLowerCase().includes(query) ||
+                surat.pengirim_penerima.toLowerCase().includes(query) ||
+                (surat.penerima && surat.penerima.toLowerCase().includes(query)) ||
+                surat.isi_surat.toLowerCase().includes(query);
+        }
+
+        return statusFilter && jenisFilterPass && searchFilter;
     });
 
-
-    const formatDateTime = (dateString) => {
+    const formatDateTime = (dateString: string | null) => {
         if (!dateString) return "-";
         return new Date(dateString).toLocaleString('id-ID', {
             day: '2-digit',
@@ -73,22 +170,88 @@ export default function CetakVerifikasi() {
         });
     };
 
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+    };
+
     const handleApprove = () => {
-        // console.log("Approved:", selectedSurat.id, catatanVerifikasi);
+        if (!selectedSurat) return;
+        
+        setProcessing(true);
+        router.post(route('verif.approve', selectedSurat.id), {
+            catatan_verifikasi: catatanVerifikasi,
+            jenis: selectedSurat.jenis
+        }, {
+            onSuccess: () => {
+                // toast.success('Surat berhasil disetujui!');
+                setApprovedModalOpen(false);
+                setCatatanVerifikasi("");
+                router.reload({ only: ['suratMasuk', 'suratKeluar'] });
+            },
+            onError: (errors) => {
+                // toast.error('Gagal menyetujui surat');
+            },
+            onFinish: () => {
+                setProcessing(false);
+            }
+        });
     };
 
     const handleReject = () => {
-        console.log("Rejected:", selectedSurat.id, catatanVerifikasi);
+        if (!selectedSurat) return;
+        
+        setProcessing(true);
+        router.post(route('verif.reject', selectedSurat.id), {
+            catatan_verifikasi: catatanVerifikasi,
+            jenis: selectedSurat.jenis
+        }, {
+            onSuccess: () => {
+                // toast.success('Surat berhasil ditolak!');
+                setDeleteModalOpen(false);
+                setCatatanVerifikasi("");
+                router.reload({ only: ['suratMasuk', 'suratKeluar'] });
+            },
+            onError: (errors) => {
+                // toast.error('Gagal menolak surat');
+            },
+            onFinish: () => {
+                setProcessing(false);
+            }
+        });
     };
 
     const handlePrint = () => {
-        console.log("Print:", selectedSurat.id);
+        if (!selectedSurat) return;
+        
+        setProcessing(true);
+        router.post(route('verif.print', selectedSurat.id), {
+            jenis: selectedSurat.jenis
+        }, {
+            onSuccess: () => {
+                // toast.success('Surat berhasil dicetak!');
+                router.reload({ only: ['suratMasuk', 'suratKeluar'] });
+            },
+            onError: (errors) => {
+                // toast.error('Gagal mencetak surat');
+            },
+            onFinish: () => {
+                setProcessing(false);
+            }
+        });
     };
+
+    // Hitung statistik
+    const statMenungguVerifikasi = allSurat.filter(s => s.status_verifikasi === "pending").length;
+    const statSiapCetak = allSurat.filter(s => s.status_verifikasi === "approved" && s.status_cetak === "belum").length;
+    const statSudahCetak = allSurat.filter(s => s.status_cetak === "sudah").length;
+    const statDitolak = allSurat.filter(s => s.status_verifikasi === "rejected").length;
 
     return (
         <Authenticated>
             <div className="flex h-screen overflow-hidden bg-gray-50">
+                {/* Main Content Area */}
                 <div className="flex-1 flex flex-col overflow-hidden">
+                    {/* Header Section */}
                     <div className="bg-white border-b border-gray-200 p-6">
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-3">
@@ -106,34 +269,28 @@ export default function CetakVerifikasi() {
                             </div>
                         </div>
 
+                        {/* Statistics Cards */}
                         <div className="grid grid-cols-4 gap-4">
                             <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl p-4 border border-yellow-200">
                                 <p className="text-xs font-medium text-yellow-600 mb-1">Menunggu Verifikasi</p>
-                                <p className="text-2xl font-bold text-yellow-900">
-                                    {suratMasuk.filter(s => s.status_verifikasi === "pending").length}
-                                </p>
+                                <p className="text-2xl font-bold text-yellow-900">{statMenungguVerifikasi}</p>
                             </div>
                             <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4 border border-emerald-200">
                                 <p className="text-xs font-medium text-emerald-600 mb-1">Siap Cetak</p>
-                                <p className="text-2xl font-bold text-emerald-900">
-                                    {suratMasuk.filter(s => s.status_verifikasi === "approved" && s.status_cetak === "belum").length}
-                                </p>
+                                <p className="text-2xl font-bold text-emerald-900">{statSiapCetak}</p>
                             </div>
                             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
                                 <p className="text-xs font-medium text-blue-600 mb-1">Sudah Dicetak</p>
-                                <p className="text-2xl font-bold text-blue-900">
-                                    {suratMasuk.filter(s => s.status_cetak === "sudah").length}
-                                </p>
+                                <p className="text-2xl font-bold text-blue-900">{statSudahCetak}</p>
                             </div>
                             <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-4 border border-red-200">
                                 <p className="text-xs font-medium text-red-600 mb-1">Ditolak</p>
-                                <p className="text-2xl font-bold text-red-900">
-                                    {suratMasuk.filter(s => s.status_verifikasi === "rejected").length}
-                                </p>
+                                <p className="text-2xl font-bold text-red-900">{statDitolak}</p>
                             </div>
                         </div>
                     </div>
 
+                    {/* Tabs Navigation */}
                     <div className="bg-white border-b border-gray-200 px-6">
                         <Tabs value={activeTab} onValueChange={setActiveTab}>
                             <TabsList className="w-full justify-start border-b-0 bg-transparent h-auto p-0">
@@ -157,6 +314,7 @@ export default function CetakVerifikasi() {
                         </Tabs>
                     </div>
 
+                    {/* Search and Filter Bar */}
                     <div className="bg-white border-b border-gray-200 px-6 py-4">
                         <div className="flex items-center gap-3">
                             <div className="flex-1 relative">
@@ -164,9 +322,11 @@ export default function CetakVerifikasi() {
                                 <Input
                                     placeholder="Cari nomor surat atau pengirim/penerima..."
                                     className="pl-10 h-11"
+                                    value={searchQuery}
+                                    onChange={handleSearch}
                                 />
                             </div>
-                            <Select defaultValue="all">
+                            <Select value={jenisFilter} onValueChange={setJenisFilter}>
                                 <SelectTrigger className="w-40 h-11">
                                     <SelectValue placeholder="Jenis Surat" />
                                 </SelectTrigger>
@@ -179,6 +339,7 @@ export default function CetakVerifikasi() {
                         </div>
                     </div>
 
+                    {/* Surat List */}
                     <div className="flex-1 overflow-y-auto p-6">
                         <div className="space-y-2">
                             {filteredSurat.length === 0 ? (
@@ -195,16 +356,21 @@ export default function CetakVerifikasi() {
 
                                     return (
                                         <div
-                                            key={surat.id}
-                                            onClick={() => setSelectedSurat(surat)}
-                                            className={`bg-white rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 group hover:shadow-lg ${selectedSurat?.id === surat.id
-                                                ? 'border-emerald-500 shadow-lg ring-4 ring-emerald-50'
-                                                : 'border-gray-200 hover:border-gray-300'
-                                                }`}
+                                            key={`${surat.jenis}-${surat.id}`}
+                                            onClick={() => {
+                                                setSelectedSurat(surat);
+                                                setCatatanVerifikasi(""); // Reset catatan ketika ganti surat
+                                            }}
+                                            className={`bg-white rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 group hover:shadow-lg ${
+                                                selectedSurat?.id === surat.id && selectedSurat?.jenis === surat.jenis
+                                                    ? 'border-emerald-500 shadow-lg ring-4 ring-emerald-50'
+                                                    : 'border-gray-200 hover:border-gray-300'
+                                            }`}
                                         >
                                             <div className="flex items-start gap-4">
-                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${surat.jenis === 'masuk' ? 'bg-blue-100' : 'bg-purple-100'
-                                                    }`}>
+                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                                                    surat.jenis === 'masuk' ? 'bg-blue-100' : 'bg-purple-100'
+                                                }`}>
                                                     {surat.jenis === 'masuk' ? (
                                                         <Mail className="text-blue-600" size={20} />
                                                     ) : (
@@ -219,16 +385,17 @@ export default function CetakVerifikasi() {
                                                                 <h3 className="font-bold text-gray-900 text-base">
                                                                     {surat.nomor_surat}
                                                                 </h3>
-                                                                <span className={`px-2 py-0.5 rounded text-xs font-semibold text-white ${surat.jenis === 'masuk' ? 'bg-blue-500' : 'bg-purple-500'
-                                                                    }`}>
+                                                                <span className={`px-2 py-0.5 rounded text-xs font-semibold text-white ${
+                                                                    surat.jenis === 'masuk' ? 'bg-blue-500' : 'bg-purple-500'
+                                                                }`}>
                                                                     {surat.jenis === 'masuk' ? 'Masuk' : 'Keluar'}
                                                                 </span>
                                                             </div>
                                                             <p className="text-sm text-gray-600 font-medium">
-                                                                {surat.jenis === 'masuk' ? 'Dari:' : 'Kepada:'} {surat.pengirim_penerima}
+                                                                {surat.jenis === 'masuk' ? 'Dari:' : 'Kepada:'} {surat.pengirim_penerima || surat.penerima}
                                                             </p>
                                                         </div>
-                                                        <div className="flex items-center gap-2">
+                                                        <div className="flex flex-col items-end gap-2">
                                                             <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${statusVerifikasiInfo.color} flex items-center gap-1`}>
                                                                 <StatusVerifIcon size={12} />
                                                                 {statusVerifikasiInfo.label}
@@ -239,6 +406,13 @@ export default function CetakVerifikasi() {
                                                                     {statusCetakInfo.label}
                                                                 </span>
                                                             )}
+                                                            {surat.jenis === 'keluar' && surat.status_arsip && (
+                                                                <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${
+                                                                    getStatusArsipInfo(surat.status_arsip).color
+                                                                } flex items-center gap-1`}>
+                                                                    {getStatusArsipInfo(surat.status_arsip).label}
+                                                                </span>
+                                                            )}
                                                         </div>
                                                     </div>
 
@@ -246,7 +420,7 @@ export default function CetakVerifikasi() {
                                                         {surat.isi_surat}
                                                     </p>
 
-                                                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                                                    <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
                                                         <div className="flex items-center gap-1.5">
                                                             <User size={14} />
                                                             <span>Diajukan: {surat.diajukan_oleh}</span>
@@ -255,6 +429,12 @@ export default function CetakVerifikasi() {
                                                             <Calendar size={14} />
                                                             <span>{formatDateTime(surat.tanggal_pengajuan)}</span>
                                                         </div>
+                                                        {surat.jenis === 'keluar' && surat.unit_pengirim && (
+                                                            <div className="flex items-center gap-1.5">
+                                                                <Building2 size={14} />
+                                                                <span>{surat.unit_pengirim.nama_bidang}</span>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
@@ -266,8 +446,10 @@ export default function CetakVerifikasi() {
                     </div>
                 </div>
 
+                {/* Sidebar Detail */}
                 {selectedSurat && (
                     <div className="w-96 bg-white border-l border-gray-200 flex flex-col">
+                        {/* Sidebar Header */}
                         <div className="p-6 border-b border-gray-200 bg-gradient-to-b from-gray-50 to-white">
                             <h3 className="text-lg font-bold text-gray-900 mb-4">Detail & Verifikasi</h3>
 
@@ -276,7 +458,7 @@ export default function CetakVerifikasi() {
                                     <p className="text-xs font-semibold text-gray-500 uppercase mb-1">Nomor Surat</p>
                                     <p className="text-base font-bold text-gray-900">{selectedSurat.nomor_surat}</p>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex flex-wrap gap-2">
                                     {(() => {
                                         const statusVerifInfo = getStatusVerifikasiInfo(selectedSurat.status_verifikasi);
                                         const StatusIcon = statusVerifInfo.icon;
@@ -287,27 +469,68 @@ export default function CetakVerifikasi() {
                                             </span>
                                         );
                                     })()}
-                                    <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold text-white ${selectedSurat.jenis === 'masuk' ? 'bg-blue-500' : 'bg-purple-500'
-                                        }`}>
+                                    <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold text-white ${
+                                        selectedSurat.jenis === 'masuk' ? 'bg-blue-500' : 'bg-purple-500'
+                                    }`}>
                                         {selectedSurat.jenis === 'masuk' ? 'Surat Masuk' : 'Surat Keluar'}
                                     </span>
+                                    {selectedSurat.jenis === 'keluar' && selectedSurat.status_arsip && (
+                                        <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${
+                                            getStatusArsipInfo(selectedSurat.status_arsip).color
+                                        } flex items-center gap-1.5`}>
+                                            {getStatusArsipInfo(selectedSurat.status_arsip).label}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         </div>
 
+                        {/* Sidebar Content */}
                         <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                            {/* Pengirim/Penerima */}
                             <div>
                                 <p className="text-xs font-semibold text-gray-500 uppercase mb-2">
                                     {selectedSurat.jenis === 'masuk' ? 'Pengirim' : 'Penerima'}
                                 </p>
-                                <p className="text-sm font-medium text-gray-900">{selectedSurat.pengirim_penerima}</p>
+                                <p className="text-sm font-medium text-gray-900">
+                                    {selectedSurat.pengirim_penerima || selectedSurat.penerima}
+                                </p>
                             </div>
 
+                            {/* Isi Surat */}
                             <div>
                                 <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Isi/Perihal Surat</p>
                                 <p className="text-sm text-gray-700 leading-relaxed">{selectedSurat.isi_surat}</p>
                             </div>
 
+                            {/* Informasi Khusus Surat Keluar */}
+                            {selectedSurat.jenis === 'keluar' && (
+                                <div className="space-y-4">
+                                    {selectedSurat.unit_pengirim && (
+                                        <div>
+                                            <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Unit Pengirim</p>
+                                            <p className="text-sm text-gray-900">{selectedSurat.unit_pengirim.nama_bidang}</p>
+                                        </div>
+                                    )}
+                                    {selectedSurat.user_penanda_tangan && (
+                                        <div>
+                                            <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Penanda Tangan</p>
+                                            <p className="text-sm text-gray-900">
+                                                {selectedSurat.user_penanda_tangan.nama_lengkap}
+                                                {selectedSurat.user_penanda_tangan.jabatan && ` (${selectedSurat.user_penanda_tangan.jabatan})`}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {selectedSurat.tanggal_kirim && (
+                                        <div>
+                                            <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Tanggal Kirim</p>
+                                            <p className="text-sm text-gray-900">{formatDateTime(selectedSurat.tanggal_kirim)}</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Informasi Umum */}
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Tanggal Surat</p>
@@ -317,17 +540,19 @@ export default function CetakVerifikasi() {
                                 </div>
                                 <div>
                                     <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Diajukan Oleh</p>
-                                    <p className="text-sm text-gray-900">{String(selectedSurat.diajukan_oleh)}</p>
+                                    <p className="text-sm text-gray-900">{selectedSurat.diajukan_oleh}</p>
                                 </div>
                             </div>
 
+                            {/* Timeline Verifikasi (jika sudah diverifikasi/ditolak) */}
                             {(selectedSurat.status_verifikasi === 'approved' || selectedSurat.status_verifikasi === 'rejected') && (
                                 <div>
                                     <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Timeline Verifikasi</p>
                                     <div className="space-y-3">
                                         <div className="flex gap-3">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${selectedSurat.status_verifikasi === 'approved' ? 'bg-green-100' : 'bg-red-100'
-                                                }`}>
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                                                selectedSurat.status_verifikasi === 'approved' ? 'bg-green-100' : 'bg-red-100'
+                                            }`}>
                                                 {selectedSurat.status_verifikasi === 'approved' ? (
                                                     <Check className="text-green-600" size={16} />
                                                 ) : (
@@ -339,7 +564,7 @@ export default function CetakVerifikasi() {
                                                     {selectedSurat.status_verifikasi === 'approved' ? 'Diverifikasi' : 'Ditolak'}
                                                 </p>
                                                 <p className="text-xs text-gray-500">
-                                                    oleh {selectedSurat.diverifikasi_oleh} • {formatDateTime(selectedSurat.tanggal_verifikasi)}
+                                                    oleh {selectedSurat.diverifikasi_oleh || '-'} • {formatDateTime(selectedSurat.tanggal_verifikasi)}
                                                 </p>
                                                 {selectedSurat.catatan_verifikasi && (
                                                     <div className="mt-2 bg-gray-50 rounded-lg p-2 border border-gray-200">
@@ -357,7 +582,7 @@ export default function CetakVerifikasi() {
                                                 <div className="flex-1">
                                                     <p className="text-sm font-semibold text-gray-900">Dicetak</p>
                                                     <p className="text-xs text-gray-500">
-                                                        oleh {selectedSurat.dicetak_oleh} • {formatDateTime(selectedSurat.tanggal_cetak)}
+                                                        oleh {selectedSurat.dicetak_oleh || '-'} • {formatDateTime(selectedSurat.tanggal_cetak)}
                                                     </p>
                                                 </div>
                                             </div>
@@ -366,6 +591,7 @@ export default function CetakVerifikasi() {
                                 </div>
                             )}
 
+                            {/* Form Verifikasi (jika masih pending) */}
                             {selectedSurat.status_verifikasi === 'pending' && (
                                 <div>
                                     <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Form Verifikasi</p>
@@ -386,6 +612,7 @@ export default function CetakVerifikasi() {
                             )}
                         </div>
 
+                        {/* Sidebar Actions */}
                         <div className="p-6 border-t border-gray-200 bg-gray-50 space-y-3">
                             {selectedSurat.status_verifikasi === 'pending' && (
                                 <>
@@ -393,15 +620,17 @@ export default function CetakVerifikasi() {
                                         size="lg"
                                         className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700"
                                         onClick={() => setApprovedModalOpen(true)}
+                                        disabled={processing}
                                     >
                                         <Check size={18} />
-                                        Setujui & Verifikasi
+                                        {processing ? 'Memproses...' : 'Setujui & Verifikasi'}
                                     </Button>
                                     <Button
                                         size="lg"
                                         variant="outline"
                                         className="w-full gap-2 text-red-600 hover:bg-red-50 border-red-200"
                                         onClick={() => setDeleteModalOpen(true)}
+                                        disabled={processing}
                                     >
                                         <X size={18} />
                                         Tolak Surat
@@ -415,9 +644,10 @@ export default function CetakVerifikasi() {
                                         size="lg"
                                         className="w-full gap-2 bg-blue-600 hover:bg-blue-700"
                                         onClick={handlePrint}
+                                        disabled={processing}
                                     >
                                         <Printer size={18} />
-                                        Cetak Surat
+                                        {processing ? 'Memproses...' : 'Cetak Surat'}
                                     </Button>
                                     <Button
                                         size="lg"
@@ -452,60 +682,90 @@ export default function CetakVerifikasi() {
                                 </Button>
                             )}
                         </div>
-
-                        <Dialog open={approvedModalOpen} onOpenChange={setApprovedModalOpen}>
-                            <DialogContent className="max-w-sm">
-                                <DialogHeader>
-                                    <DialogTitle>Hapus Surat?</DialogTitle>
-                                    <DialogDescription>
-                                        Surat yang dihapus tidak dapat dikembalikan. Yakin ingin melanjutkan?
-                                    </DialogDescription>
-                                </DialogHeader>
-
-                                <DialogFooter>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setApprovedModalOpen(false)}
-                                    >
-                                        Batal
-                                    </Button>
-
-                                    <Button
-                                        variant="destructive"
-                                    >
-                                        Hapus
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                        
-                        <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-                            <DialogContent className="max-w-sm">
-                                <DialogHeader>
-                                    <DialogTitle>Tolak Surat?</DialogTitle>
-                                    <DialogDescription>
-                                        Surat yang dihapus tidak dapat dikembalikan. Yakin ingin melanjutkan?
-                                    </DialogDescription>
-                                </DialogHeader>
-
-                                <DialogFooter>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setDeleteModalOpen(false)}
-                                    >
-                                        Batal
-                                    </Button>
-
-                                    <Button
-                                        variant="destructive"
-                                    >
-                                        Hapus
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
                     </div>
                 )}
+
+                {/* Modal Setujui Verifikasi */}
+                <Dialog open={approvedModalOpen} onOpenChange={setApprovedModalOpen}>
+                    <DialogContent className="max-w-sm">
+                        <DialogHeader>
+                            <DialogTitle>Setujui Verifikasi?</DialogTitle>
+                            <DialogDescription>
+                                Surat akan disetujui dan siap untuk dicetak. Yakin ingin melanjutkan?
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="mt-4">
+                            <Label htmlFor="catatan-approve" className="text-sm font-semibold">Catatan (Opsional)</Label>
+                            <Textarea
+                                id="catatan-approve"
+                                value={catatanVerifikasi}
+                                onChange={(e) => setCatatanVerifikasi(e.target.value)}
+                                placeholder="Tambahkan catatan..."
+                                rows={3}
+                                className="mt-2"
+                            />
+                        </div>
+                        <DialogFooter className="mt-4">
+                            <Button
+                                variant="outline"
+                                onClick={() => setApprovedModalOpen(false)}
+                                disabled={processing}
+                            >
+                                Batal
+                            </Button>
+                            <Button
+                                onClick={handleApprove}
+                                className="bg-emerald-600 hover:bg-emerald-700"
+                                disabled={processing}
+                            >
+                                {processing ? 'Menyetujui...' : 'Setujui'}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Modal Tolak Verifikasi */}
+                <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+                    <DialogContent className="max-w-sm">
+                        <DialogHeader>
+                            <DialogTitle>Tolak Verifikasi?</DialogTitle>
+                            <DialogDescription>
+                                Surat akan ditolak dan tidak dapat diproses lebih lanjut.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="mt-4">
+                            <Label htmlFor="catatan-reject" className="text-sm font-semibold text-red-600">
+                                Catatan Penolakan <span className="text-red-500">*</span>
+                            </Label>
+                            <Textarea
+                                id="catatan-reject"
+                                value={catatanVerifikasi}
+                                onChange={(e) => setCatatanVerifikasi(e.target.value)}
+                                placeholder="Berikan alasan penolakan..."
+                                rows={3}
+                                className="mt-2"
+                                required
+                            />
+                            <p className="text-xs text-gray-500 mt-1">Catatan penolakan wajib diisi</p>
+                        </div>
+                        <DialogFooter className="mt-4">
+                            <Button
+                                variant="outline"
+                                onClick={() => setDeleteModalOpen(false)}
+                                disabled={processing}
+                            >
+                                Batal
+                            </Button>
+                            <Button
+                                onClick={handleReject}
+                                variant="destructive"
+                                disabled={processing || !catatanVerifikasi.trim()}
+                            >
+                                {processing ? 'Menolak...' : 'Tolak'}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </Authenticated>
     );

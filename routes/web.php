@@ -28,7 +28,7 @@ Route::get('/', function () {
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::middleware(['jabatan:' . Jabatan::ADMIN->value])->group(function () {
+    Route::middleware(['jabatan:'.Jabatan::ADMIN->value])->group(function () {
         Route::get('/admin/dashboard', [DashboardAdminController::class, 'index'])->name('admin.dashboard');
         Route::get('/admin/manage-user', [ManageUserController::class, 'index'])->name('admin.manage-user');
         Route::post('/admin/manage-user', [ManageUserController::class, 'store'])->name('admin.manage-user.store');
@@ -37,15 +37,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/admin/master-data', [ManageUserController::class, 'storeBidang'])->name('admin.master-bidang.store');
     });
 
-    Route::middleware(['jabatan:' . Jabatan::KEPALA->value])->group(function () {
+    Route::middleware(['jabatan:'.Jabatan::KEPALA->value])->group(function () {
         Route::get('kepala/dashboard', [DashboardKepalaController::class, 'index'])->name('kepala.dashboard');
     });
 
-    Route::middleware(['jabatan:' . Jabatan::STAF->value])->group(function () {
+    Route::middleware(['jabatan:'.Jabatan::STAF->value])->group(function () {
         Route::get('staf/dashboard', [DashboardStafController::class, 'index'])->name('staf.dashboard');
     });
 
-    Route::middleware(['jabatan:' . Jabatan::VERIFIKATOR->value])->group(function () {
+    Route::middleware(['jabatan:'.Jabatan::VERIFIKATOR->value])->group(function () {
         Route::get('verif/dashboard', [DashboardVerifController::class, 'index'])->name('verif.dashboard');
         Route::get('verif/input-surat-masuk', [SuratMasukController::class, 'index'])->name('verif.input-surat-masuk');
         Route::post('verif/input-surat-masuk', [SuratMasukController::class, 'store'])->name('verif.input-surat-masuk.store');
@@ -58,13 +58,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('verif/input-surat-keluar', [SuratKeluarController::class, 'index'])->name('verif.surat-keluar');
         Route::post('verif/input-surat-keluar', [SuratKeluarController::class, 'store'])->name('verif.surat-keluar.store');
         Route::get('verif/surat-keluar/file/{filename}', [SuratKeluarController::class, 'previewFile'])
-        ->name('verif.surat-keluar.file');
+            ->name('verif.surat-keluar.file');
         Route::get('verif/input-surat-keluar', [SuratKeluarController::class, 'suratTerakhir'])->name('verif.surat-keluar.search');
-        
+
         Route::get('verif/daftar-surat-keluar', [SuratKeluarController::class, 'daftarSuratKeluar'])->name('verif.daftar-surat-keluar');
         Route::delete('verif/input-surat-keluar/{id}', [SuratKeluarController::class, 'destroy'])->name('verif.surat-keluar.destroy');
 
         Route::get('verif/cetak-verifikasi', [VerifikasiController::class, 'index'])->name('verif.cetak-verifikasi');
+        Route::post('/verifikasi/{id}/approve', [VerifikasiController::class, 'approve'])->name('verif.approve');
+        Route::post('/verifikasi/{id}/reject', [VerifikasiController::class, 'reject'])->name('verif.reject');
+        Route::post('/verifikasi/{id}/print', [VerifikasiController::class, 'print'])->name('verif.print');
     });
 });
 
@@ -74,4 +77,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';
