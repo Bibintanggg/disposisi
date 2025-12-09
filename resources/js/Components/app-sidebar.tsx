@@ -77,8 +77,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               { title: "Master Data Bidang", url: "/admin/master-data" },
             ]
         },
-        { title: 'Arsip Global', url: '/admin/permits', icon: Calendar },
-        { title: 'Laporan & Audit', url: '/admin/users', icon: Monitor },
+        { title: 'Arsip Global', url: '/admin/arsip-global', icon: Calendar },
+        { title: 'Laporan & Audit', url: '/admin/laporan-audit', icon: Monitor },
       ]
     } else if (userRole === USER_JABATAN.STAF) {
       return [

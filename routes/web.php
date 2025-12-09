@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\ArsipGlobalController;
 use App\Http\Controllers\Admin\DashboardAdminController;
+use App\Http\Controllers\Admin\LaporanAuditController;
 use App\Http\Controllers\Admin\ManageUserController;
 use App\Http\Controllers\Kepala\DashboardKepalaController;
 use App\Http\Controllers\ProfileController;
@@ -35,6 +37,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/admin/master-data', [ManageUserController::class, 'masterBidang'])->name('admin.master-bidang');
         Route::post('/admin/master-data', [ManageUserController::class, 'storeBidang'])->name('admin.master-bidang.store');
+
+        Route::get('/admin/arsip-global', [ArsipGlobalController::class, 'index'])->name('admin.arsip-global');
+
+        Route::get('/admin/laporan-audit', [LaporanAuditController::class, 'index'])->name('admin.laporan-audit');
     });
 
     Route::middleware(['jabatan:'.Jabatan::KEPALA->value])->group(function () {

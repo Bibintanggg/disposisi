@@ -218,7 +218,6 @@ export default function Dashboard({
                             <span className="text-gray-500">• Metrics update every 15s</span>
                         </div>
 
-                        {/* Stats Cards */}
                         <div className="grid grid-cols-4 gap-6">
                             <div className="bg-[#fafafa] rounded-2xl border p-8 hover:border-blue-500 transition-all duration-300">
                                 <div className="flex items-start justify-between mb-6">
@@ -425,13 +424,10 @@ export default function Dashboard({
                     </div>
                 </div>
 
-                {/* Right Sidebar - Real-time Performance */}
                 <div className="w-96 bg-[#fafafa] border-l flex flex-col overflow-y-auto">
-                    {/* Performance - REAL-TIME */}
                     <div className="p-6 border-b">
                         <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-6">
                             System Performance 
-                            <span className="ml-2 text-green-500 animate-pulse">• LIVE</span>
                         </h4>
                         <div className="space-y-4">
                             <div className="bg-white rounded-xl p-5 border hover:border-blue-500 transition-colors">

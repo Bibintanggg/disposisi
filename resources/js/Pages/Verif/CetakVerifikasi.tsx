@@ -73,7 +73,6 @@ export default function CetakVerifikasi() {
     const [approvedModalOpen, setApprovedModalOpen] = useState(false);
     const [processing, setProcessing] = useState(false);
 
-    // Update selected surat jika allSurat berubah
     useEffect(() => {
         if (allSurat.length > 0 && !selectedSurat) {
             setSelectedSurat(allSurat[0]);
