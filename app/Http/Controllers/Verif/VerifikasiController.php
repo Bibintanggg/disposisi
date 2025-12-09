@@ -118,7 +118,7 @@ class VerifikasiController extends Controller
             'catatan_verifikasi' => 'nullable|string|max:500',
         ]);
 
-        $jenis = $request->input('jenis'); // 'masuk' atau 'keluar'
+        $jenis = $request->input('jenis');
         
         if ($jenis === 'masuk') {
             $surat = SuratMasuk::findOrFail($id);

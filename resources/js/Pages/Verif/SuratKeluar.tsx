@@ -574,7 +574,6 @@ export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: Surat
                                 </div>
                             </div>
 
-                            {/* PDF Preview */}
                             {selectedSurat.gambar && (
                                 <div>
                                     <p className="text-sm font-semibold text-gray-500 mb-2">Lampiran Dokumen</p>

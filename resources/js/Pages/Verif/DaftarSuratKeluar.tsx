@@ -21,6 +21,7 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
     const [searchQuery, setSearchQuery] = useState('');
     const [filterUnit, setFilterUnit] = useState('all');
     const [filterStatus, setFilterStatus] = useState('all');
+    const [showDetailModal, setShowDetailModal] = useState(false)
 
     useEffect(() => {
         if (initialSuratKeluar && initialSuratKeluar.length > 0) {
@@ -49,10 +50,10 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
 
     const getJabatanRole = (jabatan: number) => {
         switch (jabatan) {
-            case 1 : return "ADMIN"
-            case 2 : return "KEPALA"
-            case 3 : return "STAF"
-            case 4 : return "VERIFIKATOR"
+            case 1: return "ADMIN"
+            case 2: return "KEPALA"
+            case 3: return "STAF"
+            case 4: return "VERIFIKATOR"
             default: return "STAF"
         }
     }
@@ -411,7 +412,10 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                         </div>
 
                         <div className="p-6 border-t border-gray-200 bg-gray-50">
-                            <Button size="lg" className="w-full gap-2 bg-purple-600 hover:bg-purple-700">
+                            <Button
+                            onClick={() => setShowDetailModal(true)} 
+                            size="lg" 
+                            className="w-full gap-2 bg-purple-600 hover:bg-purple-700">
                                 <Eye size={18} />
                                 Lihat Detail Lengkap
                             </Button>
@@ -419,33 +423,168 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                     </div>
                 )}
 
-                 <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-                            <DialogContent className="max-w-sm">
-                                <DialogHeader>
-                                    <DialogTitle>Hapus Surat?</DialogTitle>
-                                    <DialogDescription>
-                                        Surat yang dihapus tidak dapat dikembalikan. Yakin ingin melanjutkan?
-                                    </DialogDescription>
-                                </DialogHeader>
+                <Dialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+                    <DialogContent className="max-w-sm">
+                        <DialogHeader>
+                            <DialogTitle>Hapus Surat?</DialogTitle>
+                            <DialogDescription>
+                                Surat yang dihapus tidak dapat dikembalikan. Yakin ingin melanjutkan?
+                            </DialogDescription>
+                        </DialogHeader>
 
-                                <DialogFooter>
-                                    <Button
-                                        variant="outline"
-                                        onClick={() => setDeleteModalOpen(false)}
-                                    >
-                                        Batal
-                                    </Button>
+                        <DialogFooter>
+                            <Button
+                                variant="outline"
+                                onClick={() => setDeleteModalOpen(false)}
+                            >
+                                Batal
+                            </Button>
 
-                                    <Button
-                                        variant="destructive"
-                                        onClick={handleDelete}
-                                    >
-                                        Hapus
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
+                            <Button
+                                variant="destructive"
+                                onClick={handleDelete}
+                            >
+                                Hapus
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
+
+              {showDetailModal && selectedSurat && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+                        {/* Header */}
+                        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-purple-50 to-white">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                                    <FileText className="text-purple-600" size={24} />
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold text-gray-900">Detail Surat Keluar</h2>
+                                    <p className="text-sm text-gray-500">{selectedSurat.nomor_surat}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowDetailModal(false)}
+                                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                            >
+                                <XCircle className="text-gray-400 hover:text-gray-600" size={24} />
+                            </button>
+                        </div>
+
+                        {/* Content */}
+                        <div className="flex-1 overflow-y-auto p-6">
+                            <div className="grid grid-cols-2 gap-6 mb-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Nomor Surat</p>
+                                        <p className="text-base font-bold text-gray-900">{selectedSurat.nomor_surat}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Penerima</p>
+                                        <p className="text-base text-gray-900">{selectedSurat.penerima}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Unit Pengirim</p>
+                                        <div className="flex items-center gap-2">
+                                            <Building2 size={16} className="text-purple-600" />
+                                            <p className="text-base text-gray-900">{selectedSurat.unit_pengirim.nama_bidang}</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Penanda Tangan</p>
+                                        <div className="flex items-center gap-2">
+                                            <PenTool size={16} className="text-purple-600" />
+                                            <p className="text-base text-gray-900">{selectedSurat.user_penanda_tangan.nama_lengkap}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Tanggal Surat</p>
+                                        <p className="text-base text-gray-900">
+                                            {new Date(selectedSurat.tanggal_surat).toLocaleDateString('id-ID', {
+                                                weekday: 'long',
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric'
+                                            })}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Tanggal & Waktu Kirim</p>
+                                        <p className="text-base text-gray-900">
+                                            {new Date(selectedSurat.tanggal_kirim).toLocaleString('id-ID', {
+                                                weekday: 'long',
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Status Arsip</p>
+                                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg ${getStatusArsipInfo(selectedSurat.status_arsip).color}`}>
+                                            {(() => {
+                                                const StatusIcon = getStatusArsipInfo(selectedSurat.status_arsip).icon;
+                                                return <StatusIcon size={16} />;
+                                            })()}
+                                            <span className="font-semibold">{getStatusArsipInfo(selectedSurat.status_arsip).label}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mb-6">
+                                <p className="text-sm font-semibold text-gray-500 mb-2">Isi/Perihal Surat</p>
+                                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                    <p className="text-base text-gray-900 whitespace-pre-wrap">{selectedSurat.isi_surat}</p>
+                                </div>
+                            </div>
+
+                            {selectedSurat.gambar && (
+                                <div>
+                                    <p className="text-sm font-semibold text-gray-500 mb-2">Lampiran Dokumen</p>
+                                    <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+                                        <iframe
+                                            src={route('verif.surat-keluar.file', selectedSurat.gambar.split('/').pop())}
+                                            className="w-full h-[500px]"
+                                            title="PDF Preview"
+                                        />
+                                        <div className="p-4 bg-white border-t border-gray-200 flex items-center justify-between">
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <Paperclip size={16} />
+                                                <span>{selectedSurat.gambar.split('/').pop()}</span>
+                                            </div>
+                                            <a
+                                                href={route('verif.surat-keluar.file', selectedSurat.gambar.split('/').pop())}
+                                                download
+                                                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                                            >
+                                                <ArrowUpRight size={16} />
+                                                Download PDF
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="p-6 border-t border-gray-200 bg-gray-50">
+                            <Button
+                                onClick={() => setShowDetailModal(false)}
+                                className="w-full h-12 bg-purple-600 hover:bg-purple-700"
+                            >
+                                Tutup
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </Authenticated>
     );
 }

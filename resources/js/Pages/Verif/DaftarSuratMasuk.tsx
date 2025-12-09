@@ -1,6 +1,6 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { useEffect, useState } from "react";
-import { Mail, Search, Filter, Download, Eye, Edit2, Trash2, MoreVertical, Calendar, User, FileText, AlertCircle, Clock, CheckCircle, XCircle, Paperclip, SlidersHorizontal, Grid3X3, List } from "lucide-react";
+import { Mail, Search, Filter, Download, Eye, Edit2, Trash2, MoreVertical, Calendar, User, FileText, AlertCircle, Clock, CheckCircle, XCircle, Paperclip, SlidersHorizontal, Grid3X3, List, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -32,6 +32,7 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [filterSifat, setFilterSifat] = useState('all');
     const [filterStatus, setFilterStatus] = useState("all");
+    const [showDetailModal, setShowDetailModal] = useState(false)
 
     const [selectedSurat, setSelectedSurat] = useState(surat?.[0] ?? null);
     const [viewMode, setViewMode] = useState('list');
@@ -384,7 +385,6 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                             </DialogContent>
                         </Dialog>
 
-                        {/* Content */}
                         <div className="flex-1 overflow-y-auto p-6 space-y-6">
                             <div>
                                 <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Pengirim</p>
@@ -461,9 +461,8 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                             </div>
                         </div>
 
-                        {/* Footer Actions */}
                         <div className="p-6 border-t border-gray-200 bg-gray-50">
-                            <Button size="lg" className="w-full gap-2">
+                            <Button size="lg" className="w-full gap-2" onClick={() => setShowDetailModal(true)}>
                                 <Eye size={18} />
                                 Lihat Detail Lengkap
                             </Button>
@@ -471,6 +470,131 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                     </div>
                 )}
             </div>
+
+            {showDetailModal && selectedSurat && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+                        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                                    <FileText className="text-blue-600" size={24} />
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold text-gray-900">Detail Surat Masuk</h2>
+                                    <p className="text-sm text-gray-500">{selectedSurat.nomor_surat}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowDetailModal(false)}
+                                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                            >
+                                <XCircle className="text-gray-400 hover:text-gray-600" size={24} />
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-6">
+                            <div className="grid grid-cols-2 gap-6 mb-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Nomor Surat</p>
+                                        <p className="text-base font-bold text-gray-900">{selectedSurat.nomor_surat}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Pengirim</p>
+                                        <p className="text-base text-gray-900">{selectedSurat.pengirim}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Sifat Surat</p>
+                                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-white ${getSifatInfo(selectedSurat.sifat_surat).color}`}>
+                                            <span className="font-semibold">{getSifatInfo(selectedSurat.sifat_surat).label}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Tanggal Surat</p>
+                                        <p className="text-base text-gray-900">
+                                            {new Date(selectedSurat.tanggal_surat).toLocaleDateString('id-ID', {
+                                                weekday: 'long',
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric'
+                                            })}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Tanggal Terima</p>
+                                        <p className="text-base text-gray-900">
+                                            {new Date(selectedSurat.tanggal_terima).toLocaleString('id-ID', {
+                                                weekday: 'long',
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Status</p>
+                                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg ${getStatusInfo(selectedSurat.status_akhir).color}`}>
+                                            {(() => {
+                                                const StatusIcon = getStatusInfo(selectedSurat.status_akhir).icon;
+                                                return <StatusIcon size={16} />;
+                                            })()}
+                                            <span className="font-semibold">{getStatusInfo(selectedSurat.status_akhir).label}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mb-6">
+                                <p className="text-sm font-semibold text-gray-500 mb-2">Isi/Perihal Surat</p>
+                                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                    <p className="text-base text-gray-900 whitespace-pre-wrap">{selectedSurat.isi_surat}</p>
+                                </div>
+                            </div>
+
+                            {selectedSurat.gambar && (
+                                <div>
+                                    <p className="text-sm font-semibold text-gray-500 mb-2">Lampiran Dokumen</p>
+                                    <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+                                        <iframe
+                                            src={route('verif.surat-masuk.file', selectedSurat.gambar.split('/').pop())}
+                                            className="w-full h-[500px]"
+                                            title="PDF Preview"
+                                        />
+                                        <div className="p-4 bg-white border-t border-gray-200 flex items-center justify-between">
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <Paperclip size={16} />
+                                                <span>{selectedSurat.gambar.split('/').pop()}</span>
+                                            </div>
+                                            <a
+                                                href={route('verif.surat-masuk.file', selectedSurat.gambar.split('/').pop())}
+                                                download
+                                                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                                            >
+                                                <ArrowUpRight size={16} />
+                                                Download PDF
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="p-6 border-t border-gray-200 bg-gray-50">
+                            <Button
+                                onClick={() => setShowDetailModal(false)}
+                                className="w-full h-12 bg-blue-600 hover:bg-blue-700"
+                            >
+                                Tutup
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </Authenticated>
     );
 }

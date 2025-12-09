@@ -1,15 +1,20 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import React, { useState, useEffect } from "react";
-import { 
-    Mail, 
-    FileText, 
-    AlertCircle, 
-    Send, 
-    Clock, 
-    CheckCircle, 
-    XCircle, 
-    Search, 
-    MoreHorizontal 
+import {
+    Mail,
+    FileText,
+    AlertCircle,
+    Send,
+    Clock,
+    CheckCircle,
+    XCircle,
+    Search,
+    MoreHorizontal,
+    Eye,
+    Paperclip,
+    ArrowUpRight,
+    Building2,
+    PenTool
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,12 +34,11 @@ import { User } from "@/types/user";
 interface SuratMasukProps {
     surat: SuratMasuk[];
     auth: {
-        user: User; // ✅ Diperbaiki: User singular, bukan array
+        user: User;
     };
 }
 
 export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
-    // Gunakan auth dari props
     const { user } = auth;
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -50,8 +54,9 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
     });
 
     const [selectedSurat, setSelectedSurat] = useState<SuratMasuk | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [showDetailModal, setShowDetailModal] = useState(false);
 
-    // Pastikan user_input_id selalu terisi dengan ID user yang login
     useEffect(() => {
         if (user?.id) {
             setData("user_input_id", user.id);
@@ -61,30 +66,9 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
-        // Debug: lihat data sebelum submit
-        console.log('Submitting data:', {
-            ...data,
-            user_input_id: user?.id
-        });
-        
-        // Gunakan FormData untuk handle file upload
-        const formData = new FormData();
-        formData.append('user_input_id', data.user_input_id.toString());
-        formData.append('nomor_surat', data.nomor_surat);
-        formData.append('tanggal_surat', data.tanggal_surat);
-        formData.append('tanggal_terima', data.tanggal_terima);
-        formData.append('pengirim', data.pengirim);
-        formData.append('isi_surat', data.isi_surat);
-        formData.append('sifat_surat', data.sifat_surat.toString());
-        formData.append('status_akhir', data.status_akhir.toString());
-        
-        if (data.gambar) {
-            formData.append('gambar', data.gambar);
-        }
-        
+
         post(route("verif.input-surat-masuk.store"), {
-            data: formData,
+            data,
             forceFormData: true,
             onError: (errors) => {
                 console.log('Validation errors:', errors);
@@ -117,10 +101,18 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
         return statusOptions.find(s => s.value === status) || statusOptions[0];
     };
 
+    const filteredSurat = surat.filter((s) => {
+        const text = searchTerm.toLowerCase();
+        return (
+            (s.nomor_surat ?? "").toLowerCase().includes(text) ||
+            (s.pengirim ?? "").toLowerCase().includes(text) ||
+            (s.isi_surat ?? "").toLowerCase().includes(text)
+        );
+    });
+
     return (
         <Authenticated>
             <div className="flex h-screen overflow-hidden bg-gray-50">
-                {/* MAIN CONTENT */}
                 <div className="flex-1 flex flex-col overflow-hidden">
                     <div className="bg-white border-b border-gray-200 p-6">
                         <div className="flex items-center justify-between mb-6">
@@ -139,7 +131,6 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                             </div>
                         </div>
 
-                        {/* SUMMARY */}
                         <div className="grid grid-cols-3 gap-4">
                             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border border-blue-200">
                                 <p className="text-xs font-medium text-blue-600 mb-1">Total Surat</p>
@@ -160,7 +151,6 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                         </div>
                     </div>
 
-                    {/* FORM */}
                     <div className="flex-1 overflow-y-auto p-6">
                         <div className="max-w-4xl mx-auto">
                             <form onSubmit={handleSubmit}>
@@ -172,35 +162,9 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                                         <h2 className="text-2xl font-bold text-gray-900">Form Input Surat Masuk</h2>
                                     </div>
 
-                                    {/* Debug Info */}
-                                    {process.env.NODE_ENV === 'development' && (
-                                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-                                            <p className="text-sm text-yellow-800">
-                                                <strong>Debug Info:</strong> User ID: {user?.id || 'Not found'}, 
-                                                Form User ID: {data.user_input_id}
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    {/* Error Messages */}
-                                    {errors && Object.keys(errors).length > 0 && (
-                                        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                                            <div className="flex items-center gap-2 text-red-800 mb-2">
-                                                <AlertCircle size={20} />
-                                                <span className="font-semibold">Terjadi Kesalahan Validasi</span>
-                                            </div>
-                                            <ul className="text-sm text-red-700 list-disc list-inside">
-                                                {Object.entries(errors).map(([field, message]) => (
-                                                    <li key={field}><strong>{field}:</strong> {message}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    )}
-
                                     <div className="space-y-6">
-                                        {/* NOMOR SURAT + PENGIRIM */}
                                         <div className="grid grid-cols-2 gap-6">
-                                            <div>
+                                            <div className="space-y-2">
                                                 <Label htmlFor="nomor_surat">Nomor Surat *</Label>
                                                 <Input
                                                     id="nomor_surat"
@@ -214,7 +178,7 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                                                 )}
                                             </div>
 
-                                            <div>
+                                            <div className="space-y-2">
                                                 <Label htmlFor="pengirim">Pengirim *</Label>
                                                 <Input
                                                     id="pengirim"
@@ -229,9 +193,8 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                                             </div>
                                         </div>
 
-                                        {/* DATE INPUTS */}
                                         <div className="grid grid-cols-2 gap-6">
-                                            <div>
+                                            <div className="space-y-2">
                                                 <Label htmlFor="tanggal_surat">Tanggal Surat *</Label>
                                                 <Input
                                                     id="tanggal_surat"
@@ -245,7 +208,7 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                                                 )}
                                             </div>
 
-                                            <div>
+                                            <div className="space-y-2">
                                                 <Label htmlFor="tanggal_terima">Tanggal Terima *</Label>
                                                 <Input
                                                     id="tanggal_terima"
@@ -260,10 +223,10 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                                             </div>
                                         </div>
 
-                                        {/* SIFAT SURAT */}
-                                        <div>
+                                        <div className="space-y-2">
                                             <Label htmlFor="sifat_surat">Sifat Surat *</Label>
                                             <Select
+                                                value={String(data.sifat_surat)}
                                                 onValueChange={(value) => setData("sifat_surat", Number(value))}
                                             >
                                                 <SelectTrigger className="h-12" id="sifat_surat">
@@ -282,8 +245,7 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                                             )}
                                         </div>
 
-                                        {/* ISI SURAT */}
-                                        <div>
+                                        <div className="space-y-2">
                                             <Label htmlFor="isi_surat">Isi Surat *</Label>
                                             <Textarea
                                                 id="isi_surat"
@@ -291,14 +253,14 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                                                 onChange={(e) => setData("isi_surat", e.target.value)}
                                                 rows={4}
                                                 placeholder="Masukkan isi ringkas surat"
+                                                className="resize-none"
                                             />
                                             {errors.isi_surat && (
                                                 <p className="text-red-500 text-xs mt-1">{errors.isi_surat}</p>
                                             )}
                                         </div>
 
-                                        {/* FILE UPLOAD */}
-                                        <div>
+                                        <div className="space-y-2">
                                             <Label htmlFor="gambar">Lampiran File</Label>
                                             <Input
                                                 id="gambar"
@@ -316,9 +278,9 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                                         </div>
 
                                         <div className="flex gap-4 pt-6">
-                                            <Button 
-                                                type="submit" 
-                                                size="lg" 
+                                            <Button
+                                                type="submit"
+                                                size="lg"
                                                 className="flex-1 h-12 gap-2"
                                                 disabled={processing}
                                             >
@@ -347,19 +309,20 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                 <div className="w-96 bg-white border-l border-gray-200 flex flex-col">
                     <div className="p-6 border-b border-gray-200">
                         <h3 className="text-lg font-bold text-gray-900 mb-4">Surat Terakhir</h3>
-
                         <div className="relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                             <Input
                                 placeholder="Cari surat..."
                                 className="pl-10 h-11"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
                             />
                         </div>
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-4">
                         <div className="space-y-2">
-                            {surat.map((s) => {
+                            {filteredSurat.map((s) => {
                                 const sifatInfo = getSifatInfo(s.sifat_surat);
                                 const statusInfo = getStatusInfo(s.status_akhir);
                                 const StatusIcon = statusInfo.icon;
@@ -368,11 +331,10 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                                     <div
                                         key={s.id}
                                         onClick={() => setSelectedSurat(s)}
-                                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                                            selectedSurat?.id === s.id
+                                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${selectedSurat?.id === s.id
                                                 ? "border-blue-500 bg-blue-50"
                                                 : "border-gray-200 hover:border-gray-300"
-                                        }`}
+                                            }`}
                                     >
                                         <div className="flex justify-between items-start">
                                             <div className="flex-1">
@@ -409,7 +371,18 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
 
                     {selectedSurat && (
                         <div className="p-4 border-t border-gray-200">
-                            <p className="text-xs font-bold text-gray-700 mb-3">Quick Preview</p>
+                            <div className="flex items-center justify-between mb-2">
+                                <p className="text-xs font-bold text-gray-700 uppercase">Quick Preview</p>
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-8 gap-1"
+                                    onClick={() => setShowDetailModal(true)}
+                                >
+                                    <Eye size={14} />
+                                    Detail
+                                </Button>
+                            </div>
                             <div className="text-xs space-y-2">
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Penginput:</span>
@@ -434,6 +407,131 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                     )}
                 </div>
             </div>
+
+            {showDetailModal && selectedSurat && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+                        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                                    <FileText className="text-blue-600" size={24} />
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold text-gray-900">Detail Surat Masuk</h2>
+                                    <p className="text-sm text-gray-500">{selectedSurat.nomor_surat}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowDetailModal(false)}
+                                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                            >
+                                <XCircle className="text-gray-400 hover:text-gray-600" size={24} />
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-6">
+                            <div className="grid grid-cols-2 gap-6 mb-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Nomor Surat</p>
+                                        <p className="text-base font-bold text-gray-900">{selectedSurat.nomor_surat}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Pengirim</p>
+                                        <p className="text-base text-gray-900">{selectedSurat.pengirim}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Sifat Surat</p>
+                                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-white ${getSifatInfo(selectedSurat.sifat_surat).color}`}>
+                                            <span className="font-semibold">{getSifatInfo(selectedSurat.sifat_surat).label}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Tanggal Surat</p>
+                                        <p className="text-base text-gray-900">
+                                            {new Date(selectedSurat.tanggal_surat).toLocaleDateString('id-ID', {
+                                                weekday: 'long',
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric'
+                                            })}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Tanggal Terima</p>
+                                        <p className="text-base text-gray-900">
+                                            {new Date(selectedSurat.tanggal_terima).toLocaleString('id-ID', {
+                                                weekday: 'long',
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Status</p>
+                                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg ${getStatusInfo(selectedSurat.status_akhir).color}`}>
+                                            {(() => {
+                                                const StatusIcon = getStatusInfo(selectedSurat.status_akhir).icon;
+                                                return <StatusIcon size={16} />;
+                                            })()}
+                                            <span className="font-semibold">{getStatusInfo(selectedSurat.status_akhir).label}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mb-6">
+                                <p className="text-sm font-semibold text-gray-500 mb-2">Isi/Perihal Surat</p>
+                                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                    <p className="text-base text-gray-900 whitespace-pre-wrap">{selectedSurat.isi_surat}</p>
+                                </div>
+                            </div>
+
+                            {selectedSurat.gambar && (
+                                <div>
+                                    <p className="text-sm font-semibold text-gray-500 mb-2">Lampiran Dokumen</p>
+                                    <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+                                        <iframe
+                                            src={route('verif.surat-masuk.file', selectedSurat.gambar.split('/').pop())}
+                                            className="w-full h-[500px]"
+                                            title="PDF Preview"
+                                        />
+                                        <div className="p-4 bg-white border-t border-gray-200 flex items-center justify-between">
+                                            <div className="flex items-center gap-2 text-sm text-gray-600">
+                                                <Paperclip size={16} />
+                                                <span>{selectedSurat.gambar.split('/').pop()}</span>
+                                            </div>
+                                            <a
+                                                href={route('verif.surat-masuk.file', selectedSurat.gambar.split('/').pop())}
+                                                download
+                                                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                                            >
+                                                <ArrowUpRight size={16} />
+                                                Download PDF
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="p-6 border-t border-gray-200 bg-gray-50">
+                            <Button
+                                onClick={() => setShowDetailModal(false)}
+                                className="w-full h-12 bg-blue-600 hover:bg-blue-700"
+                            >
+                                Tutup
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </Authenticated>
     );
 }

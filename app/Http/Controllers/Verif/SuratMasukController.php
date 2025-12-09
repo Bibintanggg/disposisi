@@ -11,10 +11,28 @@ use Inertia\Inertia;
 
 class SuratMasukController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $query = SuratMasuk::with('users');
+
+        if ($request->nomor_surat) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nomor_surat', 'like', '%' . $request->nomor_surat . '%')
+                    ->orWhere('pengirim', 'like', '%' . $request->nomor_surat . '%')
+                    ->orWhere('isi_surat', 'like', '%' . $request->nomor_surat . '%');
+            });
+        }
+
+        if ($request->sifat && $request->sifat !== "all") {
+            $query->where('sifat_surat', $request->sifat);
+        }
+
+        if ($request->status && $request->status !== "all") {
+            $query->where('status_akhir', $request->status);
+        }
+
         return Inertia::render('Verif/SuratMasuk', [
-            'surat' => SuratMasuk::with('users')->get()
+            'surat' => $query->get()
         ]);
     }
 
@@ -69,7 +87,7 @@ class SuratMasukController extends Controller
         if ($surat->gambar && file_exists(storage_path('app/public/' . $surat->gambar))) {
             unlink(storage_path('app/public/' . $surat->gambar));
         }
-        
+
         $surat->delete();
 
         return redirect()->back()->with('success', 'Surat berhasil dihapus');
@@ -86,5 +104,42 @@ class SuratMasukController extends Controller
         }
 
         return response()->download($file);
+    }
+
+    public function previewFile($filename)
+    {
+        $path = storage_path('app/public/surat/' . $filename);
+
+        if (!file_exists($path)) {
+            abort(404, 'File tidak ditemukan');
+        }
+
+        return response()->file($path);
+    }
+
+
+    public function suratTerakhir(Request $request)
+    {
+        $query = SuratMasuk::with('users');
+
+        if ($request->nomor_surat) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nomor_surat', 'like', '%' . $request->nomor_surat . '%')
+                    ->orWhere('pengirim', 'like', '%' . $request->nomor_surat . '%')
+                    ->orWhere('isi_surat', 'like', '%' . $request->nomor_surat . '%');
+            });
+        }
+
+        if ($request->sifat && $request->sifat !== "all") {
+            $query->where('sifat_surat', $request->sifat);
+        }
+
+        if ($request->status && $request->status !== "all") {
+            $query->where('status_akhir', $request->status);
+        }
+
+        return Inertia::render('Verif/SuratMasuk', [
+            'surat' => $query->get(),
+        ]);
     }
 }

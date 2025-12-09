@@ -22,6 +22,9 @@ return new class extends Migration
             $table->string("gambar")->nullable();
             $table->dateTime("tanggal_kirim");
             $table->integer("status_arsip");
+            $table->integer("status_akhir")->default(1);
+            $table->integer("status_verifikasi")->default(1);
+            $table->integer("status_cetak")->default(1);
             $table->timestamps();
         });
     }

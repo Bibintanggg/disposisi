@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Http\Enum\StatusArsip;
+use App\Http\Enum\StatusCetak;
+use App\Http\Enum\StatusVerifikasi;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,11 +23,16 @@ class SuratKeluar extends Model
         'isi_surat',
         'gambar',
         'tanggal_kirim',
-        'status_arsip'
+        'status_arsip',
+
+        'status_verifikasi',
+        'status_cetak',
     ];
 
     protected $casts = [
-        'status_arsip' => StatusArsip::class
+        'status_arsip' => StatusArsip::class,
+        'status_verifikasi' => StatusVerifikasi::class,
+        'status_cetak' => StatusCetak::class
     ];
 
     public function unit_pengirim() 

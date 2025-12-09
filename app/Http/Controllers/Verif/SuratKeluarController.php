@@ -80,7 +80,6 @@ class SuratKeluarController extends Controller
         $query = SuratKeluar::with(['unit_pengirim', 'user_penanda_tangan'])
             ->orderBy('tanggal_kirim', 'desc');
 
-        // Filter berdasarkan search (nomor surat, penerima, isi surat)
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -90,7 +89,6 @@ class SuratKeluarController extends Controller
             });
         }
 
-        // Filter berdasarkan unit pengirim
         if ($request->filled('unit_pengirim_id') && $request->unit_pengirim_id !== 'all') {
             $query->where('unit_pengirim_id', $request->unit_pengirim_id);
         }

@@ -48,6 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['jabatan:'.Jabatan::VERIFIKATOR->value])->group(function () {
         Route::get('verif/dashboard', [DashboardVerifController::class, 'index'])->name('verif.dashboard');
         Route::get('verif/input-surat-masuk', [SuratMasukController::class, 'index'])->name('verif.input-surat-masuk');
+        Route::get('verif/input-surat-masuk/{filename}', [SuratMasukController::class, 'previewFile'])->name('verif.surat-masuk.file');
         Route::post('verif/input-surat-masuk', [SuratMasukController::class, 'store'])->name('verif.input-surat-masuk.store');
 
         Route::get('verif/daftar-surat-masuk', [SuratMasukController::class, 'daftarSurat'])->name('verif.daftar-surat-masuk');
