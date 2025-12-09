@@ -9,7 +9,6 @@ use App\Http\Enum\SifatSurat;
 use App\Models\SuratMasuk;
 use App\Models\SuratKeluar;
 use App\Models\Bidang;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -22,26 +21,50 @@ class DashboardVerifController extends Controller
         $bulanIni = now()->month;
         $tahunIni = now()->year;
 
+        $verifiedMasuk = SuratMasuk::where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)->count();
+        $verifiedKeluar = SuratKeluar::where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)->count();
+        \Log::info('Total Terverifikasi Masuk: ' . $verifiedMasuk);
+        \Log::info('Total Terverifikasi Keluar: ' . $verifiedKeluar);
+        
+        // Cek contoh data
+        $sample = SuratMasuk::where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)->first();
+        if ($sample) {
+            \Log::info('Sample Surat Masuk Terverifikasi:', [
+                'id' => $sample->id,
+                'status_verifikasi' => $sample->status_verifikasi,
+                'tanggal_verifikasi' => $sample->tanggal_verifikasi,
+                'diverifikasi_oleh' => $sample->diverifikasi_oleh
+            ]);
+        }
+
+        // Total surat masuk bulan ini (dibuat bulan ini)
         $totalSuratMasuk = SuratMasuk::whereMonth('tanggal_terima', $bulanIni)
             ->whereYear('tanggal_terima', $tahunIni)
             ->count();
 
+        // Total surat keluar bulan ini (dibuat bulan ini)
         $totalSuratKeluar = SuratKeluar::whereMonth('tanggal_kirim', $bulanIni)
             ->whereYear('tanggal_kirim', $tahunIni)
             ->count();
 
+        // Pending verification
         $totalPending = SuratMasuk::where('status_verifikasi', StatusVerifikasi::PENDING)->count() +
                        SuratKeluar::where('status_verifikasi', StatusVerifikasi::PENDING)->count();
 
-        $totalTerverifikasi = SuratMasuk::where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)
-            ->whereMonth('tanggal_verifikasi', $bulanIni)
-            ->whereYear('tanggal_verifikasi', $tahunIni)
-            ->count() +
-            SuratKeluar::where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)
-            ->whereMonth('tanggal_verifikasi', $bulanIni)
-            ->whereYear('tanggal_verifikasi', $tahunIni)
-            ->count();
+        // **PERBAIKAN DI SINI:** Hitung semua surat yang sudah terverifikasi (tidak hanya bulan ini)
+        $totalTerverifikasi = SuratMasuk::where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)->count() +
+                             SuratKeluar::where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)->count();
 
+        \Log::info('Dashboard Stats:', [
+            'totalSuratMasuk' => $totalSuratMasuk,
+            'totalSuratKeluar' => $totalSuratKeluar,
+            'totalPending' => $totalPending,
+            'totalTerverifikasi' => $totalTerverifikasi,
+            'verifiedMasuk' => $verifiedMasuk,
+            'verifiedKeluar' => $verifiedKeluar
+        ]);
+
+        // Data untuk chart volume surat (7 bulan terakhir)
         $suratBulananData = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = now()->subMonths($i);
@@ -69,12 +92,14 @@ class DashboardVerifController extends Controller
         
         \Log::info('Debug Sifat Surat:', $debugSifat->toArray());
 
+        // Distribusi sifat surat - Coba query dengan berbagai kemungkinan
         $totalSurat = SuratMasuk::count();
         
+        // Cek apakah kolom sifat_surat berisi integer atau string
         $biasaCount = SuratMasuk::where(function($q) {
-            $q->where('sifat_surat', SifatSurat::BIASA->value)  
+            $q->where('sifat_surat', SifatSurat::BIASA->value) 
               ->orWhere('sifat_surat', 'biasa')                 
-              ->orWhere('sifat_surat', 'Biasa');        
+              ->orWhere('sifat_surat', 'Biasa');                
         })->count();
 
         $pentingCount = SuratMasuk::where(function($q) {
@@ -131,10 +156,25 @@ class DashboardVerifController extends Controller
             $hari = $hariIndonesia[$date->dayOfWeek];
             
             $approved = SuratMasuk::where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)
-                ->whereDate('tanggal_verifikasi', $date->toDateString())
+                ->where(function($q) use ($date) {
+                    $q->whereDate('tanggal_verifikasi', $date->toDateString())
+                      ->orWhere(function($q2) use ($date) {
+                          // Jika tanggal_verifikasi null, gunakan updated_at
+                          $q2->whereNull('tanggal_verifikasi')
+                             ->whereDate('updated_at', $date->toDateString())
+                             ->where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI);
+                      });
+                })
                 ->count() +
                 SuratKeluar::where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)
-                ->whereDate('tanggal_verifikasi', $date->toDateString())
+                ->where(function($q) use ($date) {
+                    $q->whereDate('tanggal_verifikasi', $date->toDateString())
+                      ->orWhere(function($q2) use ($date) {
+                          $q2->whereNull('tanggal_verifikasi')
+                             ->whereDate('updated_at', $date->toDateString())
+                             ->where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI);
+                      });
+                })
                 ->count();
             
             $pending = SuratMasuk::where('status_verifikasi', StatusVerifikasi::PENDING)
@@ -227,7 +267,6 @@ class DashboardVerifController extends Controller
             ->values()
             ->toArray();
 
-        
         // 1. Response Time (rata-rata waktu verifikasi dalam jam) - REAL-TIME
         $responseTime = $this->calculateResponseTime();
         
@@ -259,7 +298,12 @@ class DashboardVerifController extends Controller
             ],
             'debug' => [
                 'totalSurat' => $totalSurat,
-                'sifatDebug' => $debugSifat->toArray()
+                'sifatDebug' => $debugSifat->toArray(),
+                'verifiedStats' => [
+                    'masuk' => $verifiedMasuk,
+                    'keluar' => $verifiedKeluar,
+                    'total' => $totalTerverifikasi
+                ]
             ]
         ]);
     }
@@ -272,17 +316,23 @@ class DashboardVerifController extends Controller
         try {
             // Rata-rata waktu verifikasi dalam jam dari surat yang sudah diverifikasi
             $avgHours = DB::table('surat_masuk')
-                ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, created_at, tanggal_verifikasi)) as avg_hours'))
-                ->whereNotNull('tanggal_verifikasi')
-                ->whereDate('tanggal_verifikasi', '>=', now()->subDays(30))
+                ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, created_at, COALESCE(tanggal_verifikasi, updated_at))) as avg_hours'))
+                ->where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)
+                ->where(function($q) {
+                    $q->whereNotNull('tanggal_verifikasi')
+                      ->orWhereNotNull('updated_at');
+                })
                 ->value('avg_hours');
 
-            if (!$avgHours) {
+            if (!$avgHours || $avgHours == 0) {
                 // Jika tidak ada data, ambil dari surat keluar
                 $avgHours = DB::table('surat_keluar')
-                    ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, created_at, tanggal_verifikasi)) as avg_hours'))
-                    ->whereNotNull('tanggal_verifikasi')
-                    ->whereDate('tanggal_verifikasi', '>=', now()->subDays(30))
+                    ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, created_at, COALESCE(tanggal_verifikasi, updated_at))) as avg_hours'))
+                    ->where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)
+                    ->where(function($q) {
+                        $q->whereNotNull('tanggal_verifikasi')
+                          ->orWhereNotNull('updated_at');
+                    })
                     ->value('avg_hours');
             }
 
@@ -327,32 +377,21 @@ class DashboardVerifController extends Controller
     {
         try {
             // User yang memiliki aktivitas dalam 24 jam terakhir
-            // Asumsi: user yang membuat/memverifikasi surat dalam 24 jam terakhir
             $last24Hours = now()->subDay();
 
-            // Hitung user unik yang membuat surat dalam 24 jam terakhir
-            $activeFromSuratMasuk = SuratMasuk::where('created_at', '>=', $last24Hours)
+            // Hitung user unik yang membuat/memverifikasi surat dalam 24 jam terakhir
+            $activeUsers = DB::table('surat_masuk')
+                ->where('created_at', '>=', $last24Hours)
+                ->orWhere('tanggal_verifikasi', '>=', $last24Hours)
                 ->distinct('user_input_id')
-                ->pluck('user_input_id')
-                ->filter()
-                ->count();
-
-            // Hitung user unik yang memverifikasi dalam 24 jam terakhir
-            $activeFromVerification = DB::table('surat_masuk')
-                ->where('tanggal_verifikasi', '>=', $last24Hours)
-                ->whereNotNull('diverifikasi_oleh')
-                ->distinct('diverifikasi_oleh')
                 ->count() +
                 DB::table('surat_keluar')
-                ->where('tanggal_verifikasi', '>=', $last24Hours)
-                ->whereNotNull('diverifikasi_oleh')
-                ->distinct('diverifikasi_oleh')
+                ->where('created_at', '>=', $last24Hours)
+                ->orWhere('tanggal_verifikasi', '>=', $last24Hours)
+                ->distinct('user_penanda_tangan_id')
                 ->count();
 
-            // Total active users (minimal 1 untuk user yang sedang login)
-            $totalActive = max(1, $activeFromSuratMasuk + $activeFromVerification);
-            
-            return $totalActive;
+            return max(1, $activeUsers);
         } catch (\Exception $e) {
             \Log::error('Error calculating active users: ' . $e->getMessage());
             return 1;
@@ -365,14 +404,10 @@ class DashboardVerifController extends Controller
     private function getPreviousResponseTime()
     {
         try {
-            // Waktu response 7 hari sebelumnya
-            $sevenDaysAgo = now()->subDays(7);
-            
             $previousAvg = DB::table('surat_masuk')
-                ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, created_at, tanggal_verifikasi)) as avg_hours'))
-                ->whereNotNull('tanggal_verifikasi')
-                ->whereDate('tanggal_verifikasi', '<', $sevenDaysAgo)
-                ->whereDate('tanggal_verifikasi', '>=', $sevenDaysAgo->subDays(30))
+                ->select(DB::raw('AVG(TIMESTAMPDIFF(HOUR, created_at, COALESCE(tanggal_verifikasi, updated_at))) as avg_hours'))
+                ->where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)
+                ->where('created_at', '<', now()->subDays(7))
                 ->value('avg_hours');
 
             return $previousAvg ? round($previousAvg, 1) : 3.0;
@@ -405,12 +440,12 @@ class DashboardVerifController extends Controller
 
             // Total terverifikasi dalam periode sebelumnya
             $previousVerified = SuratMasuk::where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)
-                ->where('tanggal_verifikasi', '<', $sevenDaysAgo)
-                ->where('tanggal_verifikasi', '>=', $fourteenDaysAgo)
+                ->where('created_at', '<', $sevenDaysAgo)
+                ->where('created_at', '>=', $fourteenDaysAgo)
                 ->count() +
                 SuratKeluar::where('status_verifikasi', StatusVerifikasi::TERVERIFIKASI)
-                ->where('tanggal_verifikasi', '<', $sevenDaysAgo)
-                ->where('tanggal_verifikasi', '>=', $fourteenDaysAgo)
+                ->where('created_at', '<', $sevenDaysAgo)
+                ->where('created_at', '>=', $fourteenDaysAgo)
                 ->count();
 
             $previousRate = ($previousVerified / $previousTotal) * 100;
@@ -436,29 +471,15 @@ class DashboardVerifController extends Controller
                 ->where('created_at', '>=', $threeDaysAgo)
                 ->distinct('user_input_id')
                 ->count() +
-                DB::table('surat_masuk')
-                ->where('tanggal_verifikasi', '<', $twoDaysAgo)
-                ->where('tanggal_verifikasi', '>=', $threeDaysAgo)
-                ->whereNotNull('diverifikasi_oleh')
-                ->distinct('diverifikasi_oleh')
+                DB::table('surat_keluar')
+                ->where('created_at', '<', $twoDaysAgo)
+                ->where('created_at', '>=', $threeDaysAgo)
+                ->distinct('user_penanda_tangan_id')
                 ->count();
 
             return max(1, $previousActive);
         } catch (\Exception $e) {
             return 150;
         }
-    }
-
-    /**
-     * API endpoint untuk mendapatkan data real-time (optional)
-     */
-    public function getRealtimeMetrics()
-    {
-        return response()->json([
-            'responseTime' => $this->calculateResponseTime(),
-            'approvalRate' => $this->calculateApprovalRate(),
-            'activeUsers' => $this->calculateActiveUsers(),
-            'updated_at' => now()->toDateTimeString()
-        ]);
     }
 }
