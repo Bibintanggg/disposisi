@@ -15,34 +15,54 @@ export default function ArsipGlobal() {
     const [activeTab, setActiveTab] = useState<'masuk' | 'keluar'>('masuk');
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilter, setShowFilter] = useState(false);
+    const [filters, setFilters] = useState({
+        tanggalMulai: '',
+        tanggalAkhir: '',
+        sifat: '',
+        statusAkhir: '',
+        unitPengirim: '',
+        statusArsip: ''
+    });
 
-    const getStatusBadgeClass = (statusArsip: number): StatusBadge => {
-        switch (statusArsip) {
+
+    const getStatusBadgeClass = (StatusAkhir: number): StatusBadge => {
+        switch (StatusAkhir) {
             case 1:
-                return {label: "Baru", className: 'bg-green-100 text-green-800 border-green-200'};
+                return { label: "Baru", className: 'bg-green-100 text-green-800 border-green-200' };
             case 2:
-                return {label: "Disposisi", className: 'bg-yellow-100 text-yellow-800 border-yellow-200'};
+                return { label: "Disposisi", className: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
             case 3:
-                return {label: "Selesai", className: 'bg-indigo-100 text-indigo-800 border-indigo-200'};
+                return { label: "Selesai", className: 'bg-indigo-100 text-indigo-800 border-indigo-200' };
             case 4:
-                return {label: "Arsip", className: 'bg-purple-100 text-purple-800 border-purple-200'};
+                return { label: "Arsip", className: 'bg-purple-100 text-purple-800 border-purple-200' };
             default:
-                return {label: "Baru", className: 'bg-gray-100 text-gray-800 border-gray-200'};
+                return { label: "Baru", className: 'bg-gray-100 text-gray-800 border-gray-200' };
+        }
+    };
+
+    const getStatusArsipClass = (StatusArsip: number): StatusBadge => {
+        switch (StatusArsip) {
+            case 1:
+                return { label: "Sudah Diarsipkan", className: 'bg-green-100 text-green-800 border-green-200' };
+            case 2:
+                return { label: "Belum Diarsipkan", className: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
+            default:
+                return { label: "Belum Diarsipkan", className: 'bg-gray-100 text-gray-800 border-gray-200' };
         }
     };
 
     const getSifatBadgeClass = (sifatSurat: number): StatusBadge => {
         switch (sifatSurat) {
-            case 1 :
-                return {label: "Biasa", className: 'bg-blue-100 text-blue-800 border-blue-200'};
+            case 1:
+                return { label: "Biasa", className: 'bg-blue-100 text-blue-800 border-blue-200' };
             case 2:
-                return {label: "Penting", className: 'bg-orange-100 text-orange-800 border-orange-200'};
+                return { label: "Penting", className: 'bg-orange-100 text-orange-800 border-orange-200' };
             case 3:
-                return {label: "Rahasia", className: 'bg-purple-100 text-purple-800 border-purple-200'};
+                return { label: "Rahasia", className: 'bg-purple-100 text-purple-800 border-purple-200' };
             case 4:
-                return {label: "Segera", className: 'bg-red-100 text-red-800 border-red-200'};
+                return { label: "Segera", className: 'bg-red-100 text-red-800 border-red-200' };
             default:
-                return {label: "Biasa", className: 'bg-blue-100 text-blue-800 border-blue-200'};
+                return { label: "Biasa", className: 'bg-blue-100 text-blue-800 border-blue-200' };
         }
     };
 
@@ -50,15 +70,25 @@ export default function ArsipGlobal() {
         setSearchQuery(e.target.value)
     }
 
-    const filteredSuratMasuk = suratMasuk.filter((surat: SuratMasuk) => (
+    const filteredSuratMasuk = suratMasuk.data.filter((surat: SuratMasuk) => (
         surat.nomor_surat.toLowerCase().includes(searchQuery.toLowerCase()) ||
         surat.isi_surat.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        surat.pengirim.toLowerCase().includes(searchQuery.toLowerCase()) 
+        surat.pengirim.toLowerCase().includes(searchQuery.toLowerCase())
     ))
+
+    const filteredSuratKeluar = suratKeluar.data.filter((surat: SuratKeluarProps) => {
+        const nomor = surat.nomor_surat?.toLowerCase() ?? '';
+        const isi = surat.isi_surat?.toLowerCase() ?? '';
+        const unit = surat.unit_pengirim?.nama_bidang?.toLowerCase() ?? '';
+
+        const query = searchQuery.toLowerCase();
+
+        return nomor.includes(query) || isi.includes(query) || unit.includes(query);
+    });
+
     return (
         <Authenticated>
             <div className="py-6">
-                {/* Header Section */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-6">
                         <h1 className="text-3xl font-bold text-gray-900">Arsip Global</h1>
@@ -73,8 +103,8 @@ export default function ArsipGlobal() {
                             <button
                                 onClick={() => setActiveTab('masuk')}
                                 className={`${activeTab === 'masuk'
-                                        ? 'border-blue-500 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-blue-500 text-blue-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2`}
                             >
                                 <FileText className="w-5 h-5" />
@@ -83,8 +113,8 @@ export default function ArsipGlobal() {
                             <button
                                 onClick={() => setActiveTab('keluar')}
                                 className={`${activeTab === 'keluar'
-                                        ? 'border-blue-500 text-blue-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    ? 'border-blue-500 text-blue-600'
+                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                     } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2`}
                             >
                                 <FileText className="w-5 h-5" />
@@ -153,24 +183,33 @@ export default function ArsipGlobal() {
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                                     Sifat Surat
                                                 </label>
-                                                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                                <select
+                                                    value={filters.sifat}
+                                                    onChange={(e) => setFilters({ ...filters, sifat: Number(e.target.value) })}
+                                                >
                                                     <option value="">Semua</option>
-                                                    <option value="Sangat Segera">Sangat Segera</option>
-                                                    <option value="Segera">Segera</option>
-                                                    <option value="Biasa">Biasa</option>
-                                                    <option value="Rahasia">Rahasia</option>
+                                                    <option value={1}>Biasa</option>
+                                                    <option value={2}>Penting</option>
+                                                    <option value={3}>Rahasia</option>
+                                                    <option value={4}>Segera</option>
                                                 </select>
+
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                                     Status Akhir
                                                 </label>
-                                                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                                <select
+                                                    value={filters.sifat}
+                                                    onChange={(e) => setFilters({ ...filters, sifat: Number(e.target.value) })}
+                                                >
                                                     <option value="">Semua</option>
-                                                    <option value="Selesai">Selesai</option>
-                                                    <option value="Dalam Proses">Dalam Proses</option>
-                                                    <option value="Tertunda">Tertunda</option>
+                                                    <option value={1}>Biasa</option>
+                                                    <option value={2}>Penting</option>
+                                                    <option value={3}>Rahasia</option>
+                                                    <option value={4}>Segera</option>
                                                 </select>
+
                                             </div>
                                         </>
                                     )}
@@ -181,11 +220,11 @@ export default function ArsipGlobal() {
                                                     <Users className="w-4 h-4 inline mr-1" />
                                                     Unit Pengirim
                                                 </label>
-                                                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                                    <option value="">Semua Unit</option>
-                                                    <option value="sekretariat">Sekretariat</option>
-                                                    <option value="keuangan">Keuangan</option>
-                                                </select>
+                                                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                                        <option value="">Semua Unit</option>
+                                                        <option value="sekretariat">Sekretariat</option>
+                                                        <option value="keuangan">Keuangan</option>
+                                                    </select>
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -282,17 +321,25 @@ export default function ArsipGlobal() {
                             {/* Pagination */}
                             <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
                                 <div className="text-sm text-gray-700">
-                                    Menampilkan <span className="font-medium">1</span> sampai <span className="font-medium">2</span> dari{' '}
-                                    <span className="font-medium">2</span> hasil
+                                    Menampilkan <span className="font-medium">1</span> sampai <span className="font-medium">{suratMasuk.data.length}</span> dari{' '}
+                                    <span className="font-medium">{suratMasuk.data.length}</span> hasil
                                 </div>
                                 <div className="flex gap-2">
-                                    <button className="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 disabled:opacity-50" disabled>
+                                    <button
+                                        className="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 disabled:opacity-50"
+                                        disabled={!suratMasuk.prev_page_url}
+                                        onClick={() => window.location.href = suratMasuk.prev_page_url!}
+                                    >
                                         Previous
                                     </button>
                                     <button className="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm">
-                                        1
+                                        {suratMasuk.current_page}
                                     </button>
-                                    <button className="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 disabled:opacity-50" disabled>
+                                    <button
+                                        className="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 disabled:opacity-50"
+                                        disabled={!suratMasuk.next_page_url}
+                                        onClick={() => window.location.href = suratMasuk.next_page_url!}
+                                    >
                                         Next
                                     </button>
                                 </div>
@@ -330,7 +377,7 @@ export default function ArsipGlobal() {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {suratKeluar.map((surat) => (
+                                        {filteredSuratKeluar.map((surat) => (
                                             <tr key={surat.id} className="hover:bg-gray-50 transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                     {surat.nomor_surat}
@@ -338,18 +385,18 @@ export default function ArsipGlobal() {
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                                     {surat.penerima}
                                                 </td>
-                                                <td className="px-6 py-4 text-sm text-gray-700 max-w-xs truncate">
-                                                    {surat.perihal}
+                                                <td className="px-6 py-4 text-sm text-gray-700 max-w-[13rem] truncate whitespace-nowrap overflow-hidden">
+                                                    {surat.isi_surat}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                                    {surat.unit_pengirim}
+                                                    {surat.unit_pengirim?.nama_bidang ?? "-"}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                                     {new Date(surat.tanggal_kirim).toLocaleDateString('id-ID')}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusBadgeClass(surat.status_arsip)}`}>
-                                                        {surat.status_arsip}
+                                                    <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusArsipClass(surat.status_arsip).className}`}>
+                                                        {getStatusArsipClass(surat.status_arsip).label}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -357,10 +404,6 @@ export default function ArsipGlobal() {
                                                         <button className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium">
                                                             <Eye className="w-4 h-4" />
                                                             Detail
-                                                        </button>
-                                                        <button className="inline-flex items-center gap-1 text-green-600 hover:text-green-800 font-medium">
-                                                            <Download className="w-4 h-4" />
-                                                            File
                                                         </button>
                                                     </div>
                                                 </td>
@@ -373,17 +416,25 @@ export default function ArsipGlobal() {
                             {/* Pagination */}
                             <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
                                 <div className="text-sm text-gray-700">
-                                    Menampilkan <span className="font-medium">1</span> sampai <span className="font-medium">1</span> dari{' '}
-                                    <span className="font-medium">1</span> hasil
+                                    Menampilkan <span className="font-medium">1</span> sampai <span className="font-medium">{suratKeluar.data.length}</span> dari{' '}
+                                    <span className="font-medium">{suratKeluar.data.length}</span> hasil
                                 </div>
                                 <div className="flex gap-2">
-                                    <button className="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 disabled:opacity-50" disabled>
+                                    <button
+                                        className="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 disabled:opacity-50"
+                                        disabled={!suratKeluar.prev_page_url}
+                                        onClick={() => window.location.href = suratKeluar.prev_page_url!}
+                                    >
                                         Previous
                                     </button>
                                     <button className="px-3 py-1 bg-blue-600 text-white rounded-lg text-sm">
-                                        1
+                                        {suratKeluar.current_page}
                                     </button>
-                                    <button className="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 disabled:opacity-50" disabled>
+                                    <button
+                                        className="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-100 disabled:opacity-50"
+                                        disabled={!suratKeluar.next_page_url}
+                                        onClick={() => window.location.href = suratKeluar.next_page_url!}
+                                    >
                                         Next
                                     </button>
                                 </div>
