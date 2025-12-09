@@ -24,7 +24,6 @@ class SuratKeluar extends Model
         'gambar',
         'tanggal_kirim',
         'status_arsip',
-
         'status_verifikasi',
         'status_cetak',
     ];
@@ -35,7 +34,7 @@ class SuratKeluar extends Model
         'status_cetak' => StatusCetak::class
     ];
 
-    public function unit_pengirim() 
+    public function unit_pengirim()
     {
         return $this->belongsTo(Bidang::class, 'unit_pengirim_id');
     }
@@ -43,5 +42,10 @@ class SuratKeluar extends Model
     public function user_penanda_tangan()
     {
         return $this->belongsTo(User::class, 'user_penanda_tangan_id');
+    }
+
+    public function verifikator()
+    {
+        return $this->belongsTo(User::class, 'user_verifikator_id');
     }
 }

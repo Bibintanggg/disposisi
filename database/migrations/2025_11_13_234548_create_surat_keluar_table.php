@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId("unit_pengirim_id")->constrained("bidang")->onDelete("cascade");
             $table->foreignId("user_penanda_tangan_id")->constrained("users")->onDelete("cascade");
+            $table->foreignId('user_verifikator_id')->nullable()->constrained('users');
             $table->string("nomor_surat")->unique();
             $table->date('tanggal_surat');
             $table->string("penerima");
@@ -25,6 +26,8 @@ return new class extends Migration
             $table->integer("status_akhir")->default(1);
             $table->integer("status_verifikasi")->default(1);
             $table->integer("status_cetak")->default(1);
+            $table->dateTime('tanggal_verifikasi')->nullable();
+            $table->string('catatan_verifikasi')->nullable();
             $table->timestamps();
         });
     }

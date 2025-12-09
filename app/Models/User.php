@@ -43,13 +43,13 @@ class User extends Authenticatable
     {
         return $this->hasMany(SuratMasuk::class, 'user_input_id');
     }
-    
+
     public function disposisi()
     {
         return $this->hasMany(Disposisi::class, 'pengirim_id');
     }
 
-    public function suratKeluar() 
+    public function suratKeluar()
     {
         return $this->hasMany(SuratKeluar::class, "user_penanda_tangan_id");
     }
@@ -57,5 +57,10 @@ class User extends Authenticatable
     public function tujuanDisposisi()
     {
         return $this->hasMany(TujuanDisposisi::class, 'penerima_id');
+    }
+
+    public function verifikasiSuratKeluar()
+    {
+        return $this->hasMany(SuratKeluar::class, 'user_verifikator_id');
     }
 }

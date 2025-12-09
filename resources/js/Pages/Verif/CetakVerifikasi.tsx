@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/tabs";
 import { usePage, router } from "@inertiajs/react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/Components/ui/dialog";
-// import { toast } from "sonner";
 
 interface SuratItem {
     id: number;
@@ -60,10 +59,9 @@ interface PageProps {
 
 export default function CetakVerifikasi() {
     const { suratMasuk, suratKeluar } = usePage<PageProps>().props;
-    
-    // Gabungkan surat masuk dan keluar
+
     const allSurat = [...suratMasuk, ...suratKeluar];
-    
+
     const [selectedSurat, setSelectedSurat] = useState<SuratItem | null>(
         allSurat.length > 0 ? allSurat[0] : null
     );
@@ -149,12 +147,14 @@ export default function CetakVerifikasi() {
         let searchFilter = true;
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
-            searchFilter = 
-                surat.nomor_surat.toLowerCase().includes(query) ||
-                surat.pengirim_penerima.toLowerCase().includes(query) ||
-                (surat.penerima && surat.penerima.toLowerCase().includes(query)) ||
-                surat.isi_surat.toLowerCase().includes(query);
+
+            searchFilter =
+                (surat.nomor_surat?.toLowerCase?.() || "").includes(query) ||
+                (surat.pengirim_penerima?.toLowerCase?.() || "").includes(query) ||
+                (surat.penerima?.toLowerCase?.() || "").includes(query) ||
+                (surat.isi_surat?.toLowerCase?.() || "").includes(query);
         }
+
 
         return statusFilter && jenisFilterPass && searchFilter;
     });
@@ -176,7 +176,7 @@ export default function CetakVerifikasi() {
 
     const handleApprove = () => {
         if (!selectedSurat) return;
-        
+
         setProcessing(true);
         router.post(route('verif.approve', selectedSurat.id), {
             catatan_verifikasi: catatanVerifikasi,
@@ -199,7 +199,7 @@ export default function CetakVerifikasi() {
 
     const handleReject = () => {
         if (!selectedSurat) return;
-        
+
         setProcessing(true);
         router.post(route('verif.reject', selectedSurat.id), {
             catatan_verifikasi: catatanVerifikasi,
@@ -222,7 +222,7 @@ export default function CetakVerifikasi() {
 
     const handlePrint = () => {
         if (!selectedSurat) return;
-        
+
         setProcessing(true);
         router.post(route('verif.print', selectedSurat.id), {
             jenis: selectedSurat.jenis
@@ -361,16 +361,14 @@ export default function CetakVerifikasi() {
                                                 setSelectedSurat(surat);
                                                 setCatatanVerifikasi(""); // Reset catatan ketika ganti surat
                                             }}
-                                            className={`bg-white rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 group hover:shadow-lg ${
-                                                selectedSurat?.id === surat.id && selectedSurat?.jenis === surat.jenis
+                                            className={`bg-white rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 group hover:shadow-lg ${selectedSurat?.id === surat.id && selectedSurat?.jenis === surat.jenis
                                                     ? 'border-emerald-500 shadow-lg ring-4 ring-emerald-50'
                                                     : 'border-gray-200 hover:border-gray-300'
-                                            }`}
+                                                }`}
                                         >
                                             <div className="flex items-start gap-4">
-                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                                                    surat.jenis === 'masuk' ? 'bg-blue-100' : 'bg-purple-100'
-                                                }`}>
+                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${surat.jenis === 'masuk' ? 'bg-blue-100' : 'bg-purple-100'
+                                                    }`}>
                                                     {surat.jenis === 'masuk' ? (
                                                         <Mail className="text-blue-600" size={20} />
                                                     ) : (
@@ -385,9 +383,8 @@ export default function CetakVerifikasi() {
                                                                 <h3 className="font-bold text-gray-900 text-base">
                                                                     {surat.nomor_surat}
                                                                 </h3>
-                                                                <span className={`px-2 py-0.5 rounded text-xs font-semibold text-white ${
-                                                                    surat.jenis === 'masuk' ? 'bg-blue-500' : 'bg-purple-500'
-                                                                }`}>
+                                                                <span className={`px-2 py-0.5 rounded text-xs font-semibold text-white ${surat.jenis === 'masuk' ? 'bg-blue-500' : 'bg-purple-500'
+                                                                    }`}>
                                                                     {surat.jenis === 'masuk' ? 'Masuk' : 'Keluar'}
                                                                 </span>
                                                             </div>
@@ -407,9 +404,8 @@ export default function CetakVerifikasi() {
                                                                 </span>
                                                             )}
                                                             {surat.jenis === 'keluar' && surat.status_arsip && (
-                                                                <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${
-                                                                    getStatusArsipInfo(surat.status_arsip).color
-                                                                } flex items-center gap-1`}>
+                                                                <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${getStatusArsipInfo(surat.status_arsip).color
+                                                                    } flex items-center gap-1`}>
                                                                     {getStatusArsipInfo(surat.status_arsip).label}
                                                                 </span>
                                                             )}
@@ -469,15 +465,13 @@ export default function CetakVerifikasi() {
                                             </span>
                                         );
                                     })()}
-                                    <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold text-white ${
-                                        selectedSurat.jenis === 'masuk' ? 'bg-blue-500' : 'bg-purple-500'
-                                    }`}>
+                                    <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold text-white ${selectedSurat.jenis === 'masuk' ? 'bg-blue-500' : 'bg-purple-500'
+                                        }`}>
                                         {selectedSurat.jenis === 'masuk' ? 'Surat Masuk' : 'Surat Keluar'}
                                     </span>
                                     {selectedSurat.jenis === 'keluar' && selectedSurat.status_arsip && (
-                                        <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${
-                                            getStatusArsipInfo(selectedSurat.status_arsip).color
-                                        } flex items-center gap-1.5`}>
+                                        <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusArsipInfo(selectedSurat.status_arsip).color
+                                            } flex items-center gap-1.5`}>
                                             {getStatusArsipInfo(selectedSurat.status_arsip).label}
                                         </span>
                                     )}
@@ -544,15 +538,13 @@ export default function CetakVerifikasi() {
                                 </div>
                             </div>
 
-                            {/* Timeline Verifikasi (jika sudah diverifikasi/ditolak) */}
                             {(selectedSurat.status_verifikasi === 'approved' || selectedSurat.status_verifikasi === 'rejected') && (
                                 <div>
                                     <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Timeline Verifikasi</p>
                                     <div className="space-y-3">
                                         <div className="flex gap-3">
-                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                                selectedSurat.status_verifikasi === 'approved' ? 'bg-green-100' : 'bg-red-100'
-                                            }`}>
+                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${selectedSurat.status_verifikasi === 'approved' ? 'bg-green-100' : 'bg-red-100'
+                                                }`}>
                                                 {selectedSurat.status_verifikasi === 'approved' ? (
                                                     <Check className="text-green-600" size={16} />
                                                 ) : (
@@ -649,14 +641,7 @@ export default function CetakVerifikasi() {
                                         <Printer size={18} />
                                         {processing ? 'Memproses...' : 'Cetak Surat'}
                                     </Button>
-                                    <Button
-                                        size="lg"
-                                        variant="outline"
-                                        className="w-full gap-2"
-                                    >
-                                        <Eye size={18} />
-                                        Preview PDF
-                                    </Button>
+                                    
                                 </>
                             )}
 

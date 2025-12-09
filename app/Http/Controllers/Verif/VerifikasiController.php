@@ -50,7 +50,7 @@ class VerifikasiController extends Controller
             ];
         });
 
-        $suratKeluar = SuratKeluar::with(['unit_pengirim', 'user_penanda_tangan'])->get()->map(function ($s) {
+        $suratKeluar = SuratKeluar::with(['unit_pengirim', 'user_penanda_tangan', 'verifikator'])->get()->map(function ($s) {
             $statusVerifikasiString = match ($s->status_verifikasi) {
                 StatusVerifikasi::PENDING => "pending",
                 StatusVerifikasi::TERVERIFIKASI => "approved",
@@ -98,7 +98,7 @@ class VerifikasiController extends Controller
                 "status_cetak" => $statusCetakString,
                 "status_arsip" => $statusArsip,
                 "diajukan_oleh" => $s->user_penanda_tangan->nama_lengkap ?? "-",
-                "diverifikasi_oleh" => $s->diverifikasi_oleh,
+                "diverifikasi_oleh" => $s->verifikator->nama_lengkap ?? "-",
                 "tanggal_verifikasi" => $s->tanggal_verifikasi,
                 "catatan_verifikasi" => $s->catatan_verifikasi,
                 "dicetak_oleh" => $s->dicetak_oleh,
@@ -119,7 +119,7 @@ class VerifikasiController extends Controller
         ]);
 
         $jenis = $request->input('jenis');
-        
+
         if ($jenis === 'masuk') {
             $surat = SuratMasuk::findOrFail($id);
         } else {
@@ -128,7 +128,7 @@ class VerifikasiController extends Controller
 
         $surat->update([
             'status_verifikasi' => StatusVerifikasi::TERVERIFIKASI,
-            'diverifikasi_oleh' => Auth::user()->nama_lengkap,
+            'user_verifikator_id' => Auth::id(),
             'tanggal_verifikasi' => now(),
             'catatan_verifikasi' => $request->catatan_verifikasi,
         ]);
@@ -143,7 +143,7 @@ class VerifikasiController extends Controller
         ]);
 
         $jenis = $request->input('jenis'); // 'masuk' atau 'keluar'
-        
+
         if ($jenis === 'masuk') {
             $surat = SuratMasuk::findOrFail($id);
         } else {
@@ -163,7 +163,7 @@ class VerifikasiController extends Controller
     public function print(Request $request, $id)
     {
         $jenis = $request->input('jenis'); // 'masuk' atau 'keluar'
-        
+
         if ($jenis === 'masuk') {
             $surat = SuratMasuk::findOrFail($id);
         } else {

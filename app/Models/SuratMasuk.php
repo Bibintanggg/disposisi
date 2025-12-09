@@ -26,7 +26,7 @@ class   SuratMasuk extends Model
         'gambar',
         'status_akhir',
         'status_verifikasi',
-        'status_cetak'
+        'status_cetak',
     ];
 
     protected $casts = [

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId("user_input_id")->constrained("users")->onDelete("cascade");
             $table->string("nomor_surat", 100)->unique();
             $table->date("tanggal_surat");
+            $table->dateTime('tanggal_verifikasi')->nullable();
             $table->dateTime("tanggal_terima");
             $table->string("pengirim", 250);
             $table->string("isi_surat");
