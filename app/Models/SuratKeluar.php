@@ -31,7 +31,8 @@ class SuratKeluar extends Model
     protected $casts = [
         'status_arsip' => StatusArsip::class,
         'status_verifikasi' => StatusVerifikasi::class,
-        'status_cetak' => StatusCetak::class
+        'status_cetak' => StatusCetak::class,
+        'tanggal_kirim' => 'datetime:Y-m-d\TH:i:s',
     ];
 
     public function unit_pengirim()

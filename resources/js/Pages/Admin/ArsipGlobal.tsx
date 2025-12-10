@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Filter, Download, Eye, Calendar, FileText, Users, ChevronDown } from 'lucide-react';
+import { Search, Filter, Download, Eye, Calendar, FileText, Users, ChevronDown, CheckCircle, Clock, Archive, ArrowUpRight, Paperclip, XCircle } from 'lucide-react';
 import Authenticated from '@/Layouts/AuthenticatedLayout';
 import { router, usePage } from '@inertiajs/react';
 import { SuratMasuk } from '@/types/surat-masuk';
@@ -7,6 +7,7 @@ import { SuratKeluarProps } from '@/types/surat-keluar';
 import { DropdownPick } from './components/DropdownPick';
 import { DatePicker } from './components/DatePicker';
 import { Bidang } from '@/types/bidang';
+import { Button } from '@/components/ui/button';
 
 interface StatusBadge {
     label: string
@@ -20,6 +21,8 @@ export default function ArsipGlobal() {
     const [activeTab, setActiveTab] = useState<'masuk' | 'keluar'>('masuk');
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilter, setShowFilter] = useState(false)
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [selectedSurat, setSelectedSurat] = useState(null);
 
     const [filters, setFilters] = useState({
         tanggalMulai: '',
@@ -70,6 +73,28 @@ export default function ArsipGlobal() {
         { id: 3, label: "Selesai" },
         { id: 4, label: "Arsip" },
     ];
+
+    const getSifatInfo = (sifatSurat: number) => {
+        switch (sifatSurat) {
+            case 1: return { label: "Biasa", color: "bg-blue-600" };
+            case 2: return { label: "Penting", color: "bg-orange-600" };
+            case 3: return { label: "Rahasia", color: "bg-purple-600" };
+            case 4: return { label: "Segera", color: "bg-red-600" };
+            default: return { label: "Biasa", color: "bg-blue-600" };
+        }
+    };
+
+    const getStatusInfo = (statusArsip: number) => {
+        switch (statusArsip) {
+            case 1: return { label: "Baru", color: "bg-green-200 border-green-600", icon: CheckCircle };
+            case 2: return { label: "Disposisi", color: "bg-yellow-600", icon: Clock };
+            case 3: return { label: "Selesai", color: "bg-indigo-600", icon: CheckCircle };
+            case 4: return { label: "Arsip", color: "bg-purple-600", icon: Archive };
+            default: return { label: "Baru", color: "bg-gray-600", icon: Clock };
+        }
+    };
+
+
     const getSifatBadgeClass = (sifatSurat: number): StatusBadge => {
         switch (sifatSurat) {
             case 1:
@@ -108,6 +133,7 @@ export default function ArsipGlobal() {
     };
 
 
+
     const applyFilters = () => {
         router.get('/admin/arsip-global', {
             tab: activeTab,
@@ -143,7 +169,7 @@ export default function ArsipGlobal() {
             preserveState: false
         });
     }
-    
+
     const unitOptions = (pageProps.bidang || []).map((b: any) => ({
         id: b.id,
         label: b.nama_bidang
@@ -155,7 +181,6 @@ export default function ArsipGlobal() {
         { id: 1, label: "Sudah Diarsipkan" },
         { id: 2, label: "Belum Diarsipkan" }
     ];
-
 
     return (
         <Authenticated>
@@ -206,6 +231,7 @@ export default function ArsipGlobal() {
                                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
+
 
                             {/* Action Buttons */}
                             <div className="flex gap-2 w-full sm:w-auto">
@@ -377,12 +403,13 @@ export default function ArsipGlobal() {
                                                         {getStatusBadgeClass(surat.status_akhir).label}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                    <button className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium">
-                                                        <Eye className="w-4 h-4" />
-                                                        Detail
-                                                    </button>
-                                                </td>
+                                                <button
+                                                    onClick={() => { setSelectedSurat(surat); setShowDetailModal(true); }}
+                                                    className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                    Detail
+                                                </button>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -470,14 +497,13 @@ export default function ArsipGlobal() {
                                                         {getStatusArsipClass(surat.status_arsip).label}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                                    <div className="flex gap-2">
-                                                        <button className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium">
-                                                            <Eye className="w-4 h-4" />
-                                                            Detail
-                                                        </button>
-                                                    </div>
-                                                </td>
+                                                <button
+                                                    onClick={() => { setSelectedSurat(surat); setShowDetailModal(true); }}
+                                                    className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium"
+                                                >
+                                                    <Eye className="w-4 h-4" />
+                                                    Detail
+                                                </button>
                                             </tr>
                                         ))}
                                     </tbody>
@@ -514,6 +540,149 @@ export default function ArsipGlobal() {
                     )}
                 </div>
             </div>
+
+
+            {showDetailModal && selectedSurat && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
+                        <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white">
+                            <div className="flex items-center gap-3">
+                                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                                    <FileText className="text-blue-600" size={24} />
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold text-gray-900">
+                                        {activeTab === 'masuk' ? 'Detail Surat Masuk' : 'Detail Surat Keluar'}
+                                    </h2>
+                                    <p className="text-sm text-gray-500">{selectedSurat.nomor_surat || '-'}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setShowDetailModal(false)}
+                                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                            >
+                                <XCircle className="text-gray-400 hover:text-gray-600" size={24} />
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-y-auto p-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Nomor Surat</p>
+                                        <p className="text-base font-bold text-gray-900">{selectedSurat.nomor_surat || '-'}</p>
+                                    </div>
+
+                                    {activeTab === 'masuk' ? (
+                                        <>
+                                            <div>
+                                                <p className="text-sm font-semibold text-gray-500 mb-1">Pengirim</p>
+                                                <p className="text-base text-gray-900">{selectedSurat.pengirim || '-'}</p>
+                                            </div>
+
+                                                <div>
+                                                    <p className="text-sm font-semibold text-gray-500 mb-1">Tanggal Terima</p>
+                                                    <p className="text-base text-gray-900">
+                                                        {selectedSurat.tanggal_terima
+                                                            ? new Date(selectedSurat.tanggal_terima).toLocaleDateString('id-ID')
+                                                            : '-'}
+                                                    </p>
+                                                </div>
+
+                                                <div>
+                                                    <p className="text-sm font-semibold text-gray-500 mb-1">Sifat Surat</p>
+                                                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-white ${getSifatInfo(selectedSurat.sifat_surat || selectedSurat.sifat || 1).color}`}>
+                                                        <span className="font-semibold">
+                                                            {getSifatInfo(selectedSurat.sifat_surat || selectedSurat.sifat || 1).label}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div>
+                                                <p className="text-sm font-semibold text-gray-500 mb-1">Penerima</p>
+                                                <p className="text-base text-gray-900">{selectedSurat.penerima || '-'}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-semibold text-gray-500 mb-1">Unit Pengirim</p>
+                                                <p className="text-base text-gray-900">
+                                                    {selectedSurat.unit_pengirim?.nama_bidang || '-'}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-semibold text-gray-500 mb-1">Tanggal Kirim</p>
+                                                <p className="text-base text-gray-900">
+                                                    {selectedSurat.tanggal_kirim
+                                                        ? new Date(selectedSurat.tanggal_kirim).toLocaleDateString('id-ID')
+                                                        : '-'}
+                                                </p>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">Tanggal Surat</p>
+                                        <p className="text-base text-gray-900">
+                                            {selectedSurat.tanggal_surat
+                                                ? new Date(selectedSurat.tanggal_surat).toLocaleDateString('id-ID', {
+                                                    weekday: 'long',
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric'
+                                                })
+                                                : '-'}
+                                        </p>
+                                    </div>
+
+
+
+                                    <div>
+                                        <p className="text-sm font-semibold text-gray-500 mb-1">
+                                            {activeTab === 'masuk' ? 'Status Akhir' : 'Status Arsip'}
+                                        </p>
+                                        {activeTab === 'masuk' ? (
+                                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg ${getStatusInfo(selectedSurat.status_akhir || 1).color}`}>
+                                                {(() => {
+                                                    const StatusIcon = getStatusInfo(selectedSurat.status_akhir || 1).icon;
+                                                    return <StatusIcon size={16} />;
+                                                })()}
+                                                <span className="font-semibold">
+                                                    {getStatusInfo(selectedSurat.status_akhir || 1).label}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className={`px-3 py-1.5 rounded-lg text-sm font-medium ${getStatusArsipClass(selectedSurat.status_arsip || 2).className}`}>
+                                                {getStatusArsipClass(selectedSurat.status_arsip || 2).label}
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mb-6">
+                                <p className="text-sm font-semibold text-gray-500 mb-2">Isi/Perihal Surat</p>
+                                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                                    <p className="text-base text-gray-900 whitespace-pre-wrap">
+                                        {selectedSurat.isi_surat || '-'}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-6 border-t border-gray-200 bg-gray-50">
+                            <Button
+                                onClick={() => setShowDetailModal(false)}
+                                className="w-full h-12 bg-blue-600 hover:bg-blue-700"
+                            >
+                                Tutup
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </Authenticated>
     );
 }
