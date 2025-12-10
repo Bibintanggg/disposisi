@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { Search, Filter, Download, Eye, Calendar, FileText, Users, ChevronDown } from 'lucide-react';
 import Authenticated from '@/Layouts/AuthenticatedLayout';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { SuratMasuk } from '@/types/surat-masuk';
 import { SuratKeluarProps } from '@/types/surat-keluar';
+import { DropdownPick } from './components/DropdownPick';
+import { DatePicker } from './components/DatePicker';
+import { Bidang } from '@/types/bidang';
 
 interface StatusBadge {
     label: string
@@ -11,17 +14,20 @@ interface StatusBadge {
 }
 
 export default function ArsipGlobal() {
-    const { suratMasuk, suratKeluar } = usePage().props;
+    const pageProps = usePage().props as any;
+    const suratMasuk = pageProps.suratMasuk ?? { data: [], current_page: 1, prev_page_url: null, next_page_url: null };
+    const suratKeluar = pageProps.suratKeluar ?? { data: [], current_page: 1, prev_page_url: null, next_page_url: null };
     const [activeTab, setActiveTab] = useState<'masuk' | 'keluar'>('masuk');
     const [searchQuery, setSearchQuery] = useState('');
-    const [showFilter, setShowFilter] = useState(false);
+    const [showFilter, setShowFilter] = useState(false)
+
     const [filters, setFilters] = useState({
         tanggalMulai: '',
         tanggalAkhir: '',
-        sifat: '',
-        statusAkhir: '',
-        unitPengirim: '',
-        statusArsip: ''
+        sifat: '' as number | '',
+        statusAkhir: '' as number | '',
+        unitPengirim: '' as number | '',
+        statusArsip: '' as number | ''
     });
 
 
@@ -51,6 +57,19 @@ export default function ArsipGlobal() {
         }
     };
 
+    const sifatOptions = [
+        { id: 1, label: "Biasa" },
+        { id: 2, label: "Penting" },
+        { id: 3, label: "Rahasia" },
+        { id: 4, label: "Segera" },
+    ];
+
+    const statusAkhirOptions = [
+        { id: 1, label: "Baru" },
+        { id: 2, label: "Disposisi" },
+        { id: 3, label: "Selesai" },
+        { id: 4, label: "Arsip" },
+    ];
     const getSifatBadgeClass = (sifatSurat: number): StatusBadge => {
         switch (sifatSurat) {
             case 1:
@@ -66,25 +85,77 @@ export default function ArsipGlobal() {
         }
     };
 
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchQuery(e.target.value)
+    const handleSearch = (e) => {
+        const value = e.target.value;
+        setSearchQuery(value);
+
+        router.get('/admin/arsip-global', {
+            tab: activeTab,
+            search: value,
+
+            sifat: activeTab === 'masuk' ? filters.sifat : '',
+            statusAkhir: activeTab === 'masuk' ? filters.statusAkhir : '',
+
+            unitPengirim: activeTab === 'keluar' ? filters.unitPengirim : '',
+            statusArsip: activeTab === 'keluar' ? filters.statusArsip : '',
+
+            tanggalMulai: filters.tanggalMulai,
+            tanggalAkhir: filters.tanggalAkhir,
+        }, {
+            preserveState: true,
+            replace: true
+        });
+    };
+
+
+    const applyFilters = () => {
+        router.get('/admin/arsip-global', {
+            tab: activeTab,
+            search: searchQuery,
+
+            sifat: activeTab === 'masuk' ? filters.sifat : '',
+            statusAkhir: activeTab === 'masuk' ? filters.statusAkhir : '',
+
+            unitPengirim: activeTab === 'keluar' ? filters.unitPengirim : '',
+            statusArsip: activeTab === 'keluar' ? filters.statusArsip : '',
+
+            tanggalMulai: filters.tanggalMulai,
+            tanggalAkhir: filters.tanggalAkhir,
+        }, {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
+
+    const resetFilters = () => {
+        setFilters({
+            tanggalMulai: '',
+            tanggalAkhir: '',
+            sifat: '',
+            statusAkhir: '',
+            unitPengirim: '',
+            statusArsip: ''
+        })
+
+        setSearchQuery('')
+        router.get('/admin/arsip-global', {}, {
+            preserveState: false
+        });
     }
+    
+    const unitOptions = (pageProps.bidang || []).map((b: any) => ({
+        id: b.id,
+        label: b.nama_bidang
+    }));
 
-    const filteredSuratMasuk = suratMasuk.data.filter((surat: SuratMasuk) => (
-        surat.nomor_surat.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        surat.isi_surat.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        surat.pengirim.toLowerCase().includes(searchQuery.toLowerCase())
-    ))
 
-    const filteredSuratKeluar = suratKeluar.data.filter((surat: SuratKeluarProps) => {
-        const nomor = surat.nomor_surat?.toLowerCase() ?? '';
-        const isi = surat.isi_surat?.toLowerCase() ?? '';
-        const unit = surat.unit_pengirim?.nama_bidang?.toLowerCase() ?? '';
 
-        const query = searchQuery.toLowerCase();
+    const arsipOptions = [
+        { id: 1, label: "Sudah Diarsipkan" },
+        { id: 2, label: "Belum Diarsipkan" }
+    ];
 
-        return nomor.includes(query) || isi.includes(query) || unit.includes(query);
-    });
 
     return (
         <Authenticated>
@@ -162,20 +233,14 @@ export default function ArsipGlobal() {
                                             <Calendar className="w-4 h-4 inline mr-1" />
                                             Tanggal Mulai
                                         </label>
-                                        <input
-                                            type="date"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
+                                        <DatePicker />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-2">
                                             <Calendar className="w-4 h-4 inline mr-1" />
                                             Tanggal Akhir
                                         </label>
-                                        <input
-                                            type="date"
-                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
+                                        <DatePicker />
                                     </div>
                                     {activeTab === 'masuk' && (
                                         <>
@@ -183,32 +248,28 @@ export default function ArsipGlobal() {
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                                     Sifat Surat
                                                 </label>
-                                                <select
-                                                    value={filters.sifat}
-                                                    onChange={(e) => setFilters({ ...filters, sifat: Number(e.target.value) })}
-                                                >
-                                                    <option value="">Semua</option>
-                                                    <option value={1}>Biasa</option>
-                                                    <option value={2}>Penting</option>
-                                                    <option value={3}>Rahasia</option>
-                                                    <option value={4}>Segera</option>
-                                                </select>
+                                                <DropdownPick
+                                                    data={sifatOptions}
+                                                    valueKey="id"
+                                                    labelKey="label"
+                                                    value={filters.sifat === '' ? '' : filters.sifat}
+                                                    onChange={(v) => setFilters(prev => ({ ...prev, sifat: Number(v) }))}
+                                                    placeholder="Pilih Sifat Surat"
+                                                />
 
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                                     Status Akhir
                                                 </label>
-                                                <select
-                                                    value={filters.sifat}
-                                                    onChange={(e) => setFilters({ ...filters, sifat: Number(e.target.value) })}
-                                                >
-                                                    <option value="">Semua</option>
-                                                    <option value={1}>Biasa</option>
-                                                    <option value={2}>Penting</option>
-                                                    <option value={3}>Rahasia</option>
-                                                    <option value={4}>Segera</option>
-                                                </select>
+                                                <DropdownPick
+                                                    data={statusAkhirOptions}
+                                                    valueKey="id"
+                                                    labelKey="label"
+                                                    value={filters.statusAkhir === '' ? '' : filters.statusAkhir}
+                                                    onChange={(v) => setFilters(prev => ({ ...prev, statusAkhir: Number(v) }))}
+                                                    placeholder="Pilih Status Akhir"
+                                                />
 
                                             </div>
                                         </>
@@ -220,30 +281,40 @@ export default function ArsipGlobal() {
                                                     <Users className="w-4 h-4 inline mr-1" />
                                                     Unit Pengirim
                                                 </label>
-                                                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                                        <option value="">Semua Unit</option>
-                                                        <option value="sekretariat">Sekretariat</option>
-                                                        <option value="keuangan">Keuangan</option>
-                                                    </select>
+                                                <DropdownPick
+                                                    data={unitOptions}
+                                                    valueKey="id"
+                                                    labelKey="label"
+                                                    value={filters.unitPengirim === '' ? '' : filters.unitPengirim}
+                                                    onChange={(v) => setFilters(prev => ({ ...prev, unitPengirim: Number(v) }))}
+                                                    placeholder="Pilih Unit Pengirim"
+                                                />
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                                     Status Arsip
                                                 </label>
-                                                <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                                                    <option value="">Semua</option>
-                                                    <option value="Terarsip">Terarsip</option>
-                                                    <option value="Belum Diarsipkan">Belum Diarsipkan</option>
-                                                </select>
+                                                <DropdownPick
+                                                    data={arsipOptions}
+                                                    valueKey="id"
+                                                    labelKey="label"
+                                                    value={filters.statusArsip === '' ? '' : filters.statusArsip}
+                                                    onChange={(v) => setFilters(prev => ({ ...prev, statusArsip: Number(v) }))}
+                                                    placeholder="Pilih Status Arsip"
+                                                />
                                             </div>
                                         </>
                                     )}
                                 </div>
                                 <div className="flex gap-2 mt-4">
-                                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                                    <button
+                                        onClick={applyFilters}
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                                         Terapkan Filter
                                     </button>
-                                    <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <button
+                                        onClick={resetFilters}
+                                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                                         Reset
                                     </button>
                                 </div>
@@ -282,7 +353,7 @@ export default function ArsipGlobal() {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {filteredSuratMasuk.map((surat: any) => (
+                                        {suratMasuk.data.map((surat: any) => (
                                             <tr key={surat.id} className="hover:bg-gray-50 transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                     {surat.nomor_surat}
@@ -295,7 +366,7 @@ export default function ArsipGlobal() {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getSifatBadgeClass(surat.sifat).className}`}>
-                                                        {getSifatBadgeClass(surat.sifat).label}
+                                                        {getSifatBadgeClass(surat.surat_sifat).label}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
@@ -377,7 +448,7 @@ export default function ArsipGlobal() {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {filteredSuratKeluar.map((surat) => (
+                                        {suratKeluar.data.map((surat) => (
                                             <tr key={surat.id} className="hover:bg-gray-50 transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                     {surat.nomor_surat}

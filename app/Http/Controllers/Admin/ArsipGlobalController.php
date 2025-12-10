@@ -15,20 +15,19 @@ class ArsipGlobalController extends Controller
     {
         $bidang = Bidang::all();
 
-        // Surat Masuk
         $queryMasuk = SuratMasuk::query();
 
         if ($request->search) {
             $search = $request->search;
             $queryMasuk->where(function ($q) use ($search) {
-                $q->where('nomor_surat', 'like', '%' . $search . '%')
-                    ->orWhere('pengirim', 'like', '%' . $search . '%')
-                    ->orWhere('isi_surat', 'like', '%' . $search . '%');
+                $q->where('nomor_surat', 'like', "%$search%")
+                    ->orWhere('pengirim', 'like', "%$search%")
+                    ->orWhere('isi_surat', 'like', "%$search%");
             });
         }
 
         if ($request->sifat) {
-            $queryMasuk->where('sifat', $request->sifat);
+            $queryMasuk->where('sifat_surat', $request->sifat);
         }
 
         if ($request->statusAkhir) {
@@ -43,24 +42,25 @@ class ArsipGlobalController extends Controller
             $queryMasuk->whereDate('tanggal_terima', '<=', $request->tanggalAkhir);
         }
 
-        $suratMasuk = $queryMasuk->with('users')->paginate(10)->withQueryString();
+        $suratMasuk = $queryMasuk
+            ->with('users')
+            ->paginate(10)
+            ->withQueryString();
 
-        // Surat Keluar
+
         $queryKeluar = SuratKeluar::query();
 
         if ($request->search) {
             $search = $request->search;
             $queryKeluar->where(function ($q) use ($search) {
-                $q->where('nomor_surat', 'like', '%' . $search . '%')
-                    ->orWhere('penerima', 'like', '%' . $search . '%')
-                    ->orWhere('isi_surat', 'like', '%' . $search . '%');
+                $q->where('nomor_surat', 'like', "%$search%")
+                    ->orWhere('penerima', 'like', "%$search%")
+                    ->orWhere('isi_surat', 'like', "%$search%");
             });
         }
 
         if ($request->unitPengirim) {
-            $queryKeluar->whereHas('unit_pengirim', function($q) use ($request) {
-                $q->where('nama_bidang', $request->unitPengirim);
-            });
+            $queryKeluar->where('unit_pengirim_id', $request->unitPengirim);
         }
 
         if ($request->statusArsip) {
@@ -75,7 +75,11 @@ class ArsipGlobalController extends Controller
             $queryKeluar->whereDate('tanggal_kirim', '<=', $request->tanggalAkhir);
         }
 
-        $suratKeluar = $queryKeluar->with('unit_pengirim')->paginate(10)->withQueryString();
+        $suratKeluar = $queryKeluar
+            ->with('unit_pengirim')
+            ->paginate(10)
+            ->withQueryString();
+
 
         return Inertia::render('Admin/ArsipGlobal', [
             'suratMasuk' => $suratMasuk,

@@ -13,4 +13,5 @@ export interface SuratMasuk {
     gambar: string
     status_verifikasi: number
     status_cetak: number
+    status_akhir: number
 }
