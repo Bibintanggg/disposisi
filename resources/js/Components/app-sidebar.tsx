@@ -78,7 +78,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             ]
         },
         { title: 'Arsip Global', url: '/admin/arsip-global', icon: Calendar },
-        { title: 'Laporan & Audit', url: '/admin/laporan-audit', icon: Monitor },
       ]
     } else if (userRole === USER_JABATAN.STAF) {
       return [
