@@ -58,7 +58,7 @@ export default function Dashboard() {
                             title="Pengguna Aktif"
                             value={users?.length ?? 0}
                             buttonText="Kelola Pengguna"
-                            onClick={() => handleNavigation('/admin/users')}
+                            onClick={() => handleNavigation('/admin/manage-user')}
                             accentColor="bg-blue-500"
                             bgPattern="bg-blue-50"
                         />
@@ -67,7 +67,7 @@ export default function Dashboard() {
                             title="Unit Kerja"
                             value={unitKerja?.length ?? 0}
                             buttonText="Kelola Bidang"
-                            onClick={() => handleNavigation('/admin/bidang')}
+                            onClick={() => handleNavigation('/admin/master-data')}
                             accentColor="bg-purple-500"
                             bgPattern="bg-purple-50"
                         />
@@ -76,7 +76,7 @@ export default function Dashboard() {
                             title="Surat Masuk Total"
                             value={suratMasuk.length}
                             buttonText="Lihat Arsip Global"
-                            onClick={() => handleNavigation('/admin/arsip?type=masuk')}
+                            onClick={() => handleNavigation('/admin/arsip-global')}
                             accentColor="bg-emerald-500"
                             bgPattern="bg-emerald-50"
                         />
@@ -85,7 +85,7 @@ export default function Dashboard() {
                             title="Surat Keluar Total"
                             value={suratKeluar?.length ?? 0}
                             buttonText="Lihat Arsip Global"
-                            onClick={() => handleNavigation('/admin/arsip?type=keluar')}
+                            onClick={() => handleNavigation('/admin/arsip-global')}
                             accentColor="bg-orange-500"
                             bgPattern="bg-orange-50"
                         />
@@ -188,9 +188,9 @@ export default function Dashboard() {
                                             <p className="text-xs text-gray-600">5 surat terbaru yang baru diinput</p>
                                         </div>
                                     </div>
-                                    <button className="px-4 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors">
+                                    {/* <button className="px-4 py-2 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors">
                                         Lihat Semua
-                                    </button>
+                                    </button> */}
                                 </div>
                                 <div className="space-y-2">
                                     {recentActivity.map((activity) => (
