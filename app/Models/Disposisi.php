@@ -31,6 +31,6 @@ class Disposisi extends Model
 
     public function tujuanDisposisi()
     {
-        return $this->belongsTo(TujuanDisposisi::class, 'disposisi_id');
+        return $this->hasMany(TujuanDisposisi::class, 'disposisi_id');
     }
 }

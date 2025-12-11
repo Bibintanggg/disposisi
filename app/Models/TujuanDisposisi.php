@@ -25,12 +25,12 @@ class TujuanDisposisi extends Model
 
     public function disposisi()
     {
-        return $this->hasMany(Disposisi::class, 'disposisi_id');
+        return $this->belongsTo(Disposisi::class, 'disposisi_id');
     }
 
     public function penerima()
     {
-        return $this->hasMany(User::class, 'penerima_id');
+        return $this->belongsTo(User::class, 'penerima_id');
     }
 
     public function riwayatTindakLanjut()

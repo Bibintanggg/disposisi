@@ -1,12 +1,12 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { Head, Link, router } from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import { useState, useEffect } from "react";
-import { 
-  Search, 
-  Filter, 
-  Clock, 
-  CheckCircle, 
-  AlertCircle, 
+import {
+  Search,
+  Filter,
+  Clock,
+  CheckCircle,
+  AlertCircle,
   PlayCircle,
   Users,
   FileText,
@@ -21,7 +21,7 @@ import {
   ExternalLink,
   ChevronDown,
   Home,
-  FileBarChart
+  FileBarChart,
 } from "lucide-react";
 
 interface Disposisi {
@@ -29,7 +29,7 @@ interface Disposisi {
   nomor_surat: string;
   isi_disposisi: string;
   tanggal_disposisi: string;
-  status_global: 'semua_selesai' | 'sebagian_proses' | 'tertunda';
+  status_global: "semua_selesai" | "sebagian_proses" | "tertunda";
   waktu_berjalan: string;
   penerima_count: number;
   file_surat?: string;
@@ -40,199 +40,187 @@ interface PenerimaTugas {
   nama: string;
   jabatan: string;
   avatar?: string;
-  status: 'belum' | 'proses' | 'selesai';
+  status: "belum" | "proses" | "selesai";
   tanggal_update: string;
   laporan?: string;
 }
 
 export default function LacakDisposisi() {
-  const [disposisiList, setDisposisiList] = useState<Disposisi[]>([
-    {
-      id: 1,
-      nomor_surat: "001/SK/VI/2024",
-      isi_disposisi: "Mohon ditindaklanjuti pengajuan anggaran Q3",
-      tanggal_disposisi: "2024-06-15",
-      status_global: 'sebagian_proses',
-      waktu_berjalan: "15 hari",
-      penerima_count: 4,
-      file_surat: "/files/surat.pdf"
-    },
-    {
-      id: 2,
-      nomor_surat: "045/SP/VI/2024",
-      isi_disposisi: "Koordinasi pelaksanaan rapat kerja tahunan",
-      tanggal_disposisi: "2024-06-10",
-      status_global: 'semua_selesai',
-      waktu_berjalan: "20 hari",
-      penerima_count: 3
-    },
-    {
-      id: 3,
-      nomor_surat: "089/ND/VI/2024",
-      isi_disposisi: "Evaluasi hasil audit internal departemen",
-      tanggal_disposisi: "2024-06-18",
-      status_global: 'tertunda',
-      waktu_berjalan: "12 hari",
-      penerima_count: 5
-    },
-    {
-      id: 4,
-      nomor_surat: "102/PL/VI/2024",
-      isi_disposisi: "Persiapan laporan triwulan untuk direksi",
-      tanggal_disposisi: "2024-06-05",
-      status_global: 'sebagian_proses',
-      waktu_berjalan: "25 hari",
-      penerima_count: 2
-    },
-    {
-      id: 5,
-      nomor_surat: "156/MM/VI/2024",
-      isi_disposisi: "Pengembangan sistem monitoring kinerja",
-      tanggal_disposisi: "2024-06-22",
-      status_global: 'semua_selesai',
-      waktu_berjalan: "8 hari",
-      penerima_count: 6
-    }
-  ]);
+  // Inertia props -- backend harus mengirim: suratMasuk, suratSelesai, suratProses, suratBatal, disposisi (opsional)
+  const { suratMasuk = [], suratSelesai = [], suratProses = [], suratBatal = [], disposisi = [] }: any = usePage().props;
 
-  const [penerimaList, setPenerimaList] = useState<PenerimaTugas[]>([
-    {
-      id: 1,
-      nama: "Ahmad Fauzi",
-      jabatan: "Staf Administrasi",
-      status: 'selesai',
-      tanggal_update: "2024-06-20",
-      laporan: "Pengajuan anggaran sudah diselesaikan dan diunggah ke sistem"
-    },
-    {
-      id: 2,
-      nama: "Siti Rahayu",
-      jabatan: "Staf Keuangan",
-      status: 'proses',
-      tanggal_update: "2024-06-18"
-    },
-    {
-      id: 3,
-      nama: "Budi Santoso",
-      jabatan: "Koordinator Proyek",
-      status: 'selesai',
-      tanggal_update: "2024-06-22",
-      laporan: "Dokumen lengkap sudah dipersiapkan"
-    },
-    {
-      id: 4,
-      nama: "Dewi Anggraeni",
-      jabatan: "Analis Data",
-      status: 'belum',
-      tanggal_update: "2024-06-15"
-    }
-  ]);
-
+  // Local state UI
+  const [disposisiList, setDisposisiList] = useState<Disposisi[]>([]);
+  const [penerimaList, setPenerimaList] = useState<PenerimaTugas[]>([]);
   const [selectedDisposisi, setSelectedDisposisi] = useState<Disposisi | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [filteredData, setFilteredData] = useState<Disposisi[]>(disposisiList);
+  const [filteredData, setFilteredData] = useState<Disposisi[]>([]);
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
 
+  // Map backend payload to frontend structure. Backend can send either `disposisi` array directly
+  // or only suratMasuk + related models. We try disposisi first, fallback to mapping suratMasuk.
+  useEffect(() => {
+    if (Array.isArray(disposisi) && disposisi.length > 0) {
+      // assume backend already shaped data
+      setDisposisiList(
+        disposisi.map((d: any) => ({
+          id: d.id,
+          nomor_surat: d.surat_masuk?.nomor_surat ?? d.nomor_surat ?? "-",
+          isi_disposisi: d.instruksi ?? d.isi_disposisi ?? "-",
+          tanggal_disposisi: d.tanggal_disposisi ?? d.tanggal ?? "-",
+          status_global:
+            d.status_global === 1 || d.status_global === "1" ? "tertunda" :
+            d.status_global === 2 || d.status_global === "2" ? "sebagian_proses" :
+            "semua_selesai",
+          waktu_berjalan: d.waktu_berjalan ?? "-",
+          penerima_count: d.penerima_count ?? (d.penerima ? d.penerima.length : 0),
+          file_surat: d.file_surat ?? d.surat_masuk?.gambar ?? undefined,
+        }))
+      );
+    } else if (Array.isArray(suratMasuk) && suratMasuk.length > 0) {
+      // fallback: build from suratMasuk (minimal fields)
+      setDisposisiList(
+        suratMasuk.map((s: any, idx: number) => ({
+          id: s.id ?? idx + 1,
+          nomor_surat: s.nomor_surat ?? "-",
+          isi_disposisi: s.isi_surat ?? "-",
+          tanggal_disposisi: s.tanggal_terima ?? s.tanggal_surat ?? "-",
+          status_global: "sebagian_proses",
+          waktu_berjalan: "-",
+          penerima_count: s._tujuan_count ?? 0,
+          file_surat: s.gambar ?? undefined,
+        }))
+      );
+    } else {
+      // default demo data (keamanan jika backend belum kirim apa-apa)
+      setDisposisiList([]);
+    }
+  }, [disposisi, suratMasuk]);
+
+  // penerimaList: di real app harus di-fetch per disposisi via endpoint show atau sudah dikirim bersama disposisi
+  useEffect(() => {
+    // default empty; kept for modal demo
+    setPenerimaList([]);
+  }, []);
+
+  // filtering
   useEffect(() => {
     let filtered = disposisiList;
-    
+
     if (searchQuery) {
-      filtered = filtered.filter(item =>
-        item.nomor_surat.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.isi_disposisi.toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter((item) =>
+        (item.nomor_surat ?? "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (item.isi_disposisi ?? "").toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-    
+
     if (statusFilter !== "all") {
-      filtered = filtered.filter(item => item.status_global === statusFilter);
+      filtered = filtered.filter((item) => item.status_global === statusFilter);
     }
-    
+
     setFilteredData(filtered);
   }, [searchQuery, statusFilter, disposisiList]);
 
   const getStatusColor = (status: string) => {
-    switch(status) {
-      case 'semua_selesai': return 'bg-green-100 text-green-800 border-green-200';
-      case 'sebagian_proses': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'tertunda': return 'bg-red-100 text-red-800 border-red-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    switch (status) {
+      case "semua_selesai":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "sebagian_proses":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "tertunda":
+        return "bg-red-100 text-red-800 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getStatusIcon = (status: string) => {
-    switch(status) {
-      case 'semua_selesai': return <CheckCircle className="w-4 h-4" />;
-      case 'sebagian_proses': return <PlayCircle className="w-4 h-4" />;
-      case 'tertunda': return <AlertCircle className="w-4 h-4" />;
-      default: return null;
+    switch (status) {
+      case "semua_selesai":
+        return <CheckCircle className="w-4 h-4" />;
+      case "sebagian_proses":
+        return <PlayCircle className="w-4 h-4" />;
+      case "tertunda":
+        return <AlertCircle className="w-4 h-4" />;
+      default:
+        return null;
     }
   };
 
   const getStatusText = (status: string) => {
-    switch(status) {
-      case 'semua_selesai': return 'Semua Selesai';
-      case 'sebagian_proses': return 'Dalam Proses';
-      case 'tertunda': return 'Tertunda';
-      default: return '';
+    switch (status) {
+      case "semua_selesai":
+        return "Semua Selesai";
+      case "sebagian_proses":
+        return "Dalam Proses";
+      case "tertunda":
+        return "Tertunda";
+      default:
+        return "-";
     }
   };
 
   const getProgressPercentage = (status: string) => {
-    switch(status) {
-      case 'semua_selesai': return 100;
-      case 'sebagian_proses': return 50;
-      case 'tertunda': return 10;
-      default: return 0;
+    switch (status) {
+      case "semua_selesai":
+        return 100;
+      case "sebagian_proses":
+        return 50;
+      case "tertunda":
+        return 10;
+      default:
+        return 0;
     }
   };
 
+  // actions
   const handleViewDetail = (disposisi: Disposisi) => {
     setSelectedDisposisi(disposisi);
     setIsDetailOpen(true);
+
+    // fetch penerima list dari backend (jika perlu)
+    // contoh: router.get(route('kepala.lacak.show', disposisi.id), {}, { preserveState: true })
+    // atau gunakan endpoint API untuk ambil tujuan
+    // di sini kita assume backend belum nyediain, jadi tetap kosong unless server provided
   };
 
   const handleRefresh = () => {
-    // In real app, this would fetch fresh data from API
-    console.log("Refreshing data...");
+    // re-request page with same params to refresh data
+    router.reload();
   };
 
   const handleExport = () => {
-    // Export functionality
+    // contoh: download CSV via route
+    // router.get(route('kepala.lacak.export'), { format: 'csv' });
     console.log("Exporting data...");
   };
 
   return (
     <Authenticated>
       <Head title="Lacak Disposisi Terkirim" />
-      
-      {/* Main Container - Light Mode */}
+
       <div className="min-h-screen bg-gray-50 text-gray-900 p-4 md:p-6">
-        
-        {/* Breadcrumb and Header */}
+
         <div className="mb-8">
-          
+
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                Lacak Disposisi
-              </h1>
-              <p className="text-gray-600">
-                Pantau status semua tugas yang telah didelegasikan kepada staf
-              </p>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Lacak Disposisi</h1>
+              <p className="text-gray-600">Pantau status semua tugas yang telah didelegasikan kepada staf</p>
             </div>
-            
+
             <div className="flex items-center gap-3">
-              <button 
+              <button
                 onClick={handleRefresh}
                 className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg transition-colors shadow-sm"
               >
                 <RefreshCw className="w-4 h-4 text-gray-600" />
                 <span className="hidden md:inline text-gray-700">Refresh</span>
               </button>
-              
-              <button 
+
+              <button
                 onClick={handleExport}
                 className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm"
               >
@@ -255,42 +243,36 @@ export default function LacakDisposisi() {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm font-medium mb-1">Selesai</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {disposisiList.filter(d => d.status_global === 'semua_selesai').length}
-                  </p>
+                  <p className="text-2xl font-bold text-gray-900">{suratSelesai.length}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
                   <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm font-medium mb-1">Dalam Proses</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {disposisiList.filter(d => d.status_global === 'sebagian_proses').length}
-                  </p>
+                  <p className="text-2xl font-bold text-gray-900">{suratProses.length}</p>
                 </div>
                 <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
                   <PlayCircle className="w-6 h-6 text-yellow-600" />
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm font-medium mb-1">Tertunda</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {disposisiList.filter(d => d.status_global === 'tertunda').length}
-                  </p>
+                  <p className="text-2xl font-bold text-gray-900">{suratBatal.length}</p>
                 </div>
                 <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
                   <AlertCircle className="w-6 h-6 text-red-600" />
@@ -313,7 +295,7 @@ export default function LacakDisposisi() {
                 className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
               />
             </div>
-            
+
             <div className="flex gap-3">
               <div className="relative">
                 <select
@@ -328,8 +310,8 @@ export default function LacakDisposisi() {
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
               </div>
-              
-              <button 
+
+              <button
                 onClick={() => setShowAdvancedFilter(!showAdvancedFilter)}
                 className="flex items-center gap-2 px-4 py-3 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg transition-colors"
               >
@@ -338,33 +320,23 @@ export default function LacakDisposisi() {
               </button>
             </div>
           </div>
-          
+
           {/* Advanced Filters */}
           {showAdvancedFilter && (
             <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="font-medium text-gray-700">Filter Lanjutan</h4>
-                <button 
-                  onClick={() => setShowAdvancedFilter(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
+                <button onClick={() => setShowAdvancedFilter(false)} className="text-gray-500 hover:text-gray-700">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Rentang Tanggal
-                  </label>
-                  <input
-                    type="date"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Rentang Tanggal</label>
+                  <input type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Jumlah Penerima
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Jumlah Penerima</label>
                   <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option>Semua</option>
                     <option>1-3 staf</option>
@@ -373,9 +345,7 @@ export default function LacakDisposisi() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Durasi
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Durasi</label>
                   <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <option>Semua Durasi</option>
                     <option>≤ 7 hari</option>
@@ -386,12 +356,8 @@ export default function LacakDisposisi() {
                 </div>
               </div>
               <div className="flex justify-end gap-3 mt-4">
-                <button className="px-4 py-2 text-gray-700 hover:text-gray-900">
-                  Reset
-                </button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                  Terapkan Filter
-                </button>
+                <button className="px-4 py-2 text-gray-700 hover:text-gray-900">Reset</button>
+                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Terapkan Filter</button>
               </div>
             </div>
           )}
@@ -404,9 +370,7 @@ export default function LacakDisposisi() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">Daftar Disposisi</h2>
-                <p className="text-gray-600 text-sm mt-1">
-                  Menampilkan <span className="font-medium">{filteredData.length}</span> dari <span className="font-medium">{disposisiList.length}</span> disposisi
-                </p>
+                <p className="text-gray-600 text-sm mt-1">Menampilkan <span className="font-medium">{filteredData.length}</span> dari <span className="font-medium">{disposisiList.length}</span> disposisi</p>
               </div>
               <div className="flex items-center gap-2">
                 <FileBarChart className="w-5 h-5 text-gray-400" />
@@ -420,35 +384,18 @@ export default function LacakDisposisi() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">
-                    No. Surat
-                  </th>
-                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">
-                    Instruksi
-                  </th>
-                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">
-                    Tanggal
-                  </th>
-                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">
-                    Waktu
-                  </th>
-                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">
-                    Penerima
-                  </th>
-                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">
-                    Aksi
-                  </th>
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">No. Surat</th>
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">Instruksi</th>
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">Tanggal</th>
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">Status</th>
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">Waktu</th>
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">Penerima</th>
+                  <th className="text-left py-4 px-6 text-gray-600 font-medium text-sm uppercase tracking-wider">Aksi</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredData.map((disposisi) => (
-                  <tr 
-                    key={disposisi.id} 
-                    className="border-b border-gray-100 hover:bg-blue-50/30 transition-colors"
-                  >
+                  <tr key={disposisi.id} className="border-b border-gray-100 hover:bg-blue-50/30 transition-colors">
                     <td className="py-4 px-6">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -477,14 +424,11 @@ export default function LacakDisposisi() {
                           </span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className={`h-2 rounded-full ${
-                              disposisi.status_global === 'semua_selesai' ? 'bg-green-500' :
-                              disposisi.status_global === 'sebagian_proses' ? 'bg-yellow-500' :
-                              'bg-red-500'
-                            }`}
-                            style={{ width: `${getProgressPercentage(disposisi.status_global)}%` }}
-                          />
+                          <div className={`h-2 rounded-full ${
+                            disposisi.status_global === 'semua_selesai' ? 'bg-green-500' :
+                            disposisi.status_global === 'sebagian_proses' ? 'bg-yellow-500' :
+                            'bg-red-500'
+                          }`} style={{ width: `${getProgressPercentage(disposisi.status_global)}%` }} />
                         </div>
                       </div>
                     </td>
@@ -506,10 +450,7 @@ export default function LacakDisposisi() {
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <button
-                        onClick={() => handleViewDetail(disposisi)}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm hover:shadow"
-                      >
+                      <button onClick={() => handleViewDetail(disposisi)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm hover:shadow">
                         <Eye className="w-4 h-4" />
                         <span>Detail</span>
                       </button>
@@ -525,31 +466,19 @@ export default function LacakDisposisi() {
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <FileText className="w-10 h-10 text-gray-400" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">
-                Tidak ada disposisi ditemukan
-              </h3>
-              <p className="text-gray-500 max-w-md mx-auto">
-                Coba ubah kata kunci pencarian atau sesuaikan filter untuk menemukan data yang Anda cari
-              </p>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">Tidak ada disposisi ditemukan</h3>
+              <p className="text-gray-500 max-w-md mx-auto">Coba ubah kata kunci pencarian atau sesuaikan filter untuk menemukan data yang Anda cari</p>
             </div>
           )}
 
           {/* Pagination (Optional) */}
           {filteredData.length > 0 && (
             <div className="p-5 border-t border-gray-200 flex items-center justify-between">
-              <div className="text-sm text-gray-600">
-                Halaman 1 dari 1
-              </div>
+              <div className="text-sm text-gray-600">Halaman 1 dari 1</div>
               <div className="flex items-center gap-2">
-                <button className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                  Sebelumnya
-                </button>
-                <button className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                  1
-                </button>
-                <button className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
-                  Selanjutnya
-                </button>
+                <button className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Sebelumnya</button>
+                <button className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">1</button>
+                <button className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Selanjutnya</button>
               </div>
             </div>
           )}
@@ -565,10 +494,7 @@ export default function LacakDisposisi() {
                   <h2 className="text-2xl font-bold text-gray-900">Detail Pelacakan Disposisi</h2>
                   <p className="text-gray-600">{selectedDisposisi.nomor_surat}</p>
                 </div>
-                <button
-                  onClick={() => setIsDetailOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
-                >
+                <button onClick={() => setIsDetailOpen(false)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -577,10 +503,7 @@ export default function LacakDisposisi() {
               <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
                 {/* Disposisi Info */}
                 <div className="mb-8 p-5 bg-blue-50 rounded-xl border border-blue-100">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-blue-600" />
-                    Informasi Disposisi
-                  </h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2"><FileText className="w-5 h-5 text-blue-600" />Informasi Disposisi</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div className="space-y-2">
                       <p className="text-gray-500 text-xs">Nomor Surat</p>
@@ -588,16 +511,11 @@ export default function LacakDisposisi() {
                     </div>
                     <div className="space-y-2">
                       <p className="text-gray-500 text-xs">Tanggal Disposisi</p>
-                      <p className="font-medium text-gray-900 text-lg flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        {selectedDisposisi.tanggal_disposisi}
-                      </p>
+                      <p className="font-medium text-gray-900 text-lg flex items-center gap-2"><Calendar className="w-4 h-4" />{selectedDisposisi.tanggal_disposisi}</p>
                     </div>
                     <div className="md:col-span-2 space-y-2">
                       <p className="text-gray-500 text-xs">Instruksi Lengkap</p>
-                      <p className="font-medium text-gray-900 bg-white p-4 rounded-lg border border-gray-200">
-                        {selectedDisposisi.isi_disposisi}
-                      </p>
+                      <p className="font-medium text-gray-900 bg-white p-4 rounded-lg border border-gray-200">{selectedDisposisi.isi_disposisi}</p>
                     </div>
                   </div>
                 </div>
@@ -610,18 +528,16 @@ export default function LacakDisposisi() {
                       const count = penerimaList.filter(p => p.status === status).length;
                       const total = penerimaList.length;
                       const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
-                      
+
                       const cardStyle = status === 'selesai' ? 'bg-green-50 border-green-100' :
                                        status === 'proses' ? 'bg-yellow-50 border-yellow-100' :
                                        'bg-gray-50 border-gray-100';
-                      
+
                       return (
                         <div key={status} className={`rounded-xl p-4 border ${cardStyle}`}>
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-gray-600 text-sm capitalize mb-1">
-                                {status === 'belum' ? 'Belum Dimulai' : status === 'proses' ? 'Dalam Proses' : 'Selesai'}
-                              </p>
+                              <p className="text-gray-600 text-sm capitalize mb-1">{status === 'belum' ? 'Belum Dimulai' : status === 'proses' ? 'Dalam Proses' : 'Selesai'}</p>
                               <p className="text-2xl font-bold text-gray-900">{count} Staf</p>
                               <p className="text-gray-500 text-sm">{percentage}% dari total</p>
                             </div>
@@ -639,19 +555,15 @@ export default function LacakDisposisi() {
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">Daftar Penerima</h3>
-                    <span className="text-gray-600 bg-gray-100 px-3 py-1 rounded-full text-sm">
-                      {penerimaList.length} staf
-                    </span>
+                    <span className="text-gray-600 bg-gray-100 px-3 py-1 rounded-full text-sm">{penerimaList.length} staf</span>
                   </div>
-                  
+
                   <div className="space-y-3">
                     {penerimaList.map((penerima) => (
                       <div key={penerima.id} className="bg-white rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                              {penerima.nama.charAt(0)}
-                            </div>
+                            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">{penerima.nama.charAt(0)}</div>
                             <div>
                               <p className="font-medium text-gray-900">{penerima.nama}</p>
                               <p className="text-gray-500 text-sm">{penerima.jabatan}</p>
@@ -661,21 +573,13 @@ export default function LacakDisposisi() {
                             penerima.status === 'selesai' ? 'bg-green-100 text-green-800 border-green-200' :
                             penerima.status === 'proses' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
                             'bg-gray-100 text-gray-800 border-gray-200'
-                          }`}>
-                            {penerima.status === 'selesai' ? 'Selesai' :
-                             penerima.status === 'proses' ? 'Dalam Proses' : 'Belum Dimulai'}
-                          </div>
+                          }`}>{penerima.status === 'selesai' ? 'Selesai' : penerima.status === 'proses' ? 'Dalam Proses' : 'Belum Dimulai'}</div>
                         </div>
-                        
+
                         <div className="flex items-center justify-between text-sm">
-                          <div className="text-gray-500">
-                            Terakhir update: <span className="font-medium">{penerima.tanggal_update}</span>
-                          </div>
+                          <div className="text-gray-500">Terakhir update: <span className="font-medium">{penerima.tanggal_update}</span></div>
                           {penerima.laporan && (
-                            <button className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors font-medium">
-                              <BarChart3 className="w-4 h-4" />
-                              Lihat Laporan
-                            </button>
+                            <button className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors font-medium"><BarChart3 className="w-4 h-4" />Lihat Laporan</button>
                           )}
                         </div>
                       </div>
@@ -686,27 +590,12 @@ export default function LacakDisposisi() {
 
               {/* Modal Footer */}
               <div className="p-6 border-t border-gray-200 flex flex-col sm:flex-row justify-between gap-4">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Clock className="w-4 h-4" />
-                  <span>Disposisi ini telah berjalan selama {selectedDisposisi.waktu_berjalan}</span>
-                </div>
+                <div className="flex items-center gap-2 text-gray-600"><Clock className="w-4 h-4" /><span>Disposisi ini telah berjalan selama {selectedDisposisi.waktu_berjalan}</span></div>
                 <div className="flex gap-3">
                   {selectedDisposisi.file_surat && (
-                    <a 
-                      href={selectedDisposisi.file_surat}
-                      target="_blank"
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Lihat File Surat
-                    </a>
+                    <a href={selectedDisposisi.file_surat} target="_blank" className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"><ExternalLink className="w-4 h-4" />Lihat File Surat</a>
                   )}
-                  <button
-                    onClick={() => setIsDetailOpen(false)}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-                  >
-                    Tutup
-                  </button>
+                  <button onClick={() => setIsDetailOpen(false)} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">Tutup</button>
                 </div>
               </div>
             </div>
@@ -716,3 +605,11 @@ export default function LacakDisposisi() {
     </Authenticated>
   );
 }
+
+/*
+Integrasi Backend (Catatan):
+- Controller LacakDisposisiController@index harus mengirim Inertia props: suratMasuk, suratSelesai, suratProses, suratBatal atau disposisi (lebih lengkap).
+- Jika ingin modal detail menampilkan penerima, pastikan endpoint show(id) mengembalikan tujuan_disposisi + penerima + riwayat.
+- Contoh route: Route::get('/kepala/lacak', [LacakDisposisiController::class, 'index'])->name('kepala.lacak.index');
+- Untuk export, tambahkan route yang mengembalikan file (CSV/PDF) dan panggil via router.visit / window.location.
+*/
