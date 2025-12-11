@@ -40,7 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/admin/arsip-global', [ArsipGlobalController::class, 'index'])->name('admin.arsip-global');
 
-        Route::get('/admin/laporan-audit', [LaporanAuditController::class, 'index'])->name('admin.laporan-audit');
+        // Route::get('/admin/laporan-audit', [LaporanAuditController::class, 'index'])->name('admin.laporan-audit');
     });
 
     Route::middleware(['jabatan:'.Jabatan::KEPALA->value])->group(function () {

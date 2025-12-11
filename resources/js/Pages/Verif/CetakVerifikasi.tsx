@@ -106,20 +106,20 @@ export default function CetakVerifikasi() {
         return statusMap[status as keyof typeof statusMap] || statusMap.pending;
     };
 
-    const getStatusCetakInfo = (status: string) => {
+    const getStatusCetakInfo = (statusArsip: number) => {
         const statusMap = {
-            belum: { label: "Belum Dicetak", icon: Printer, color: "text-gray-600 bg-gray-100" },
-            sudah: { label: "Sudah Dicetak", icon: CheckCircle2, color: "text-blue-600 bg-blue-100" }
+            1: { label: "Belum Dicetak", icon: Printer, color: "text-gray-600 bg-gray-100" },
+            2: { label: "Sudah Dicetak", icon: CheckCircle2, color: "text-blue-600 bg-blue-100" }
         };
-        return statusMap[status as keyof typeof statusMap] || statusMap.belum;
+        return statusMap[statusArsip as keyof typeof statusMap] || statusMap[1];
     };
 
-    const getStatusArsipInfo = (status?: string) => {
+    const getStatusArsipInfo = (statusArsip: number) => {
         const statusMap = {
-            belum: { label: "Belum Diarsip", icon: Clock, color: "text-orange-600 bg-orange-100" },
-            sudah: { label: "Sudah Diarsip", icon: CheckCircle2, color: "text-green-600 bg-green-100" }
+            1: { label: "Belum Diarsip", icon: Clock, color: "text-orange-600 bg-orange-100" },
+            2: { label: "Sudah Diarsip", icon: CheckCircle2, color: "text-green-600 bg-green-100" }
         };
-        return statusMap[status as keyof typeof statusMap] || statusMap.belum;
+        return statusMap[statusArsip as keyof typeof statusMap] || statusMap[1];
     };
 
     // Filter surat berdasarkan tab aktif, jenis filter, dan pencarian
