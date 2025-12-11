@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\LaporanAuditController;
 use App\Http\Controllers\Admin\ManageUserController;
 use App\Http\Controllers\Kepala\DashboardKepalaController;
+use App\Http\Controllers\Kepala\LacakDisposisiController;
 use App\Http\Controllers\Kepala\SuratMenungguController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Staf\DashboardStafController;
@@ -50,6 +51,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/kepala/disposisi/{id}', [SuratMenungguController::class, 'showDisposisi']);
         Route::post('/kepala/disposisi/submit', [SuratMenungguController::class, 'submitDisposisi']);
         Route::get('/kepala/disposisi/file/{id}', [SuratMenungguController::class, 'previewFile'])->name('kepala.disposisi.file');
+
+        Route::get('/kepala/lacak-disposisi', [LacakDisposisiController::class, 'index'])->name('kepala.lacak-disposisi');
     });
 
     Route::middleware(['jabatan:'.Jabatan::STAF->value])->group(function () {
