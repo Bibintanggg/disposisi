@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\LaporanAuditController;
 use App\Http\Controllers\Admin\ManageUserController;
 use App\Http\Controllers\Kepala\DashboardKepalaController;
+use App\Http\Controllers\Kepala\SuratMenungguController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Staf\DashboardStafController;
 use App\Http\Controllers\Verif\DashboardVerifController;
@@ -45,6 +46,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware(['jabatan:'.Jabatan::KEPALA->value])->group(function () {
         Route::get('kepala/dashboard', [DashboardKepalaController::class, 'index'])->name('kepala.dashboard');
+        Route::get('kepala/surat-menunggu', [SuratMenungguController::class, 'index'])->name('kepala.surat-menunggu');
+        Route::get('/kepala/disposisi/{id}', [SuratMenungguController::class, 'showDisposisi']);
+        Route::post('/kepala/disposisi/submit', [SuratMenungguController::class, 'submitDisposisi']);
+        Route::get('/kepala/disposisi/file/{id}', [SuratMenungguController::class, 'previewFile'])->name('kepala.disposisi.file');
     });
 
     Route::middleware(['jabatan:'.Jabatan::STAF->value])->group(function () {
