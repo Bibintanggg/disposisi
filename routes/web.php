@@ -94,6 +94,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('staf.laporan-tindak.lihat-surat');
 
         Route::get('staf/riwayat-tugas', [RiwayatTugasController::class, 'index'])->name('staf.riwayat-tugas-selesai');
+        Route::get('/staf/riwayat-tugas/lihat-surat/{id}', [RiwayatTugasController::class, 'lihatSurat'])
+            ->name('staf.riwayat.lihat-surat');
     });
 
 
