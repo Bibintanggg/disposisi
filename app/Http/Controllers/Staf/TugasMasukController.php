@@ -70,4 +70,22 @@ class TugasMasukController extends Controller
 
         return back()->with('success', 'Tugas telah dipindahkan ke sedang diproses');
     }
+
+    public function lihatSurat($id)
+    {
+        $item = TujuanDisposisi::with(['disposisi.suratMasuk'])
+            ->where('id', $id)
+            ->where('penerima_id', Auth::id())
+            ->firstOrFail();
+
+        $surat = $item->disposisi->suratMasuk;
+
+        $filePath = $surat->gambar ?? null;
+
+        if (!$filePath || !Storage::disk('public')->exists($filePath)) {
+            abort(404, 'File surat tidak ditemukan.');
+        }
+
+        return response()->file(storage_path("app/public/" . $filePath));
+    }
 }

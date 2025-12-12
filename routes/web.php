@@ -10,7 +10,9 @@ use App\Http\Controllers\Kepala\LacakDisposisiController;
 use App\Http\Controllers\Kepala\LaporanKinerjaController;
 use App\Http\Controllers\Kepala\SuratMenungguController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Staf\DaftarTindakLanjutController;
 use App\Http\Controllers\Staf\DashboardStafController;
+use App\Http\Controllers\Staf\LaporanTindakLanjutController;
 use App\Http\Controllers\Staf\TugasDiprosesController;
 use App\Http\Controllers\Staf\TugasMasukController;
 use App\Http\Controllers\Verif\DashboardVerifController;
@@ -66,14 +68,29 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('staf/dashboard', [DashboardStafController::class, 'index'])->name('staf.dashboard');
 
         Route::get('staf/tugas-masuk', [TugasMasukController::class, 'index'])->name('staf.tugas-masuk');
+        Route::get('/staf/tugas-masuk/lihat-surat/{id}', [TugasMasukController::class, 'lihatSurat'])
+            ->name('staf.tugas-masuk.lihat-surat');
+
         Route::post('/staff/tugas-masuk/{id}/mulai', [TugasMasukController::class, 'mulai'])
             ->name('staff.tugas-masuk.mulai');
 
         Route::get('staf/tugas-sedang-diproses', [TugasDiprosesController::class, 'index'])->name('staf.tugas-proses');
         Route::get('/staf/tugas-sedang-diproses/{id}/lihat-surat', [TugasDiprosesController::class, 'lihatSurat'])
             ->name('staf.tugas.lihat-surat');
-        Route::post('/staf/tugas/{id}/selesaikan', [\App\Http\Controllers\Staf\TugasDiprosesController::class, 'selesaikan'])
+
+        Route::post('/staf/tugas/{id}/selesaikan', [TugasDiprosesController::class, 'selesaikan'])
             ->name('staf.tugas.selesaikan');
+
+        Route::get('staf/laporan-tindak', [DaftarTindakLanjutController::class, 'index'])->name('staf.laporan-tindak');
+        Route::get('staf/laporan-tindak/{id}', [LaporanTindakLanjutController::class, 'form'])
+            ->name('staf.laporan-tindak.form');
+
+
+        Route::post('staf/laporan-tindak/store', [LaporanTindakLanjutController::class, 'store'])
+            ->name('staf.laporan-tindak.store');
+
+        Route::get('staf/laporan-tindak/lihat-surat', [LaporanTindakLanjutController::class, 'lihatSurat'])
+            ->name('staf.laporan-tindak.lihat-surat');
     });
 
 

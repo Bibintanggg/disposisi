@@ -20,6 +20,24 @@ export default function TugasProses() {
         });
     };
 
+    const sortedSurat = [...surat].sort((a, b) => {
+        if (sort === "waktu") {
+            return new Date(a.tanggal_disposisi_raw) - new Date(b.tanggal_disposisi_raw);
+        }
+
+        if (sort === "prioritas") {
+            const order = {
+                "Sangat Penting": 1,
+                "Penting": 2,
+                "Biasa": 3,
+            };
+
+            return order[a.sifat_surat] - order[b.sifat_surat];
+        }
+
+        return 0;
+    });
+
 
     return (
         <Authenticated>
@@ -49,7 +67,7 @@ export default function TugasProses() {
                         }`}
                 >
 
-                    {surat.map((item: any) => (
+                    {sortedSurat.map((item: any) => (
                         <Card key={item.id} className="rounded-2xl shadow-sm border p-3 hover:shadow-md transition">
                             <CardContent className="space-y-4">
 

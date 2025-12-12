@@ -59,9 +59,9 @@ export default function TugasMasuk() {
 
   const confirmMulaiKerjakan = () => {
     if (!selectedTugas) return;
-    
+
     setIsProcessing(true);
-    
+
     router.post(route('staff.tugas-masuk.mulai', selectedTugas.id), {}, {
       onSuccess: () => {
         setShowConfirmModal(false);
@@ -79,20 +79,6 @@ export default function TugasMasuk() {
   const cancelMulaiKerjakan = () => {
     setShowConfirmModal(false);
     setSelectedTugas(null);
-  };
-
-  const handleLihatSurat = (filePath, hasFile) => {
-    console.log('=== DEBUG LIHAI SURAT ===');
-    console.log('filePath:', filePath);
-    console.log('hasFile:', hasFile);
-    console.log('========================');
-
-    if (!hasFile || !filePath) {
-      alert("File surat tidak tersedia!");
-      return;
-    }
-
-    window.open(filePath, '_blank');
   };
 
   // Komponen badge prioritas
@@ -303,7 +289,7 @@ export default function TugasMasuk() {
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end gap-2">
                             <button
-                              onClick={() => handleLihatSurat(tugas.file_path, tugas.has_file)}
+                              onClick={() => window.open(route('staf.tugas-masuk.lihat-surat', tugas.id), "_blank")}
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                             >
                               <Eye className="w-4 h-4" />
@@ -348,7 +334,7 @@ export default function TugasMasuk() {
                 <p className="text-gray-700 mb-4">
                   Anda yakin ingin memulai tugas ini sekarang?
                 </p>
-                
+
                 <div className="bg-gray-50 rounded-lg p-4 space-y-2">
                   <div className="flex items-start gap-2">
                     <span className="text-sm font-medium text-gray-500 min-w-[100px]">Nomor Surat:</span>
