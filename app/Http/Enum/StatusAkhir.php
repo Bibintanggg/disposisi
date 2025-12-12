@@ -24,7 +24,7 @@ enum StatusAkhir: int
         return [
             self::BARU->value => self::BARU->label(),
             self::DISPOSISI->value => self::DISPOSISI->label(),
-            self::BARU->value => self::BARU->label(),
+            self::SELESAI->value => self::SELESAI->label(),
             self::ARSIP->value => self::ARSIP->label(),
         ];
     }

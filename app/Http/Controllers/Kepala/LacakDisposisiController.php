@@ -106,5 +106,4 @@ class LacakDisposisiController extends Controller
         ]);
     }
 
-    // Optional: Anda bisa menghapus atau mengubah method show jika tidak dibutuhkan lagi
 }

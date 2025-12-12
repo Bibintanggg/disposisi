@@ -23,7 +23,7 @@ class Disposisi extends Model
         'tanggal_disposisi' => 'datetime',
     ];
 
-    public function users() 
+    public function pengirim() 
     {
         return $this->belongsTo(User::class, 'pengirim_id');
     }

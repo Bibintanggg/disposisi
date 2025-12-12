@@ -11,6 +11,7 @@ use App\Http\Controllers\Kepala\LaporanKinerjaController;
 use App\Http\Controllers\Kepala\SuratMenungguController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Staf\DashboardStafController;
+use App\Http\Controllers\Staf\TugasMasukController;
 use App\Http\Controllers\Verif\DashboardVerifController;
 use App\Http\Controllers\Verif\SuratKeluarController;
 use App\Http\Controllers\Verif\SuratMasukController;
@@ -34,7 +35,7 @@ Route::get('/', function () {
 // })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::middleware(['jabatan:'.Jabatan::ADMIN->value])->group(function () {
+    Route::middleware(['jabatan:' . Jabatan::ADMIN->value])->group(function () {
         Route::get('/admin/dashboard', [DashboardAdminController::class, 'index'])->name('admin.dashboard');
         Route::get('/admin/manage-user', [ManageUserController::class, 'index'])->name('admin.manage-user');
         Route::post('/admin/manage-user', [ManageUserController::class, 'store'])->name('admin.manage-user.store');
@@ -47,7 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Route::get('/admin/laporan-audit', [LaporanAuditController::class, 'index'])->name('admin.laporan-audit');
     });
 
-    Route::middleware(['jabatan:'.Jabatan::KEPALA->value])->group(function () {
+    Route::middleware(['jabatan:' . Jabatan::KEPALA->value])->group(function () {
         Route::get('kepala/dashboard', [DashboardKepalaController::class, 'index'])->name('kepala.dashboard');
         Route::get('kepala/surat-menunggu', [SuratMenungguController::class, 'index'])->name('kepala.surat-menunggu');
         Route::get('/kepala/disposisi/{id}', [SuratMenungguController::class, 'showDisposisi']);
@@ -60,11 +61,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/kepala/laporan-kinerja', [LaporanKinerjaController::class, 'index'])->name('kepala.laporan-kinerja');
     });
 
-    Route::middleware(['jabatan:'.Jabatan::STAF->value])->group(function () {
+    Route::middleware(['jabatan:' . Jabatan::STAF->value])->group(function () {
         Route::get('staf/dashboard', [DashboardStafController::class, 'index'])->name('staf.dashboard');
+
+        Route::get('staf/tugas-masuk', [TugasMasukController::class, 'index'])->name('staf.tugas-masuk');
+        Route::post('/staff/tugas-masuk/{id}/mulai', [TugasMasukController::class, 'mulai'])
+            ->name('staff.tugas-masuk.mulai');
     });
 
-    Route::middleware(['jabatan:'.Jabatan::VERIFIKATOR->value])->group(function () {
+    Route::middleware(['jabatan:' . Jabatan::VERIFIKATOR->value])->group(function () {
         Route::get('verif/dashboard', [DashboardVerifController::class, 'index'])->name('verif.dashboard');
         Route::get('verif/input-surat-masuk', [SuratMasukController::class, 'index'])->name('verif.input-surat-masuk');
         Route::get('verif/input-surat-masuk/{filename}', [SuratMasukController::class, 'previewFile'])->name('verif.surat-masuk.file');
@@ -97,4 +102,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
