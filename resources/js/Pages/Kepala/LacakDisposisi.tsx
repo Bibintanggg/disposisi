@@ -72,8 +72,8 @@ export default function LacakDisposisi() {
           tanggal_disposisi: d.tanggal_disposisi ?? d.tanggal ?? "-",
           status_global:
             d.status_global === 1 || d.status_global === "1" ? "tertunda" :
-            d.status_global === 2 || d.status_global === "2" ? "sebagian_proses" :
-            "semua_selesai",
+              d.status_global === 2 || d.status_global === "2" ? "sebagian_proses" :
+                "semua_selesai",
           waktu_berjalan: d.waktu_berjalan ?? "-",
           penerima_count: d.penerima_count ?? (d.penerima ? d.penerima.length : 0),
           file_surat: d.file_surat ?? d.surat_masuk?.gambar ?? undefined,
@@ -176,14 +176,27 @@ export default function LacakDisposisi() {
   };
 
   // actions
-  const handleViewDetail = (disposisi: Disposisi) => {
-    setSelectedDisposisi(disposisi);
-    setIsDetailOpen(true);
+  // Ganti handleViewDetail dengan ini:
+  const handleViewDetail = (id: number) => {
+    // Cari data dari disposisiList yang sudah ada
+    const disposisiData = disposisiList.find(d => d.id === id);
 
-    // fetch penerima list dari backend (jika perlu)
-    // contoh: router.get(route('kepala.lacak.show', disposisi.id), {}, { preserveState: true })
-    // atau gunakan endpoint API untuk ambil tujuan
-    // di sini kita assume backend belum nyediain, jadi tetap kosong unless server provided
+    if (disposisiData) {
+      // Gunakan struktur data yang konsisten
+      const detailData = {
+        id: disposisiData.id,
+        nomor_surat: disposisiData.nomor_surat || disposisiData.surat_masuk?.nomor_surat || '-',
+        isi_disposisi: disposisiData.isi_disposisi || disposisiData.instruksi || '-',
+        tanggal_disposisi: disposisiData.tanggal_disposisi || '-',
+        file_surat: disposisiData.file_surat || disposisiData.surat_masuk?.file_surat,
+        waktu_berjalan: disposisiData.waktu_berjalan || '-',
+        penerima: disposisiData.penerima || []
+      };
+
+      setSelectedDisposisi(detailData);
+      setPenerimaList(detailData.penerima);
+      setIsDetailOpen(true);
+    }
   };
 
   const handleRefresh = () => {
@@ -424,11 +437,10 @@ export default function LacakDisposisi() {
                           </span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div className={`h-2 rounded-full ${
-                            disposisi.status_global === 'semua_selesai' ? 'bg-green-500' :
+                          <div className={`h-2 rounded-full ${disposisi.status_global === 'semua_selesai' ? 'bg-green-500' :
                             disposisi.status_global === 'sebagian_proses' ? 'bg-yellow-500' :
-                            'bg-red-500'
-                          }`} style={{ width: `${getProgressPercentage(disposisi.status_global)}%` }} />
+                              'bg-red-500'
+                            }`} style={{ width: `${getProgressPercentage(disposisi.status_global)}%` }} />
                         </div>
                       </div>
                     </td>
@@ -450,7 +462,7 @@ export default function LacakDisposisi() {
                       </div>
                     </td>
                     <td className="py-4 px-6">
-                      <button onClick={() => handleViewDetail(disposisi)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm hover:shadow">
+                      <button onClick={() => handleViewDetail(disposisi.id)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm hover:shadow">
                         <Eye className="w-4 h-4" />
                         <span>Detail</span>
                       </button>
@@ -530,8 +542,8 @@ export default function LacakDisposisi() {
                       const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
 
                       const cardStyle = status === 'selesai' ? 'bg-green-50 border-green-100' :
-                                       status === 'proses' ? 'bg-yellow-50 border-yellow-100' :
-                                       'bg-gray-50 border-gray-100';
+                        status === 'proses' ? 'bg-yellow-50 border-yellow-100' :
+                          'bg-gray-50 border-gray-100';
 
                       return (
                         <div key={status} className={`rounded-xl p-4 border ${cardStyle}`}>
@@ -569,11 +581,10 @@ export default function LacakDisposisi() {
                               <p className="text-gray-500 text-sm">{penerima.jabatan}</p>
                             </div>
                           </div>
-                          <div className={`px-4 py-2 rounded-full text-sm font-medium border ${
-                            penerima.status === 'selesai' ? 'bg-green-100 text-green-800 border-green-200' :
+                          <div className={`px-4 py-2 rounded-full text-sm font-medium border ${penerima.status === 'selesai' ? 'bg-green-100 text-green-800 border-green-200' :
                             penerima.status === 'proses' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
-                            'bg-gray-100 text-gray-800 border-gray-200'
-                          }`}>{penerima.status === 'selesai' ? 'Selesai' : penerima.status === 'proses' ? 'Dalam Proses' : 'Belum Dimulai'}</div>
+                              'bg-gray-100 text-gray-800 border-gray-200'
+                            }`}>{penerima.status === 'selesai' ? 'Selesai' : penerima.status === 'proses' ? 'Dalam Proses' : 'Belum Dimulai'}</div>
                         </div>
 
                         <div className="flex items-center justify-between text-sm">

@@ -19,77 +19,88 @@ class LacakDisposisiController extends Controller
         $disposisi = Disposisi::with([
             'suratMasuk',
             'tujuanDisposisi.penerima',
+            'tujuanDisposisi.riwayatTindakLanjut', // Tambahkan ini dari show method
         ])
-        ->where('pengirim_id', Auth::id()) // hanya disposisi si Kepala
-        ->when($search, function ($query) use ($search) {
-            $query->whereHas('suratMasuk', function ($q) use ($search) {
-                $q->where('nomor_surat', 'LIKE', "%$search%")
-                  ->orWhere('perihal', 'LIKE', "%$search%");
-            });
-        })
-        ->latest()
-        ->get();
+            ->where('pengirim_id', Auth::id())
+            ->when($search, function ($query) use ($search) {
+                $query->whereHas('suratMasuk', function ($q) use ($search) {
+                    $q->where('nomor_surat', 'LIKE', "%$search%")
+                        ->orWhere('perihal', 'LIKE', "%$search%");
+                });
+            })
+            ->latest()
+            ->get();
 
-        // Proses status global
-        $disposisi = $disposisi->map(function ($d) {
+        // Map disposisi untuk frontend - SERTAKAN SEMUA DATA DARI SHOW METHOD
+        $disposisiMapped = $disposisi->map(function ($d) {
             $statusList = $d->tujuanDisposisi->pluck('status_tindak_lanjut')->toArray();
 
-            // Status global: ambil status "TERBURUK"
+            // Status global: ambil status TERBURUK (max)
             $globalStatus = collect($statusList)->max();
 
+            // Buat struktur yang SAMA PERSIS dengan yang ada di show method
             return [
                 'id' => $d->id,
-                'tanggal_disposisi' => $d->tanggal_disposisi,
-                'surat_masuk' => $d->suratMasuk,
+                // Data utama (sudah ada)
+                'tanggal_disposisi' => $d->tanggal_disposisi->format('Y-m-d'),
                 'instruksi' => $d->isi_disposisi,
-                
-                'status_global' => $globalStatus,  // 1 / 2 / 3 / 4
-
-                // hitung berjalan
                 'waktu_berjalan' => now()->diffForHumans($d->tanggal_disposisi, true),
+                
+                // Data dari show method - TAMBAHKAN SEMUA FIELD INI
+                'nomor_surat' => $d->suratMasuk?->nomor_surat ?? '-',
+                'isi_disposisi' => $d->isi_disposisi ?? '-',
+                'file_surat' => $d->suratMasuk?->gambar ?? null,
+                
+                // Surat masuk (format lama, tetap dipertahankan untuk kompatibilitas)
+                'surat_masuk' => [
+                    'nomor_surat' => $d->suratMasuk?->nomor_surat,
+                    'perihal' => $d->suratMasuk?->perihal,
+                    'file_surat' => $d->suratMasuk?->gambar,
+                ],
 
-                // kirim tujuan
+                // status global: 1 / 2 / 3 / 4 → map ke string
+                'status_global' => match ($globalStatus) {
+                    StatusTindakLanjut::BELUM->value => 'tertunda',
+                    StatusTindakLanjut::PROSES->value => 'sebagian_proses',
+                    StatusTindakLanjut::SELESAI->value => 'semua_selesai',
+                    StatusTindakLanjut::DIBATALKAN->value => 'tertunda',
+                    default => 'tertunda',
+                },
+
+                // penerima - PASTIKAN FORMATNYA SAMA DENGAN SHOW METHOD
                 'penerima' => $d->tujuanDisposisi->map(function ($t) {
                     return [
                         'id' => $t->id,
-                        'penerima' => $t->penerima?->nama,
-                        'status' => $t->status_tindak_lanjut,
+                        'nama' => $t->penerima?->nama_lengkap ?? '-',
+                        'jabatan' => $t->penerima?->jabatan?->value ?? '-',
+                        'status' => match ($t->status_tindak_lanjut) {
+                            StatusTindakLanjut::BELUM => 'belum',
+                            StatusTindakLanjut::PROSES => 'proses',
+                            StatusTindakLanjut::SELESAI => 'selesai',
+                            StatusTindakLanjut::DIBATALKAN => 'tertunda',
+                        },
+                        'tanggal_update' => $t->updated_at?->format('Y-m-d H:i:s') ?? null,
+                        'laporan' => null,
                     ];
                 }),
 
-                // statistik
+                // statistik penerima
                 'count' => [
                     'belum'  => $d->tujuanDisposisi->where('status_tindak_lanjut', StatusTindakLanjut::BELUM->value)->count(),
                     'proses' => $d->tujuanDisposisi->where('status_tindak_lanjut', StatusTindakLanjut::PROSES->value)->count(),
-                    'selesai'=> $d->tujuanDisposisi->where('status_tindak_lanjut', StatusTindakLanjut::SELESAI->value)->count(),
+                    'selesai' => $d->tujuanDisposisi->where('status_tindak_lanjut', StatusTindakLanjut::SELESAI->value)->count(),
                     'batal'  => $d->tujuanDisposisi->where('status_tindak_lanjut', StatusTindakLanjut::DIBATALKAN->value)->count(),
                 ],
             ];
         });
 
         return Inertia::render('Kepala/LacakDisposisi', [
-            'disposisi' => $disposisi,
+            'disposisi' => $disposisiMapped,
             'filters' => [
                 'search' => $search,
             ]
         ]);
     }
 
-
-
-    // DETAIL PELACAKAN
-    public function show($id)
-    {
-        $data = Disposisi::with([
-            'suratMasuk',
-            'tujuanDisposisi.penerima',
-            'tujuanDisposisi.riwayat',
-        ])
-        ->where('id', $id)
-        ->firstOrFail();
-
-        return Inertia::render('Kepala/LacakDisposisiDetail', [
-            'data' => $data
-        ]);
-    }
+    // Optional: Anda bisa menghapus atau mengubah method show jika tidak dibutuhkan lagi
 }

@@ -19,6 +19,10 @@ class Disposisi extends Model
         'catatan_tambahan'
     ];
 
+    protected $casts = [
+        'tanggal_disposisi' => 'datetime',
+    ];
+
     public function users() 
     {
         return $this->belongsTo(User::class, 'pengirim_id');

@@ -53,6 +53,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/kepala/disposisi/file/{id}', [SuratMenungguController::class, 'previewFile'])->name('kepala.disposisi.file');
 
         Route::get('/kepala/lacak-disposisi', [LacakDisposisiController::class, 'index'])->name('kepala.lacak-disposisi');
+        // Route::get('/kepala/lacak-disposisi/{id}', [LacakDisposisiController::class, 'show'])->name('kepala.lacak-disposisi.show');
     });
 
     Route::middleware(['jabatan:'.Jabatan::STAF->value])->group(function () {
