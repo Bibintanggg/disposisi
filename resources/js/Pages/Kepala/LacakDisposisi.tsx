@@ -1,6 +1,6 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router, usePage } from "@inertiajs/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Search,
   Filter,
@@ -33,6 +33,7 @@ interface Disposisi {
   waktu_berjalan: string;
   penerima_count: number;
   file_surat?: string;
+  penerima: string
 }
 
 interface PenerimaTugas {
@@ -46,10 +47,8 @@ interface PenerimaTugas {
 }
 
 export default function LacakDisposisi() {
-  // Inertia props -- backend harus mengirim: suratMasuk, suratSelesai, suratProses, suratBatal, disposisi (opsional)
   const { suratMasuk = [], suratSelesai = [], suratProses = [], suratBatal = [], disposisi = [] }: any = usePage().props;
 
-  // Local state UI
   const [disposisiList, setDisposisiList] = useState<Disposisi[]>([]);
   const [penerimaList, setPenerimaList] = useState<PenerimaTugas[]>([]);
   const [selectedDisposisi, setSelectedDisposisi] = useState<Disposisi | null>(null);
@@ -59,11 +58,13 @@ export default function LacakDisposisi() {
   const [filteredData, setFilteredData] = useState<Disposisi[]>([]);
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
 
-  // Map backend payload to frontend structure. Backend can send either `disposisi` array directly
-  // or only suratMasuk + related models. We try disposisi first, fallback to mapping suratMasuk.
+  const [lastUpdate, setLastUpdate] = useState("");
+  const [isAutoRefresh, setIsAutoRefresh] = useState(true);
+  const refreshInterval = useRef<NodeJS.Timeout | null>(null);
+
+
   useEffect(() => {
     if (Array.isArray(disposisi) && disposisi.length > 0) {
-      // assume backend already shaped data
       setDisposisiList(
         disposisi.map((d: any) => ({
           id: d.id,
@@ -75,12 +76,12 @@ export default function LacakDisposisi() {
               d.status_global === 2 || d.status_global === "2" ? "sebagian_proses" :
                 "semua_selesai",
           waktu_berjalan: d.waktu_berjalan ?? "-",
+          penerima: d.penerima ?? [],
           penerima_count: d.penerima_count ?? (d.penerima ? d.penerima.length : 0),
           file_surat: d.file_surat ?? d.surat_masuk?.gambar ?? undefined,
         }))
       );
     } else if (Array.isArray(suratMasuk) && suratMasuk.length > 0) {
-      // fallback: build from suratMasuk (minimal fields)
       setDisposisiList(
         suratMasuk.map((s: any, idx: number) => ({
           id: s.id ?? idx + 1,
@@ -94,16 +95,9 @@ export default function LacakDisposisi() {
         }))
       );
     } else {
-      // default demo data (keamanan jika backend belum kirim apa-apa)
       setDisposisiList([]);
     }
   }, [disposisi, suratMasuk]);
-
-  // penerimaList: di real app harus di-fetch per disposisi via endpoint show atau sudah dikirim bersama disposisi
-  useEffect(() => {
-    // default empty; kept for modal demo
-    setPenerimaList([]);
-  }, []);
 
   // filtering
   useEffect(() => {
@@ -175,40 +169,89 @@ export default function LacakDisposisi() {
     }
   };
 
+  const getJabatanRole = (jabatan: number) => {
+    switch (jabatan) {
+      case 1: 'Admin';
+      case 2: 'Staf';
+      case 3: 'Kepala';
+      case 4: 'Verifikator';
+      default: return "Staf";
+    }
+  }
+
   // actions
   // Ganti handleViewDetail dengan ini:
   const handleViewDetail = (id: number) => {
-    // Cari data dari disposisiList yang sudah ada
     const disposisiData = disposisiList.find(d => d.id === id);
 
     if (disposisiData) {
-      // Gunakan struktur data yang konsisten
-      const detailData = {
-        id: disposisiData.id,
-        nomor_surat: disposisiData.nomor_surat || disposisiData.surat_masuk?.nomor_surat || '-',
-        isi_disposisi: disposisiData.isi_disposisi || disposisiData.instruksi || '-',
-        tanggal_disposisi: disposisiData.tanggal_disposisi || '-',
-        file_surat: disposisiData.file_surat || disposisiData.surat_masuk?.file_surat,
-        waktu_berjalan: disposisiData.waktu_berjalan || '-',
-        penerima: disposisiData.penerima || []
-      };
-
-      setSelectedDisposisi(detailData);
-      setPenerimaList(detailData.penerima);
+      setSelectedDisposisi(disposisiData);
+      setPenerimaList(disposisiData.penerima ?? []); // ← ini sudah ada datanya
       setIsDetailOpen(true);
     }
   };
 
+  const handleExport = () => {
+    console.log("Exporting data...");
+  };
+
+  const formatCurrentTime = () => {
+    const now = new Date();
+    return now.toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  };
+
+  const updateLastUpdateTime = () => {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+    const dateString = now.toLocaleDateString('id-ID', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    setLastUpdate(`Update terakhir: ${dateString} ${timeString}`);
+  };
+
+  useEffect(() => {
+    updateLastUpdateTime();
+
+    if (isAutoRefresh) {
+      refreshInterval.current = setInterval(() => {
+        updateLastUpdateTime();
+        // Refresh data setiap 2 menit (120000 ms)
+        router.reload({
+          preserveScroll: true,
+          only: ['disposisi']
+        });
+      }, 30000); // Update waktu setiap 30 detik
+    }
+
+    return () => {
+      if (refreshInterval.current) {
+        clearInterval(refreshInterval.current);
+      }
+    };
+  }, [isAutoRefresh]);
+
+  const toggleAutoRefresh = () => {
+    setIsAutoRefresh(!isAutoRefresh);
+  };
+
+
   const handleRefresh = () => {
-    // re-request page with same params to refresh data
+    updateLastUpdateTime
     router.reload();
   };
 
-  const handleExport = () => {
-    // contoh: download CSV via route
-    // router.get(route('kepala.lacak.export'), { format: 'csv' });
-    console.log("Exporting data...");
-  };
+
 
   return (
     <Authenticated>
@@ -222,24 +265,6 @@ export default function LacakDisposisi() {
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Lacak Disposisi</h1>
               <p className="text-gray-600">Pantau status semua tugas yang telah didelegasikan kepada staf</p>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleRefresh}
-                className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg transition-colors shadow-sm"
-              >
-                <RefreshCw className="w-4 h-4 text-gray-600" />
-                <span className="hidden md:inline text-gray-700">Refresh</span>
-              </button>
-
-              <button
-                onClick={handleExport}
-                className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm"
-              >
-                <Download className="w-4 h-4" />
-                <span className="hidden md:inline">Export Data</span>
-              </button>
             </div>
           </div>
 
@@ -323,57 +348,8 @@ export default function LacakDisposisi() {
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
               </div>
-
-              <button
-                onClick={() => setShowAdvancedFilter(!showAdvancedFilter)}
-                className="flex items-center gap-2 px-4 py-3 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg transition-colors"
-              >
-                <Filter className="w-5 h-5 text-gray-600" />
-                <span className="hidden md:inline text-gray-700">Filter</span>
-              </button>
             </div>
           </div>
-
-          {/* Advanced Filters */}
-          {showAdvancedFilter && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="font-medium text-gray-700">Filter Lanjutan</h4>
-                <button onClick={() => setShowAdvancedFilter(false)} className="text-gray-500 hover:text-gray-700">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Rentang Tanggal</label>
-                  <input type="date" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Jumlah Penerima</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>Semua</option>
-                    <option>1-3 staf</option>
-                    <option>4-6 staf</option>
-                    <option>7+ staf</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Durasi</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option>Semua Durasi</option>
-                    <option>≤ 7 hari</option>
-                    <option>8-14 hari</option>
-                    <option>15-30 hari</option>
-                    <option> &gt; 30 hari</option>
-                  </select>
-                </div>
-              </div>
-              <div className="flex justify-end gap-3 mt-4">
-                <button className="px-4 py-2 text-gray-700 hover:text-gray-900">Reset</button>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Terapkan Filter</button>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Main Content - Light Table */}
@@ -386,8 +362,26 @@ export default function LacakDisposisi() {
                 <p className="text-gray-600 text-sm mt-1">Menampilkan <span className="font-medium">{filteredData.length}</span> dari <span className="font-medium">{disposisiList.length}</span> disposisi</p>
               </div>
               <div className="flex items-center gap-2">
-                <FileBarChart className="w-5 h-5 text-gray-400" />
-                <span className="text-sm text-gray-600 hidden md:inline">Update terakhir: Hari ini 10:30</span>
+                <button
+                  onClick={toggleAutoRefresh}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${isAutoRefresh
+                    ? 'bg-green-100 text-green-800 border border-green-200'
+                    : 'bg-gray-100 text-gray-800 border border-gray-200'
+                    }`}
+                  title={isAutoRefresh ? "Auto-refresh aktif" : "Auto-refresh nonaktif"}
+                >
+                  <RefreshCw className={`w-4 h-4 ${isAutoRefresh ? 'animate-spin' : ''}`} />
+                  <span className="hidden md:inline">
+                    {isAutoRefresh ? 'Auto' : 'Manual'}
+                  </span>
+                </button>
+
+                <div className=" items-center gap-2">
+                  <div className="text-right ">
+                    <span className="text-sm text-gray-600 hidden md:inline">{lastUpdate}</span>
+                    <span className="text-xs text-gray-500 block md:hidden">{formatCurrentTime()}</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -578,7 +572,7 @@ export default function LacakDisposisi() {
                             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">{penerima.nama.charAt(0)}</div>
                             <div>
                               <p className="font-medium text-gray-900">{penerima.nama}</p>
-                              <p className="text-gray-500 text-sm">{penerima.jabatan}</p>
+                              <p className="text-gray-500 text-sm">{getJabatanRole(penerima.jabatan)}</p>
                             </div>
                           </div>
                           <div className={`px-4 py-2 rounded-full text-sm font-medium border ${penerima.status === 'selesai' ? 'bg-green-100 text-green-800 border-green-200' :
@@ -604,7 +598,9 @@ export default function LacakDisposisi() {
                 <div className="flex items-center gap-2 text-gray-600"><Clock className="w-4 h-4" /><span>Disposisi ini telah berjalan selama {selectedDisposisi.waktu_berjalan}</span></div>
                 <div className="flex gap-3">
                   {selectedDisposisi.file_surat && (
-                    <a href={selectedDisposisi.file_surat} target="_blank" className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"><ExternalLink className="w-4 h-4" />Lihat File Surat</a>
+                    <a href={selectedDisposisi.file_surat}
+                      target="_blank"
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"><ExternalLink className="w-4 h-4" />Lihat File Surat</a>
                   )}
                   <button onClick={() => setIsDetailOpen(false)} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">Tutup</button>
                 </div>
@@ -616,11 +612,3 @@ export default function LacakDisposisi() {
     </Authenticated>
   );
 }
-
-/*
-Integrasi Backend (Catatan):
-- Controller LacakDisposisiController@index harus mengirim Inertia props: suratMasuk, suratSelesai, suratProses, suratBatal atau disposisi (lebih lengkap).
-- Jika ingin modal detail menampilkan penerima, pastikan endpoint show(id) mengembalikan tujuan_disposisi + penerima + riwayat.
-- Contoh route: Route::get('/kepala/lacak', [LacakDisposisiController::class, 'index'])->name('kepala.lacak.index');
-- Untuk export, tambahkan route yang mengembalikan file (CSV/PDF) dan panggil via router.visit / window.location.
-*/

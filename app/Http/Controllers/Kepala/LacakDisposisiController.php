@@ -43,22 +43,25 @@ class LacakDisposisiController extends Controller
                 'id' => $d->id,
                 // Data utama (sudah ada)
                 'tanggal_disposisi' => $d->tanggal_disposisi->format('Y-m-d'),
-                'instruksi' => $d->isi_disposisi,
+                'instruksi' => $d->isi_surat,
                 'waktu_berjalan' => now()->diffForHumans($d->tanggal_disposisi, true),
-                
+
                 // Data dari show method - TAMBAHKAN SEMUA FIELD INI
                 'nomor_surat' => $d->suratMasuk?->nomor_surat ?? '-',
-                'isi_disposisi' => $d->isi_disposisi ?? '-',
-                'file_surat' => $d->suratMasuk?->gambar ?? null,
-                
-                // Surat masuk (format lama, tetap dipertahankan untuk kompatibilitas)
-                'surat_masuk' => [
+                'isi_disposisi' => $d->isi_surat ?? '-',
+
+                'file_surat' => $d->suratMasuk?->gambar
+                    ? asset('storage/' . $d->suratMasuk->gambar)
+                    : null,
+
+                'surat' => [
                     'nomor_surat' => $d->suratMasuk?->nomor_surat,
                     'perihal' => $d->suratMasuk?->perihal,
-                    'file_surat' => $d->suratMasuk?->gambar,
+                    'file_surat' => $d->suratMasuk?->gambar
+                        ? asset('storage/' . $d->suratMasuk->gambar)
+                        : null,
                 ],
 
-                // status global: 1 / 2 / 3 / 4 → map ke string
                 'status_global' => match ($globalStatus) {
                     StatusTindakLanjut::BELUM->value => 'tertunda',
                     StatusTindakLanjut::PROSES->value => 'sebagian_proses',
@@ -78,6 +81,7 @@ class LacakDisposisiController extends Controller
                             StatusTindakLanjut::PROSES => 'proses',
                             StatusTindakLanjut::SELESAI => 'selesai',
                             StatusTindakLanjut::DIBATALKAN => 'tertunda',
+                            default => 'belum',
                         },
                         'tanggal_update' => $t->updated_at?->format('Y-m-d H:i:s') ?? null,
                         'laporan' => null,
