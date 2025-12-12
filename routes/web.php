@@ -13,6 +13,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Staf\DaftarTindakLanjutController;
 use App\Http\Controllers\Staf\DashboardStafController;
 use App\Http\Controllers\Staf\LaporanTindakLanjutController;
+use App\Http\Controllers\Staf\RiwayatTugasController;
 use App\Http\Controllers\Staf\TugasDiprosesController;
 use App\Http\Controllers\Staf\TugasMasukController;
 use App\Http\Controllers\Verif\DashboardVerifController;
@@ -91,6 +92,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('staf/laporan-tindak/lihat-surat', [LaporanTindakLanjutController::class, 'lihatSurat'])
             ->name('staf.laporan-tindak.lihat-surat');
+
+        Route::get('staf/riwayat-tugas', [RiwayatTugasController::class, 'index'])->name('staf.riwayat-tugas-selesai');
     });
 
 

@@ -37,4 +37,14 @@ class TujuanDisposisi extends Model
     {
         return $this->hasMany(RiwayatTindakLanjut::class, 'tujuan_id');
     }
+
+    public function suratMasuk()
+    {
+        return $this->disposisi->suratMasuk();
+    }
+
+    public function pengirim()
+    {
+        return $this->disposisi->pengirim();
+    }
 }
