@@ -11,6 +11,7 @@ use App\Http\Controllers\Kepala\LaporanKinerjaController;
 use App\Http\Controllers\Kepala\SuratMenungguController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Staf\DashboardStafController;
+use App\Http\Controllers\Staf\TugasDiprosesController;
 use App\Http\Controllers\Staf\TugasMasukController;
 use App\Http\Controllers\Verif\DashboardVerifController;
 use App\Http\Controllers\Verif\SuratKeluarController;
@@ -67,7 +68,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('staf/tugas-masuk', [TugasMasukController::class, 'index'])->name('staf.tugas-masuk');
         Route::post('/staff/tugas-masuk/{id}/mulai', [TugasMasukController::class, 'mulai'])
             ->name('staff.tugas-masuk.mulai');
+
+        Route::get('staf/tugas-sedang-diproses', [TugasDiprosesController::class, 'index'])->name('staf.tugas-proses');
+        Route::get('/staf/tugas-sedang-diproses/{id}/lihat-surat', [TugasDiprosesController::class, 'lihatSurat'])
+            ->name('staf.tugas.lihat-surat');
+        Route::post('/staf/tugas/{id}/selesaikan', [\App\Http\Controllers\Staf\TugasDiprosesController::class, 'selesaikan'])
+            ->name('staf.tugas.selesaikan');
     });
+
 
     Route::middleware(['jabatan:' . Jabatan::VERIFIKATOR->value])->group(function () {
         Route::get('verif/dashboard', [DashboardVerifController::class, 'index'])->name('verif.dashboard');
