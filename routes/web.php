@@ -4,8 +4,10 @@ use App\Http\Controllers\Admin\ArsipGlobalController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\LaporanAuditController;
 use App\Http\Controllers\Admin\ManageUserController;
+use App\Http\Controllers\Kepala\ArsipSuratMasukController;
 use App\Http\Controllers\Kepala\DashboardKepalaController;
 use App\Http\Controllers\Kepala\LacakDisposisiController;
+use App\Http\Controllers\Kepala\LaporanKinerjaController;
 use App\Http\Controllers\Kepala\SuratMenungguController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Staf\DashboardStafController;
@@ -53,7 +55,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/kepala/disposisi/file/{id}', [SuratMenungguController::class, 'previewFile'])->name('kepala.disposisi.file');
 
         Route::get('/kepala/lacak-disposisi', [LacakDisposisiController::class, 'index'])->name('kepala.lacak-disposisi');
-        // Route::get('/kepala/lacak-disposisi/{id}', [LacakDisposisiController::class, 'show'])->name('kepala.lacak-disposisi.show');
+        Route::get('/kepala/arsip-surat', [ArsipSuratMasukController::class, 'index'])->name('kepala.arsip-surat-masuk');
+
+        Route::get('/kepala/laporan-kinerja', [LaporanKinerjaController::class, 'index'])->name('kepala.laporan-kinerja');
     });
 
     Route::middleware(['jabatan:'.Jabatan::STAF->value])->group(function () {
