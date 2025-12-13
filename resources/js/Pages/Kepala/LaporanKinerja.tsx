@@ -2,81 +2,14 @@ import React, { useState } from 'react';
 import { Filter, TrendingUp, Clock, CheckCircle2, AlertCircle, Users, Calendar, Download, BarChart3 } from 'lucide-react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Authenticated from "@/Layouts/AuthenticatedLayout";
+import { usePage } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 
-// Mock data untuk demo
-const mockStafData = [
-  {
-    id: 1,
-    nama: "Ahmad Fauzi",
-    total_tugas: 45,
-    tugas_selesai: 38,
-    tugas_proses: 5,
-    tugas_belum: 2,
-    rata_hari: 3.2,
-    tingkat_penyelesaian: 84
-  },
-  {
-    id: 2,
-    nama: "Siti Nurhaliza",
-    total_tugas: 52,
-    tugas_selesai: 48,
-    tugas_proses: 3,
-    tugas_belum: 1,
-    rata_hari: 2.8,
-    tingkat_penyelesaian: 92
-  },
-  {
-    id: 3,
-    nama: "Budi Santoso",
-    total_tugas: 38,
-    tugas_selesai: 30,
-    tugas_proses: 6,
-    tugas_belum: 2,
-    rata_hari: 4.1,
-    tingkat_penyelesaian: 79
-  },
-  {
-    id: 4,
-    nama: "Dewi Lestari",
-    total_tugas: 41,
-    tugas_selesai: 35,
-    tugas_proses: 4,
-    tugas_belum: 2,
-    rata_hari: 3.5,
-    tingkat_penyelesaian: 85
-  }
-];
-
-const mockTugasTertunda = [
-  {
-    id: 1,
-    staf: "Ahmad Fauzi",
-    nomor_surat: "045/SM/XII/2024",
-    perihal: "Laporan Keuangan Q4",
-    hari_tertunda: 8,
-    status: "Proses"
-  },
-  {
-    id: 2,
-    staf: "Budi Santoso",
-    nomor_surat: "052/SM/XII/2024",
-    perihal: "Evaluasi Program Kerja",
-    hari_tertunda: 12,
-    status: "Belum"
-  },
-  {
-    id: 3,
-    staf: "Budi Santoso",
-    nomor_surat: "061/SM/XII/2024",
-    perihal: "Koordinasi Antar Bidang",
-    hari_tertunda: 9,
-    status: "Proses"
-  }
-];
 
 const COLORS = ['#10b981', '#f59e0b', '#ef4444'];
 
 export default function LaporanKinerja() {
+  const { stafData, tugasTertunda, filter } = usePage().props;
   const [filters, setFilters] = useState({
     periode: 'bulan_ini',
     staf: '',
@@ -85,15 +18,15 @@ export default function LaporanKinerja() {
   const [showFilters, setShowFilters] = useState(false);
 
   // Data untuk grafik batang (beban kerja)
-  const bebanKerjaData = mockStafData.map(staf => ({
+  const bebanKerjaData = stafData.map(staf => ({
     nama: staf.nama.split(' ')[0],
     'Total Tugas': staf.total_tugas
   }));
 
   // Data untuk pie chart (status tugas keseluruhan)
-  const totalSelesai = mockStafData.reduce((sum, staf) => sum + staf.tugas_selesai, 0);
-  const totalProses = mockStafData.reduce((sum, staf) => sum + staf.tugas_proses, 0);
-  const totalBelum = mockStafData.reduce((sum, staf) => sum + staf.tugas_belum, 0);
+  const totalSelesai = stafData.reduce((sum, staf) => sum + staf.tugas_selesai, 0);
+  const totalProses = stafData.reduce((sum, staf) => sum + staf.tugas_proses, 0);
+  const totalBelum = stafData.reduce((sum, staf) => sum + staf.tugas_belum, 0);
 
   const statusData = [
     { name: 'Selesai', value: totalSelesai },
@@ -101,8 +34,17 @@ export default function LaporanKinerja() {
     { name: 'Belum', value: totalBelum }
   ];
 
-  const totalTugas = mockStafData.reduce((sum, staf) => sum + staf.total_tugas, 0);
-  const rataRataPenyelesaian = (mockStafData.reduce((sum, staf) => sum + staf.tingkat_penyelesaian, 0) / mockStafData.length).toFixed(1);
+  const totalTugas = stafData.reduce((sum, staf) => sum + staf.total_tugas, 0);
+  const rataRataPenyelesaian = (stafData.reduce((sum, staf) => sum + staf.tingkat_penyelesaian, 0) / stafData.length).toFixed(1);
+
+  const applyFilter = () => {
+    router.get(
+      route('kepala.laporan-kinerja'),
+      filters,
+      { preserveState: true }
+    );
+  };
+
 
   return (
     <Authenticated>
@@ -114,77 +56,13 @@ export default function LaporanKinerja() {
             <p className="mt-1 text-sm text-gray-600">Monitoring dan evaluasi kinerja tim dalam penyelesaian tugas disposisi</p>
           </div>
 
-          {/* Filter Section */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <Filter className="w-4 h-4" />
-                Filter Laporan
-              </button>
-              <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                <Download className="w-4 h-4" />
-                Export Data
-              </button>
-            </div>
-
-            {showFilters && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Periode</label>
-                    <select
-                      value={filters.periode}
-                      onChange={(e) => setFilters({...filters, periode: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="bulan_ini">Bulan Ini</option>
-                      <option value="3_bulan">3 Bulan Terakhir</option>
-                      <option value="6_bulan">6 Bulan Terakhir</option>
-                      <option value="tahun_ini">Tahun Ini</option>
-                      <option value="custom">Custom Range</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Staf</label>
-                    <select
-                      value={filters.staf}
-                      onChange={(e) => setFilters({...filters, staf: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">Semua Staf</option>
-                      {mockStafData.map(staf => (
-                        <option key={staf.id} value={staf.id}>{staf.nama}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status Tugas</label>
-                    <select
-                      value={filters.status}
-                      onChange={(e) => setFilters({...filters, status: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="">Semua Status</option>
-                      <option value="selesai">Selesai</option>
-                      <option value="proses">Proses</option>
-                      <option value="belum">Belum</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-white border border-gray-200 rounded-lg p-5">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Total Staf</p>
-                  <p className="text-3xl font-semibold text-gray-900 mt-2">{mockStafData.length}</p>
+                  <p className="text-3xl font-semibold text-gray-900 mt-2">{stafData.length}</p>
                 </div>
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                   <Users className="w-6 h-6 text-blue-600" />
@@ -220,7 +98,7 @@ export default function LaporanKinerja() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Tugas Tertunda</p>
-                  <p className="text-3xl font-semibold text-gray-900 mt-2">{mockTugasTertunda.length}</p>
+                  <p className="text-3xl font-semibold text-gray-900 mt-2">{tugasTertunda.length}</p>
                 </div>
                 <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
                   <AlertCircle className="w-6 h-6 text-red-600" />
@@ -239,12 +117,12 @@ export default function LaporanKinerja() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="nama" stroke="#6b7280" style={{ fontSize: '12px' }} />
                   <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#fff', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
                       border: '1px solid #e5e7eb',
                       borderRadius: '8px'
-                    }} 
+                    }}
                   />
                   <Bar dataKey="Total Tugas" fill="#3b82f6" radius={[8, 8, 0, 0]} />
                 </BarChart>
@@ -309,7 +187,7 @@ export default function LaporanKinerja() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {mockStafData.map((staf) => (
+                  {stafData.map((staf) => (
                     <tr key={staf.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -348,12 +226,11 @@ export default function LaporanKinerja() {
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <div className="flex items-center justify-center gap-2">
                           <div className="w-24 bg-gray-200 rounded-full h-2">
-                            <div 
-                              className={`h-2 rounded-full ${
-                                staf.tingkat_penyelesaian >= 90 ? 'bg-green-600' :
+                            <div
+                              className={`h-2 rounded-full ${staf.tingkat_penyelesaian >= 90 ? 'bg-green-600' :
                                 staf.tingkat_penyelesaian >= 80 ? 'bg-blue-600' :
-                                'bg-yellow-600'
-                              }`}
+                                  'bg-yellow-600'
+                                }`}
                               style={{ width: `${staf.tingkat_penyelesaian}%` }}
                             ></div>
                           </div>
@@ -395,7 +272,7 @@ export default function LaporanKinerja() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {mockTugasTertunda.map((tugas) => (
+                  {tugasTertunda.map((tugas) => (
                     <tr key={tugas.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {tugas.staf}
@@ -412,11 +289,10 @@ export default function LaporanKinerja() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          tugas.status === 'Proses' 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${tugas.status === 'Proses'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-gray-100 text-gray-800'
+                          }`}>
                           {tugas.status}
                         </span>
                       </td>
