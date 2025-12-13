@@ -42,10 +42,10 @@ class VerifikasiController extends Controller
                 "status_verifikasi" => $statusVerifikasiString,
                 "status_cetak" => $statusCetakString,
                 "diajukan_oleh" => $s->users->nama_lengkap ?? "-",
-                "diverifikasi_oleh" => $s->diverifikasi_oleh,
+                "diverifikasi_oleh" => $s->users->nama_lengkap ?? "-",
                 "tanggal_verifikasi" => $s->tanggal_verifikasi,
                 "catatan_verifikasi" => $s->catatan_verifikasi,
-                "dicetak_oleh" => $s->dicetak_oleh,
+                "dicetak_oleh" => $s->users->nama_lengkap ?? "-",
                 "tanggal_cetak" => $s->tanggal_cetak,
             ];
         });

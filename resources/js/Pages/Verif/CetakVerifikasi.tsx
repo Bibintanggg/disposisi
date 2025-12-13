@@ -555,7 +555,7 @@ export default function CetakVerifikasi() {
                                                     {selectedSurat.status_verifikasi === 'approved' ? 'Diverifikasi' : 'Ditolak'}
                                                 </p>
                                                 <p className="text-xs text-gray-500">
-                                                    oleh {selectedSurat.diverifikasi_oleh || '-'} • {formatDateTime(selectedSurat.tanggal_verifikasi)}
+                                                    oleh {selectedSurat.diverifikasi_oleh || '-'}
                                                 </p>
                                                 {selectedSurat.catatan_verifikasi && (
                                                     <div className="mt-2 bg-gray-50 rounded-lg p-2 border border-gray-200">
@@ -573,7 +573,7 @@ export default function CetakVerifikasi() {
                                                 <div className="flex-1">
                                                     <p className="text-sm font-semibold text-gray-900">Dicetak</p>
                                                     <p className="text-xs text-gray-500">
-                                                        oleh {selectedSurat.dicetak_oleh || '-'} • {formatDateTime(selectedSurat.tanggal_cetak)}
+                                                        oleh {selectedSurat.dicetak_oleh || '-'} 
                                                     </p>
                                                 </div>
                                             </div>
