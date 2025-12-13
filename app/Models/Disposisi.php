@@ -29,7 +29,7 @@ class Disposisi extends Model
     }
 
     public function suratMasuk()
-    {
+    {   
         return $this->belongsTo(SuratMasuk::class, 'surat_id');
     }
 

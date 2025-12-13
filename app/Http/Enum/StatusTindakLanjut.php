@@ -8,6 +8,7 @@ enum StatusTindakLanjut: int
     case PROSES = 2;
     case SELESAI = 3;
     case DIBATALKAN = 4;
+
     public function label(): string
     {
         return match($this) {
@@ -16,5 +17,15 @@ enum StatusTindakLanjut: int
             self::SELESAI => "Selesai",
             self::DIBATALKAN => "Dibatalkan",
         };
+    }
+
+    public function options(): array
+    {
+        return [
+            self::BELUM->value => self::BELUM->label(),
+            self::PROSES->value => self::PROSES->label(),
+            self::SELESAI->value => self::SELESAI->label(),
+            self::DIBATALKAN->value => self::DIBATALKAN->label(),
+        ];
     }
 }

@@ -93,7 +93,7 @@ export default function TugasProses() {
                                 </div>
 
                                 {/* Perihal */}
-                                <div className="text-sm space-y-1">
+                                <div className="text-sm space-y-1 max-w-xs truncate">
                                     <p className="font-medium">Perihal:</p>
                                     <p className="text-gray-600 text-sm">{item.perihal}</p>
                                 </div>

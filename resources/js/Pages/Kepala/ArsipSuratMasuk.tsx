@@ -1,59 +1,10 @@
 import React, { useState } from 'react';
 import { Search, Filter, Download, Eye, Calendar, Building2, User, FileText, X, Clock, ChevronRight } from 'lucide-react';
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-
-// Mock data untuk demo
-const mockData = [
-  {
-    id: 1,
-    nomor_surat: "001/SM/I/2025",
-    pengirim: "Dinas Pendidikan Provinsi",
-    perihal: "Permohonan Data Siswa Tahun Ajaran 2024/2025",
-    tanggal_terima: "2025-01-15",
-    status_akhir: "Selesai",
-    bidang: "Bidang Pendidikan",
-    disposisi_oleh: "Dr. Ahmad Suryanto, M.Si",
-    file_path: "/files/surat-001.pdf"
-  },
-  {
-    id: 2,
-    nomor_surat: "002/SM/I/2025",
-    pengirim: "Kantor Walikota",
-    perihal: "Undangan Rapat Koordinasi Pembangunan Infrastruktur",
-    tanggal_terima: "2025-01-18",
-    status_akhir: "Arsip",
-    bidang: "Bidang Pembangunan",
-    disposisi_oleh: "Ir. Budi Hartono",
-    file_path: "/files/surat-002.pdf"
-  },
-  {
-    id: 3,
-    nomor_surat: "003/SM/I/2025",
-    pengirim: "BPKP Wilayah Jakarta",
-    perihal: "Pemberitahuan Audit Keuangan Triwulan IV 2024",
-    tanggal_terima: "2025-01-20",
-    status_akhir: "Selesai",
-    bidang: "Bidang Keuangan",
-    disposisi_oleh: "Dra. Siti Aminah, M.M",
-    file_path: "/files/surat-003.pdf"
-  },
-  {
-    id: 4,
-    nomor_surat: "004/SM/I/2025",
-    pengirim: "Kementerian Dalam Negeri",
-    perihal: "Pedoman Pelaksanaan Program Smart City 2025",
-    tanggal_terima: "2025-01-22",
-    status_akhir: "Arsip",
-    bidang: "Bidang IT & Komunikasi",
-    disposisi_oleh: "Dr. Ahmad Suryanto, M.Si",
-    file_path: "/files/surat-004.pdf"
-  }
-];
-
-const bidangOptions = ["Bidang Pendidikan", "Bidang Pembangunan", "Bidang Keuangan", "Bidang IT & Komunikasi"];
-const kepalaOptions = ["Dr. Ahmad Suryanto, M.Si", "Ir. Budi Hartono", "Dra. Siti Aminah, M.M"];
+import { usePage } from '@inertiajs/react';
 
 export default function ArsipSuratMasuk() {
+  const { arsipSurat, stats } = usePage().props
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedSurat, setSelectedSurat] = useState(null);
@@ -65,16 +16,16 @@ export default function ArsipSuratMasuk() {
     tanggal_sampai: ""
   });
 
-  const filteredData = mockData.filter(item => {
-    const matchSearch = searchQuery === "" || 
+  const filteredData = arsipSurat.filter(item => {
+    const matchSearch = searchQuery === "" ||
       item.nomor_surat.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.pengirim.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.perihal.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     const matchStatus = !filters.status_akhir || item.status_akhir === filters.status_akhir;
     const matchBidang = !filters.bidang || item.bidang === filters.bidang;
     const matchDisposisi = !filters.disposisi_oleh || item.disposisi_oleh === filters.disposisi_oleh;
-    
+
     return matchSearch && matchStatus && matchBidang && matchDisposisi;
   });
 
@@ -106,7 +57,7 @@ export default function ArsipSuratMasuk() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600">Total Arsip</p>
-                  <p className="text-2xl font-semibold text-gray-900 mt-1">{mockData.length}</p>
+                  <p className="text-2xl font-semibold text-gray-900 mt-1">{stats.total}</p>
                 </div>
                 <FileText className="w-8 h-8 text-gray-400" />
               </div>
@@ -116,7 +67,7 @@ export default function ArsipSuratMasuk() {
                 <div>
                   <p className="text-sm text-gray-600">Selesai</p>
                   <p className="text-2xl font-semibold text-gray-900 mt-1">
-                    {mockData.filter(d => d.status_akhir === "Selesai").length}
+                    {stats.selesai}
                   </p>
                 </div>
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -129,7 +80,7 @@ export default function ArsipSuratMasuk() {
                 <div>
                   <p className="text-sm text-gray-600">Diarsipkan</p>
                   <p className="text-2xl font-semibold text-gray-900 mt-1">
-                    {mockData.filter(d => d.status_akhir === "Arsip").length}
+                    {stats.arsip}
                   </p>
                 </div>
                 <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -152,7 +103,7 @@ export default function ArsipSuratMasuk() {
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-             
+
             </div>
 
           </div>
@@ -160,7 +111,7 @@ export default function ArsipSuratMasuk() {
           {/* Results Count */}
           <div className="mb-4">
             <p className="text-sm text-gray-600">
-              Menampilkan <span className="font-semibold text-gray-900">{filteredData.length}</span> dari {mockData.length} arsip
+              Menampilkan <span className="font-semibold text-gray-900">{filteredData.length}</span> dari {arsipSurat.length} arsip
             </p>
           </div>
 
@@ -212,13 +163,15 @@ export default function ArsipSuratMasuk() {
                         {new Date(surat.tanggal_terima).toLocaleDateString('id-ID')}
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          surat.status_akhir === 'Selesai' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-blue-100 text-blue-800'
-                        }`}>
-                          {surat.status_akhir}
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${surat.status_akhir.value === 3
+                            ? 'bg-green-100 text-green-800'
+                            : surat.status_akhir.value === 4
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                          {surat.status_akhir.label}
                         </span>
+
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
@@ -251,7 +204,6 @@ export default function ArsipSuratMasuk() {
         </div>
       </div>
 
-      {/* Detail Modal */}
       {selectedSurat && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
@@ -273,12 +225,13 @@ export default function ArsipSuratMasuk() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">Status</p>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 ${
-                    selectedSurat.status_akhir === 'Selesai' 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {selectedSurat.status_akhir}
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${selectedSurat.status_akhir.value === 3 // SELESAI
+                    ? 'bg-green-100 text-green-800'
+                    : selectedSurat.status_akhir.value === 4
+                      ? 'bg-blue-100 text-blue-800'
+                      : 'bg-gray-100 text-gray-800'
+                    }`}>
+                    {selectedSurat.status_akhir.label}
                   </span>
                 </div>
                 <div>

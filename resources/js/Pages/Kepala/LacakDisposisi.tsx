@@ -47,7 +47,7 @@ interface PenerimaTugas {
 }
 
 export default function LacakDisposisi() {
-  const { suratMasuk = [], suratSelesai = [], suratProses = [], suratBatal = [], disposisi = [] }: any = usePage().props;
+  const { suratMasuk = [], suratSelesai = [], suratProses = [], suratBatal = [], disposisi = [], selesai, proses, belum, batal }: any = usePage().props;
 
   const [disposisiList, setDisposisiList] = useState<Disposisi[]>([]);
   const [penerimaList, setPenerimaList] = useState<PenerimaTugas[]>([]);
@@ -179,6 +179,10 @@ export default function LacakDisposisi() {
     }
   }
 
+  const totalSelesai = disposisiList.filter(d => d.status_global === 'semua_selesai').length;
+  const totalProses = disposisiList.filter(d => d.status_global === 'sebagian_proses').length;
+  const totalTertunda = disposisiList.filter(d => d.status_global === 'tertunda').length;
+
   // actions
   // Ganti handleViewDetail dengan ini:
   const handleViewDetail = (id: number) => {
@@ -186,6 +190,8 @@ export default function LacakDisposisi() {
 
     if (disposisiData) {
       setSelectedDisposisi(disposisiData);
+      console.log('Data Penerima:', disposisiData.penerima); // ← Debug
+
       setPenerimaList(disposisiData.penerima ?? []); // ← ini sudah ada datanya
       setIsDetailOpen(true);
     }
@@ -286,7 +292,7 @@ export default function LacakDisposisi() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm font-medium mb-1">Selesai</p>
-                  <p className="text-2xl font-bold text-gray-900">{suratSelesai.length}</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalSelesai}</p>
                 </div>
                 <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
                   <CheckCircle className="w-6 h-6 text-green-600" />
@@ -298,7 +304,7 @@ export default function LacakDisposisi() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm font-medium mb-1">Dalam Proses</p>
-                  <p className="text-2xl font-bold text-gray-900">{suratProses.length}</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalProses}</p>
                 </div>
                 <div className="w-12 h-12 bg-yellow-50 rounded-lg flex items-center justify-center">
                   <PlayCircle className="w-6 h-6 text-yellow-600" />
@@ -310,7 +316,7 @@ export default function LacakDisposisi() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-gray-500 text-sm font-medium mb-1">Tertunda</p>
-                  <p className="text-2xl font-bold text-gray-900">{suratBatal.length}</p>
+                  <p className="text-2xl font-bold text-gray-900">{totalTertunda}</p>
                 </div>
                 <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
                   <AlertCircle className="w-6 h-6 text-red-600" />
