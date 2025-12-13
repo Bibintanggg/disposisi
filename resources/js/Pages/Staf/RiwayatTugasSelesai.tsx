@@ -12,13 +12,31 @@ import {
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog";
+import { PageProps } from '@/types';
+
+type RiwayatItem = {
+    id: number;
+    nomor_surat: string;
+    perihal: string;
+    isi_disposisi: string;
+    tanggal_selesai: string;
+    durasi: string;
+    pengirim: string;
+};
+
+interface RiwayatPageProps extends PageProps {
+    riwayat: RiwayatItem[];
+    avgDurasi: string;
+}
 
 export default function RiwayatTugasSelesai() {
     const [search, setSearch] = useState("");
     const [dateRange, setDateRange] = useState({ start: "", end: "" });
-    const { riwayat, avgDurasi } = usePage().props;
     const [openModal, setOpenModal] = useState(false);
     const [selectedLaporan, setSelectedLaporan] = useState<any>(null);
+
+    const page = usePage<RiwayatPageProps>().props;
+    const { riwayat, avgDurasi } = page;
 
     const handleLihatLaporan = (item: any) => {
         setSelectedLaporan(item);

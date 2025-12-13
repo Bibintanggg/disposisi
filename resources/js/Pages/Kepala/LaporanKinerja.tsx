@@ -4,12 +4,46 @@ import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Toolti
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { usePage } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
+import { PageProps } from '@/types';
 
 
 const COLORS = ['#10b981', '#f59e0b', '#ef4444'];
 
+interface StafKinerja {
+  id: number;
+  nama: string;
+  total_tugas: number;
+  tugas_selesai: number;
+  tugas_proses: number;
+  tugas_belum: number;
+  rata_hari: number;
+  tingkat_penyelesaian: number;
+}
+
+interface TugasTertunda {
+  id: number;
+  staf: string;
+  nomor_surat: string;
+  perihal: string;
+  hari_tertunda: number;
+  status: 'Proses' | 'Belum';
+}
+
+interface LaporanFilter {
+  periode: string;
+  staf?: string;
+  status?: string;
+}
+
+interface LaporanKinerjaProps extends PageProps{
+  stafData: StafKinerja[];
+  tugasTertunda: TugasTertunda[];
+  filter: LaporanFilter;
+}
+
+
 export default function LaporanKinerja() {
-  const { stafData, tugasTertunda, filter } = usePage().props;
+  const { stafData, tugasTertunda, filter } = usePage<LaporanKinerjaProps>().props;
   const [filters, setFilters] = useState({
     periode: 'bulan_ini',
     staf: '',

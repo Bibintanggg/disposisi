@@ -14,4 +14,6 @@ export interface SuratKeluarProps {
     gambar: string
     tanggal_kirim: Date
     status_arsip: number
+
+    unit_pengirim?: Bidang;
 }

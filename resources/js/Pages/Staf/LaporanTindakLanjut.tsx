@@ -1,11 +1,33 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { ArrowLeft, FileText, Upload, X, Eye, AlertCircle, CheckCircle } from 'lucide-react';
 import { usePage, router } from "@inertiajs/react";
+import { PageProps } from '@/types';
+
+type FormDataLaporan = {
+    judul_laporan: string;
+    deskripsi_laporan: string;
+    file_laporan: File | null;
+    tandai_selesai: boolean;
+};
+
+type Tugas = {
+    id: number;
+    nomor_surat: string;
+    perihal: string;
+    dari_kepala: string;
+    instruksi: string;
+};
+
+interface LaporanPageProps extends PageProps {
+    tugas: Tugas;
+}
 
 export default function LaporanTindakLanjut() {
-    const { tugas } = usePage().props;
-    const [formData, setFormData] = useState({
+    const page = usePage<LaporanPageProps>().props;
+    const tugas: Tugas = page.tugas;
+
+    const [formData, setFormData] = useState<FormDataLaporan>({
         judul_laporan: '',
         deskripsi_laporan: '',
         file_laporan: null,
@@ -14,13 +36,15 @@ export default function LaporanTindakLanjut() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [fileName, setFileName] = useState('');
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setFormData({ ...formData, file_laporan: file });
-            setFileName(file.name);
-        }
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        const file = files[0];
+        setFormData({ ...formData, file_laporan: file });
+        setFileName(file.name);
     };
+
 
     const handleRemoveFile = () => {
         setFormData({ ...formData, file_laporan: null });

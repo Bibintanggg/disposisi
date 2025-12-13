@@ -11,13 +11,15 @@ export default function SuratRow({ surat, onDisposisi }: SuratRowProps) {
     // Hapus konversi yang kompleks, langsung gunakan sifat_surat
     const badge = sifatSuratBadge(surat.sifat_surat);
 
-    const calculateWaitingDays = (tanggalTerima: string) => {
-        const received = new Date(tanggalTerima);
+    const calculateWaitingDays = (tanggalTerima: Date) => {
         const now = new Date();
-        return Math.floor((now.getTime() - received.getTime()) / (1000 * 60 * 60 * 24));
+        return Math.floor(
+            (now.getTime() - tanggalTerima.getTime()) / (1000 * 60 * 60 * 24)
+        );
     };
 
-    const formatDate = (dateString: string) =>
+
+    const formatDate = (dateString: Date) =>
         new Intl.DateTimeFormat("id-ID", {
             day: "numeric",
             month: "short",

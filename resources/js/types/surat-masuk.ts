@@ -14,4 +14,5 @@ export interface SuratMasuk {
     status_verifikasi: number
     status_cetak: number
     status_akhir: number
+    surat_sifat: number
 }

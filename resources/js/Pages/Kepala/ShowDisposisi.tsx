@@ -3,6 +3,7 @@ import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { ArrowLeft, FileText, Calendar, User, AlertTriangle, Bell, Download, Send, X, Plus } from 'lucide-react';
 import { router, usePage } from '@inertiajs/react';
 import { SuratMasuk } from '@/types/surat-masuk';
+import { PageProps } from '@/types';
 
 interface Staff {
     id: number;
@@ -10,7 +11,13 @@ interface Staff {
     bidang: string;
 }
 
-interface Props {
+interface SifatBadge {
+    text: string;
+    class: string;
+    icon?: 'bell' | 'alert';
+}
+
+interface Props extends PageProps {
     surat: SuratMasuk;
     staffList: Staff[];
 }
@@ -22,16 +29,17 @@ export default function LihatDisposisi() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const sifatLabel = {
+    const sifatLabel: Record<number, SifatBadge> = {
         1: { text: 'Biasa', class: 'bg-gray-100 text-gray-600' },
         2: { text: 'Penting', class: 'bg-orange-100 text-orange-700', icon: 'bell' },
         3: { text: 'Rahasia', class: 'bg-purple-100 text-purple-700' },
         4: { text: 'Segera', class: 'bg-red-100 text-red-700', icon: 'alert' }
     };
 
+
     const badge = sifatLabel[surat.sifat_surat as keyof typeof sifatLabel] || sifatLabel[1];
 
-    const formatDate = (dateString: string) => {
+    const formatDate = (dateString: string | Date) => {
         return new Intl.DateTimeFormat('id-ID', {
             day: 'numeric',
             month: 'long',

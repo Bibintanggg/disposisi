@@ -5,31 +5,28 @@ import StatCard from './components/StatsCard';
 import AlertCard from './components/AlertCard';
 import ActivityItem from './components/ActivityItem';
 import { router, usePage } from '@inertiajs/react';
-import { SuratMasuk } from '@/types/surat-masuk';
+import { SuratMasuk } from '@/types/surat-masuk'
+import { PageProps } from '@/types'
 
-const mockData = {
-    stats: {
-        totalUsers: 156,
-        totalBidang: 24,
-        suratMasuk: 1243,
-        suratKeluar: 987
-    },
-    alerts: {
-        pendingVerifikasi: 12,
-        disposisiTerlambat: 5
-    },
-    recentActivity: [
-        { id: 1, type: 'masuk', nomor: 'SM/2024/001', pengirim: 'Dinas Pendidikan', verifikator: 'Ahmad Subandi', timestamp: '2 menit lalu' },
-        { id: 2, type: 'keluar', nomor: 'SK/2024/045', tujuan: 'Kementerian Keuangan', verifikator: 'Siti Nurhaliza', timestamp: '15 menit lalu' },
-        { id: 3, type: 'masuk', nomor: 'SM/2024/002', pengirim: 'Bappeda', verifikator: 'Budi Santoso', timestamp: '1 jam lalu' },
-        { id: 4, type: 'keluar', nomor: 'SK/2024/046', tujuan: 'DPRD', verifikator: 'Ahmad Subandi', timestamp: '2 jam lalu' },
-        { id: 5, type: 'masuk', nomor: 'SM/2024/003', pengirim: 'Sekretariat Daerah', verifikator: 'Dewi Lestari', timestamp: '3 jam lalu' }
-    ]
-};
+type DashboardPageProps = PageProps &{
+    users: any[]
+    unitKerja: any[]
+    suratMasuk: SuratMasuk[]
+    suratKeluar: any[]
+    suratMenunggu: any[]
+    recentActivity: any[]
+}
 
 export default function Dashboard() {
     const [timeFilter, setTimeFilter] = useState('today');
-    const { suratMasuk, suratKeluar, users, unitKerja, suratMenunggu, recentActivity } = usePage().props
+    const {
+        users,
+        unitKerja,
+        suratMasuk,
+        suratKeluar,
+        suratMenunggu,
+        recentActivity
+    } = usePage<DashboardPageProps>().props
 
     const handleNavigation = (path: string) => {
         router.visit(path)
@@ -38,7 +35,6 @@ export default function Dashboard() {
     return (
         <Authenticated>
             <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50 to-gray-100">
-                {/* Header dengan glass effect seperti Netflix/Bilibili */}
                 <div className="sticky top-0 z-50 backdrop-blur-xl bg-white/70 border-b border-gray-200/50 shadow-sm">
                     <div className="px-8 py-6">
                         <div className="flex items-center justify-between">
@@ -51,7 +47,6 @@ export default function Dashboard() {
                 </div>
 
                 <div className="px-8 py-8">
-                    {/* Widget Statistik Utama dengan gradient modern */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         <StatCard
                             icon={<Users className="w-6 h-6 text-gray-700" />}
@@ -110,19 +105,17 @@ export default function Dashboard() {
                                 description="Surat dengan status PENDING yang perlu diverifikasi segera"
                                 color="bg-amber-500"
                             />
-                            <AlertCard
+                            {/* <AlertCard
                                 icon={<TrendingUp className="w-6 h-6 text-red-600" />}
                                 title="Disposisi Terlambat"
                                 count={mockData.alerts.disposisiTerlambat}
                                 description="Disposisi yang belum ditindaklanjuti melebihi 14 hari"
                                 color="bg-red-500"
-                            />
+                            /> */}
                         </div>
                     </div>
 
-                    {/* Quick Links & Aktivitas */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Quick Links dengan design card modern */}
                         <div className="lg:col-span-1">
                             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow">
                                 <div className="flex items-center gap-3 mb-5">
@@ -175,7 +168,6 @@ export default function Dashboard() {
                             </div>
                         </div>
 
-                        {/* Log Aktivitas Terbaru */}
                         <div className="lg:col-span-2">
                             <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-shadow">
                                 <div className="flex items-center justify-between mb-5">

@@ -9,4 +9,5 @@ export interface User {
     jabatan: number;
     bidang_id: number;
     bidang?: Bidang;
+    email_verified_at: string | null;
 }

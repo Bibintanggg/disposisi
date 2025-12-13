@@ -5,8 +5,9 @@ import { router, usePage } from '@inertiajs/react';
 import { SuratMasuk } from '@/types/surat-masuk';
 import SuratCard from './components/SuratCard';
 import SuratRow from './components/SuratRow';
+import { PageProps } from '@/types';
 
-interface Props {
+interface Props extends PageProps {
     suratMenunggu: SuratMasuk[];
 }
 
@@ -26,7 +27,7 @@ export default function SuratMenunggu() {
 
     const processedSurat = (suratMenunggu || [])
         .filter((surat) => {
-            const isi = surat.isi_surat || surat.isi || ""; // fallback kalau isi_surat undefined
+            const isi = surat.isi_surat || ""; // fallback kalau isi_surat undefined
 
             const matchSearch =
                 surat.nomor_surat?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -47,7 +48,12 @@ export default function SuratMenunggu() {
                 return new Date(b.tanggal_terima).getTime() - new Date(a.tanggal_terima).getTime();
             }
             if (sortBy === "urgent") {
-                const urgencyRank = { 4: 1, 2: 2, 3: 3, 1: 4 };
+                const urgencyRank: Record<number, number> = {
+                    4: 1,
+                    2: 2,
+                    3: 3,
+                    1: 4,
+                };
                 return urgencyRank[a.sifat_surat] - urgencyRank[b.sifat_surat];
             }
             return 0;

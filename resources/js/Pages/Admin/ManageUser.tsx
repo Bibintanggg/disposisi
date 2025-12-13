@@ -14,7 +14,7 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,  
+    DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,17 +23,20 @@ import UserForm from "./components/UserForm";
 interface UserManageProps extends PageProps {
     users: Payment[];
     bidang: {
-        id: number,
-        nama_bidang: string
-    }[]
+        id: number;
+        nama_bidang: string;
+    }[];
+    active_users: number;
+    new_users: number;
 }
+
 
 export default function ManageUser() {
     const { props } = usePage<UserManageProps>();
     const users = props.users;
     const bidang = props.bidang
-    const activeUsers = props.active_users
-    const newUsers = props.new_users
+    const activeUsers = props.active_users;
+    const newUsers = props.new_users;
 
     const totalAdmin = users.filter(u => u.jabatan === 1).length
     const totalKepala = users.filter(u => u.jabatan === 2).length
@@ -56,7 +59,7 @@ export default function ManageUser() {
                         </p>
                     </div>
 
-                   <UserForm bidang={bidang}/>
+                    <UserForm bidang={bidang as any} />
                 </div>
 
                 <div>

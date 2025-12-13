@@ -14,6 +14,22 @@ interface StatusBadge {
     className: string
 }
 
+type SelectedSurat = SuratMasuk | SuratKeluarProps;
+
+function isSuratKeluar(
+    surat: SelectedSurat
+): surat is SuratKeluarProps {
+    return 'tanggal_kirim' in surat || 'unit_pengirim' in surat;
+}
+
+function isSuratMasuk(
+    surat: SelectedSurat
+): surat is SuratMasuk {
+    return 'tanggal_terima' in surat;
+}
+
+
+
 export default function ArsipGlobal() {
     const pageProps = usePage().props as any;
     const suratMasuk = pageProps.suratMasuk ?? { data: [], current_page: 1, prev_page_url: null, next_page_url: null };
@@ -22,7 +38,8 @@ export default function ArsipGlobal() {
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilter, setShowFilter] = useState(false)
     const [showDetailModal, setShowDetailModal] = useState(false);
-    const [selectedSurat, setSelectedSurat] = useState(null);
+
+    const [selectedSurat, setSelectedSurat] = useState<SelectedSurat | null>(null);
 
     const [filters, setFilters] = useState({
         tanggalMulai: '',
@@ -110,7 +127,7 @@ export default function ArsipGlobal() {
         }
     };
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearchQuery(value);
 
@@ -416,7 +433,6 @@ export default function ArsipGlobal() {
                                 </table>
                             </div>
 
-                            {/* Pagination */}
                             <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
                                 <div className="text-sm text-gray-700">
                                     Menampilkan <span className="font-medium">1</span> sampai <span className="font-medium">{suratMasuk.data.length}</span> dari{' '}
@@ -475,7 +491,7 @@ export default function ArsipGlobal() {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-200">
-                                        {suratKeluar.data.map((surat) => (
+                                        {suratKeluar.data.map((surat: any) => (
                                             <tr key={surat.id} className="hover:bg-gray-50 transition-colors">
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                                     {surat.nomor_surat}
@@ -577,45 +593,61 @@ export default function ArsipGlobal() {
                                         <>
                                             <div>
                                                 <p className="text-sm font-semibold text-gray-500 mb-1">Pengirim</p>
-                                                <p className="text-base text-gray-900">{selectedSurat.pengirim || '-'}</p>
+                                                <p className="text-base text-gray-900">{isSuratMasuk(selectedSurat) ? selectedSurat.pengirim || '-' : '-'}</p>
                                             </div>
 
-                                                <div>
-                                                    <p className="text-sm font-semibold text-gray-500 mb-1">Tanggal Terima</p>
-                                                    <p className="text-base text-gray-900">
-                                                        {selectedSurat.tanggal_terima
-                                                            ? new Date(selectedSurat.tanggal_terima).toLocaleDateString('id-ID')
-                                                            : '-'}
-                                                    </p>
+                                            <div>
+                                                <p className="text-sm font-semibold text-gray-500 mb-1">Tanggal Terima</p>
+                                                <p className="text-base text-gray-900">
+                                                    {isSuratMasuk(selectedSurat) && selectedSurat.tanggal_terima
+                                                        ? new Date(selectedSurat.tanggal_terima).toLocaleDateString('id-ID')
+                                                        : '-'}
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <p className="text-sm font-semibold text-gray-500 mb-1">Sifat Surat</p>
+
+                                                <div
+                                                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-white 
+                                                            ${isSuratMasuk(selectedSurat)
+                                                            ? getSifatInfo(selectedSurat.sifat_surat ?? 1).color
+                                                            : getSifatInfo(1).color}`}
+                                                >
+                                                    <span className="font-semibold">
+                                                        {isSuratMasuk(selectedSurat)
+                                                            ? getSifatInfo(selectedSurat.sifat_surat ?? 1).label
+                                                            : getSifatInfo(1).label}
+                                                    </span>
                                                 </div>
 
-                                                <div>
-                                                    <p className="text-sm font-semibold text-gray-500 mb-1">Sifat Surat</p>
-                                                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-white ${getSifatInfo(selectedSurat.sifat_surat || selectedSurat.sifat || 1).color}`}>
-                                                        <span className="font-semibold">
-                                                            {getSifatInfo(selectedSurat.sifat_surat || selectedSurat.sifat || 1).label}
-                                                        </span>
-                                                    </div>
-                                                </div>
+                                            </div>
+
                                         </>
                                     ) : (
                                         <>
                                             <div>
                                                 <p className="text-sm font-semibold text-gray-500 mb-1">Penerima</p>
-                                                <p className="text-base text-gray-900">{selectedSurat.penerima || '-'}</p>
+                                                <p className="text-base text-gray-900">
+                                                    {isSuratKeluar(selectedSurat) ? selectedSurat.penerima || '-' : '-'}
+                                                </p>
                                             </div>
                                             <div>
                                                 <p className="text-sm font-semibold text-gray-500 mb-1">Unit Pengirim</p>
                                                 <p className="text-base text-gray-900">
-                                                    {selectedSurat.unit_pengirim?.nama_bidang || '-'}
+                                                    {isSuratKeluar(selectedSurat)
+                                                        ? selectedSurat.unit_pengirim?.nama_bidang || '-'
+                                                        : '-'}
                                                 </p>
                                             </div>
                                             <div>
                                                 <p className="text-sm font-semibold text-gray-500 mb-1">Tanggal Kirim</p>
                                                 <p className="text-base text-gray-900">
-                                                    {selectedSurat.tanggal_kirim
-                                                        ? new Date(selectedSurat.tanggal_kirim).toLocaleDateString('id-ID')
-                                                        : '-'}
+                                                    <p className="text-base text-gray-900">
+                                                        {isSuratKeluar(selectedSurat) && selectedSurat.tanggal_kirim
+                                                            ? new Date(selectedSurat.tanggal_kirim).toLocaleDateString('id-ID')
+                                                            : '-'}
+                                                    </p>
                                                 </p>
                                             </div>
                                         </>
@@ -637,27 +669,32 @@ export default function ArsipGlobal() {
                                         </p>
                                     </div>
 
-
-
                                     <div>
                                         <p className="text-sm font-semibold text-gray-500 mb-1">
                                             {activeTab === 'masuk' ? 'Status Akhir' : 'Status Arsip'}
                                         </p>
-                                        {activeTab === 'masuk' ? (
-                                            <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg ${getStatusInfo(selectedSurat.status_akhir || 1).color}`}>
+                                        {isSuratMasuk(selectedSurat) ? (
+                                            <div
+                                                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg 
+        ${getStatusInfo(selectedSurat.status_akhir ?? 1).color}`}
+                                            >
                                                 {(() => {
-                                                    const StatusIcon = getStatusInfo(selectedSurat.status_akhir || 1).icon;
-                                                    return <StatusIcon size={16} />;
+                                                    const StatusIcon = getStatusInfo(selectedSurat.status_akhir ?? 1).icon
+                                                    return <StatusIcon size={16} />
                                                 })()}
                                                 <span className="font-semibold">
-                                                    {getStatusInfo(selectedSurat.status_akhir || 1).label}
+                                                    {getStatusInfo(selectedSurat.status_akhir ?? 1).label}
                                                 </span>
                                             </div>
                                         ) : (
-                                            <span className={`px-3 py-1.5 rounded-lg text-sm font-medium ${getStatusArsipClass(selectedSurat.status_arsip || 2).className}`}>
-                                                {getStatusArsipClass(selectedSurat.status_arsip || 2).label}
+                                            <span
+                                                className={`px-3 py-1.5 rounded-lg text-sm font-medium 
+        ${getStatusArsipClass(selectedSurat.status_arsip ?? 2).className}`}
+                                            >
+                                                {getStatusArsipClass(selectedSurat.status_arsip ?? 2).label}
                                             </span>
                                         )}
+
                                     </div>
                                 </div>
                             </div>

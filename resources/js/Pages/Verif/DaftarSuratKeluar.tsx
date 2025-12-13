@@ -1,5 +1,5 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Send, Search, Filter, Download, Eye, Edit2, Trash2, MoreVertical, Calendar, User, FileText, AlertCircle, Clock, CheckCircle, XCircle, Paperclip, Mail, ArrowUpRight, Building2, PenTool } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,11 +11,41 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { router } from '@inertiajs/react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/Components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bidangs, users }) {
+type Bidang = {
+    id: number;
+    nama_bidang: string;
+};
+
+type User = {
+    id: number;
+    nama_lengkap: string;
+    jabatan: number;
+};
+
+type SuratKeluar = {
+    id: number;
+    nomor_surat: string;
+    penerima: string;
+    isi_surat: string;
+    unit_pengirim: Bidang;
+    user_penanda_tangan: User;
+    tanggal_surat: string;
+    tanggal_kirim: string;
+    status_arsip: number;
+    gambar?: string;
+};
+
+type Props = {
+    suratKeluar: SuratKeluar[];
+    bidangs: Bidang[];
+    users: User[];
+};
+
+export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bidangs, users }: Props) {
     const [suratKeluar, setSuratKeluar] = useState(initialSuratKeluar || []);
-    const [selectedSurat, setSelectedSurat] = useState(initialSuratKeluar?.[0] || null);
+    const [selectedSurat, setSelectedSurat] = useState<SuratKeluar | null>(initialSuratKeluar?.[0] || null);
     const [deleteModalOpen, setDeleteModalOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<number | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -35,11 +65,11 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
         { value: 2, label: 'Sudah Diarsipkan', icon: CheckCircle, color: 'text-green-600 bg-green-100' }
     ];
 
-    const getStatusArsipInfo = (status) => {
+    const getStatusArsipInfo = (status: number) => {
         return statusArsipOptions.find(s => s.value === status) || statusArsipOptions[0];
     };
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString: string | null | undefined) => {
         if (!dateString) return '-';
         return new Date(dateString).toLocaleDateString('id-ID', {
             day: '2-digit',
@@ -47,6 +77,7 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
             year: 'numeric'
         });
     };
+
 
     const getJabatanRole = (jabatan: number) => {
         switch (jabatan) {
@@ -58,7 +89,7 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
         }
     }
 
-    const formatDateTime = (dateString) => {
+    const formatDateTime = (dateString: string | null | undefined) => {
         if (!dateString) return '-';
         return new Date(dateString).toLocaleString('id-ID', {
             day: '2-digit',
@@ -82,19 +113,19 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
         return matchSearch && matchUnit && matchStatus;
     });
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(e.target.value);
     };
 
-    const handleUnitFilter = (value) => {
+    const handleUnitFilter = (value: string) => {
         setFilterUnit(value);
     };
 
-    const handleStatusFilter = (value) => {
+    const handleStatusFilter = (value: string) => {
         setFilterStatus(value);
     };
 
-    const handlePreviewFile = (filename) => {
+    const handlePreviewFile = (filename: string) => {
         if (filename) {
             window.open(route('verif.surat-keluar.preview', filename), '_blank');
         }
@@ -102,7 +133,6 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
 
 
     const handleExport = () => {
-        // Implementasi export jika diperlukan
         console.log('Export data');
     };
 
@@ -394,7 +424,7 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                                     <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Lampiran</p>
                                     <div
                                         className="bg-gray-50 rounded-xl p-4 border border-gray-200 flex items-center gap-3 hover:bg-gray-100 transition-colors cursor-pointer"
-                                        onClick={() => handlePreviewFile(selectedSurat.gambar.split('/').pop())}
+                                        onClick={() => handlePreviewFile((selectedSurat.gambar?.split('/').pop()) || '')}
                                     >
                                         <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                                             <FileText className="text-purple-600" size={20} />
@@ -413,9 +443,9 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
 
                         <div className="p-6 border-t border-gray-200 bg-gray-50">
                             <Button
-                            onClick={() => setShowDetailModal(true)} 
-                            size="lg" 
-                            className="w-full gap-2 bg-purple-600 hover:bg-purple-700">
+                                onClick={() => setShowDetailModal(true)}
+                                size="lg"
+                                className="w-full gap-2 bg-purple-600 hover:bg-purple-700">
                                 <Eye size={18} />
                                 Lihat Detail Lengkap
                             </Button>
@@ -451,7 +481,7 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                 </Dialog>
             </div>
 
-              {showDetailModal && selectedSurat && (
+            {showDetailModal && selectedSurat && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden flex flex-col">
                         {/* Header */}

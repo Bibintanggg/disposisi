@@ -2,12 +2,23 @@ import { Link, usePage } from '@inertiajs/react';
 import { FileText, ChevronRight, Search } from 'lucide-react';
 import Authenticated from '@/Layouts/AuthenticatedLayout';
 import { useState, useMemo } from 'react';
+import { PageProps } from '@/types';
+
+interface Tugas {
+    id: number;
+    nomor_surat: string;
+    perihal: string;
+    dari_kepala: string;
+}
+
+interface Props extends PageProps {
+    tugasList: Tugas[];
+}
 
 export default function DaftarTindakLanjut() {
-    const { tugasList } = usePage().props;
+    const { tugasList } = usePage<Props>().props;
     const [query, setQuery] = useState("");
 
-    // FILTER LIST CLIENT-SIDE
     const filteredList = useMemo(() => {
         return tugasList.filter(item =>
             item.nomor_surat.toLowerCase().includes(query.toLowerCase()) ||

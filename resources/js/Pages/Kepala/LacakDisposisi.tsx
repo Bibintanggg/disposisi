@@ -33,7 +33,7 @@ interface Disposisi {
   waktu_berjalan: string;
   penerima_count: number;
   file_surat?: string;
-  penerima: string
+  penerima: PenerimaTugas[]
 }
 
 interface PenerimaTugas {
@@ -92,6 +92,7 @@ export default function LacakDisposisi() {
           waktu_berjalan: "-",
           penerima_count: s._tujuan_count ?? 0,
           file_surat: s.gambar ?? undefined,
+          penerima: []
         }))
       );
     } else {
@@ -169,7 +170,7 @@ export default function LacakDisposisi() {
     }
   };
 
-  const getJabatanRole = (jabatan: number) => {
+  const getJabatanRole = (jabatan: number ) => {
     switch (jabatan) {
       case 1: 'Admin';
       case 2: 'Staf';
@@ -232,12 +233,11 @@ export default function LacakDisposisi() {
     if (isAutoRefresh) {
       refreshInterval.current = setInterval(() => {
         updateLastUpdateTime();
-        // Refresh data setiap 2 menit (120000 ms)
         router.reload({
-          preserveScroll: true,
+          // preserveScroll: true,
           only: ['disposisi']
         });
-      }, 30000); // Update waktu setiap 30 detik
+      }, 30000);
     }
 
     return () => {
@@ -578,7 +578,7 @@ export default function LacakDisposisi() {
                             <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">{penerima.nama.charAt(0)}</div>
                             <div>
                               <p className="font-medium text-gray-900">{penerima.nama}</p>
-                              <p className="text-gray-500 text-sm">{getJabatanRole(penerima.jabatan)}</p>
+                              <p className="text-gray-500 text-sm">{getJabatanRole(Number(penerima.jabatan))}</p>
                             </div>
                           </div>
                           <div className={`px-4 py-2 rounded-full text-sm font-medium border ${penerima.status === 'selesai' ? 'bg-green-100 text-green-800 border-green-200' :

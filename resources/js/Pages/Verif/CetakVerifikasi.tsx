@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { PageProps } from "@/types";
 import {
     Select,
     SelectContent,
@@ -19,7 +20,7 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs";
 import { usePage, router } from "@inertiajs/react";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/Components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface SuratItem {
     id: number;
@@ -52,13 +53,13 @@ interface SuratItem {
     tanggal_kirim?: string;
 }
 
-interface PageProps {
+interface CetakPageProps extends PageProps{
     suratMasuk: SuratItem[];
     suratKeluar: SuratItem[];
 }
 
 export default function CetakVerifikasi() {
-    const { suratMasuk, suratKeluar } = usePage<PageProps>().props;
+    const { suratMasuk, suratKeluar } = usePage<CetakPageProps>().props;
 
     const allSurat = [...suratMasuk, ...suratKeluar];
 
@@ -413,9 +414,9 @@ export default function CetakVerifikasi() {
                                                                 </span>
                                                             )}
                                                             {surat.jenis === 'keluar' && surat.status_arsip && (
-                                                                <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${getStatusArsipInfo(surat.status_arsip).color
+                                                                <span className={`px-3 py-1 rounded-lg text-xs font-semibold ${getStatusArsipInfo(Number(surat.status_arsip)).color
                                                                     } flex items-center gap-1`}>
-                                                                    {getStatusArsipInfo(surat.status_arsip).label}
+                                                                    {getStatusArsipInfo(Number(surat.status_arsip)).label}
                                                                 </span>
                                                             )}
                                                         </div>
@@ -479,9 +480,9 @@ export default function CetakVerifikasi() {
                                         {selectedSurat.jenis === 'masuk' ? 'Surat Masuk' : 'Surat Keluar'}
                                     </span>
                                     {selectedSurat.jenis === 'keluar' && selectedSurat.status_arsip && (
-                                        <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusArsipInfo(selectedSurat.status_arsip).color
+                                        <span className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${getStatusArsipInfo(Number(selectedSurat.status_arsip)).color
                                             } flex items-center gap-1.5`}>
-                                            {getStatusArsipInfo(selectedSurat.status_arsip).label}
+                                            {getStatusArsipInfo(Number(selectedSurat.status_arsip)).label}
                                         </span>
                                     )}
                                 </div>

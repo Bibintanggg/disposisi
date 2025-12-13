@@ -318,7 +318,7 @@ export default function Dashboard() {
                                             <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                                                 <span className="text-xs text-gray-500">Dari: {item.dari}</span>
                                                 <button
-                                                    onClick={() => handleMulaiTugas(item.id)}
+                                                    onClick={handleMulaiTugas}
                                                     className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
                                                 >
                                                     <PlayCircle className="w-3.5 h-3.5" />
@@ -369,7 +369,7 @@ export default function Dashboard() {
                                                     <p className="text-xs text-gray-500">Dari: {item.dari}</p>
                                                 </div>
                                                 <button
-                                                    onClick={() => handleLihatTugas(item.id)}
+                                                    onClick={handleLihatTugas}
                                                     className="text-xs font-medium text-blue-600 hover:text-blue-700 flex items-center gap-1"
                                                 >
                                                     <Eye className="w-3.5 h-3.5" />

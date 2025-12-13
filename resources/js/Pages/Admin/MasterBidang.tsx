@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Bidang } from "@/types";
 import { useForm } from "@inertiajs/react";
+import { Bidang } from "@/types/bidang";
 
 interface UserFormProps {
     bidang: Bidang[];

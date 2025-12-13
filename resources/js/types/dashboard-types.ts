@@ -1,4 +1,4 @@
-// Types untuk Dashboard Staf
+import { PageProps } from '@/types';
 export interface DashboardStats {
     tugas_baru: number;
     tugas_proses: number;
@@ -57,7 +57,7 @@ export interface TugasMendesak {
     tugas_proses_terlama: TugasProses[];
 }
 
-export interface DashboardProps {
+export interface DashboardProps extends PageProps {
     stats: DashboardStats;
     performanceData: PerformanceData;
     tugasMendesak: TugasMendesak;

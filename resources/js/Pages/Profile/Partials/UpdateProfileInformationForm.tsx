@@ -18,10 +18,14 @@ export default function UpdateProfileInformation({
     const user = usePage().props.auth.user;
 
     const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
-            name: user.name,
+        useForm<{
+            name: string;
+            email: string;
+        }>({
+            name: user.nama_lengkap,
             email: user.email,
         });
+
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();

@@ -10,14 +10,14 @@ interface SuratCardProps {
 export default function SuratCard({ surat, onDisposisi }: SuratCardProps) {
     const badge = sifatSuratBadge(surat.sifat_surat);
 
-    const calculateWaitingDays = (t: string) => {
-        const received = new Date(t);
-        return Math.floor((Date.now() - received.getTime()) / (1000 * 60 * 60 * 24));
+    const calculateWaitingDays = (t: Date) => {
+        return Math.floor((Date.now() - t.getTime()) / (1000 * 60 * 60 * 24));
     };
+
 
     const waitingDays = calculateWaitingDays(surat.tanggal_terima);
 
-    const formatDate = (d: string) =>
+    const formatDate = (d: Date) =>
         new Intl.DateTimeFormat("id-ID", {
             day: "numeric",
             month: "short",

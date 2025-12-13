@@ -13,6 +13,54 @@ import {
     BarChart3
 } from 'lucide-react';
 import { usePage, router } from "@inertiajs/react";
+import { PageProps } from '@/types';
+
+interface DashboardStats {
+    surat_menunggu: number;
+    surat_urgen: number;
+    tugas_tertunda: number;
+    rata_waktu_disposisi: number;
+    tingkat_penyelesaian: number;
+}
+
+interface VolumeSurat {
+    bulan: string;
+    jumlah: number;
+}
+
+interface StatusTugas {
+    status: 'Selesai' | 'Proses' | 'Belum';
+    jumlah: number;
+    persen: number;
+}
+
+interface DashboardTrends {
+    volume_surat: VolumeSurat[];
+    status_tugas: StatusTugas[];
+}
+
+interface RecentActivity {
+    laporan_terbaru: {
+        id: number;
+        staff: string;
+        tugas: string;
+        waktu: string;
+        status: 'selesai' | 'proses';
+    }[];
+    surat_selesai: {
+        id: number;
+        nomor: string;
+        perihal: string;
+        waktu: string;
+    }[];
+}
+
+interface DashboardProps extends PageProps {
+    stats: DashboardStats;
+    trendData: DashboardTrends;
+    recentActivities: RecentActivity;
+}
+
 
 export default function Dashboard() {
     const {
@@ -31,7 +79,7 @@ export default function Dashboard() {
             laporan_terbaru: [],
             surat_selesai: []
         }
-    } = usePage().props;
+    } = usePage<DashboardProps>().props;
 
     const data = stats;
     const trends = trendData;

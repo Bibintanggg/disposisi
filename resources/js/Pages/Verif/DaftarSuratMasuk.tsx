@@ -1,5 +1,5 @@
 import Authenticated from "@/Layouts/AuthenticatedLayout";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Mail, Search, Filter, Download, Eye, Edit2, Trash2, MoreVertical, Calendar, User, FileText, AlertCircle, Clock, CheckCircle, XCircle, Paperclip, SlidersHorizontal, Grid3X3, List, ArrowUpRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,7 +37,7 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
     const [selectedSurat, setSelectedSurat] = useState(surat?.[0] ?? null);
     const [viewMode, setViewMode] = useState('list');
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
         router.get('/verif/daftar-surat-masuk', { nomor_surat: search }, {
             preserveScroll: true,
@@ -97,31 +97,37 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
         });
     };
 
-    const getSifatInfo = (sifat) => {
+    const getSifatInfo = (sifat: number) => {
         return sifatSuratOptions.find(s => s.value === sifat) || sifatSuratOptions[0];
     };
 
-    const getStatusInfo = (status) => {
+    const getStatusInfo = (status: number) => {
         return statusOptions.find(s => s.value === status) || statusOptions[0];
     };
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('id-ID', {
+    const formatDate = (date?: string | Date | null) => {
+        if (!date) return '-';
+        const d = typeof date === 'string' ? new Date(date) : date;
+        return d.toLocaleDateString('id-ID', {
             day: '2-digit',
             month: 'short',
-            year: 'numeric'
+            year: 'numeric',
         });
     };
 
-    const formatDateTime = (dateString) => {
-        return new Date(dateString).toLocaleString('id-ID', {
+    const formatDateTime = (date?: string | Date | null) => {
+        if (!date) return '-';
+        const d = typeof date === 'string' ? new Date(date) : date;
+        return d.toLocaleString('id-ID', {
             day: '2-digit',
             month: 'short',
             year: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
         });
     };
+
+
 
     return (
         <Authenticated>

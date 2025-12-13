@@ -2,22 +2,39 @@ import { useState } from 'react';
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { Search, AlertCircle, Clock, Eye, PlayCircle, ChevronDown, Filter, X } from 'lucide-react';
 import { usePage, router } from "@inertiajs/react";
+import { PageProps } from '@/types';
+
+type TugasItem = {
+  id: number;
+  nomor_surat: string;
+  perihal: string;
+  dari_kepala: string;
+  instruksi: string;
+  sifat_surat: 'Segera' | 'Penting' | 'Biasa';
+  tanggal_disposisi: string;
+};
+
+interface TugasPageProps extends PageProps {
+  tugas: TugasItem[];
+}
 
 export default function TugasMasuk() {
-  const { tugas } = usePage().props;
+  const page = usePage<TugasPageProps>().props;
+  const { tugas } = page;
+
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('terbaru');
   const [selectedSifat, setSelectedSifat] = useState('semua');
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
-  const [selectedTugas, setSelectedTugas] = useState(null);
+  const [selectedTugas, setSelectedTugas] = useState<TugasItem | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const hitungWaktuTunggu = (tanggal) => {
-    const sekarang = new Date();
-    const waktuDisposisi = new Date(tanggal);
-    const selisihMs = sekarang - waktuDisposisi;
+  const hitungWaktuTunggu = (tanggal: string) => {
+    const sekarang = new Date().getTime(); // number
+    const waktuDisposisi = new Date(tanggal).getTime(); // number
+    const selisihMs = sekarang - waktuDisposisi; // number, aman
     const selisihJam = Math.floor(selisihMs / (1000 * 60 * 60));
     const selisihHari = Math.floor(selisihJam / 24);
 
@@ -30,6 +47,7 @@ export default function TugasMasuk() {
     }
   };
 
+
   // Filter dan sort data
   const tugasFiltered = tugas
     .filter((tugas) => {
@@ -41,9 +59,9 @@ export default function TugasMasuk() {
     })
     .sort((a, b) => {
       if (sortBy === 'terbaru') {
-        return new Date(b.tanggal_disposisi) - new Date(a.tanggal_disposisi);
+        return new Date(b.tanggal_disposisi).getTime() - new Date(a.tanggal_disposisi).getTime();
       } else if (sortBy === 'terlama') {
-        return new Date(a.tanggal_disposisi) - new Date(b.tanggal_disposisi);
+        return new Date(a.tanggal_disposisi).getTime() - new Date(b.tanggal_disposisi).getTime();
       } else if (sortBy === 'prioritas') {
         const prioritas = { 'Segera': 3, 'Penting': 2, 'Biasa': 1 };
         return (prioritas[b.sifat_surat] || 0) - (prioritas[a.sifat_surat] || 0);
@@ -51,8 +69,9 @@ export default function TugasMasuk() {
       return 0;
     });
 
+
   // Fungsi untuk menangani aksi
-  const handleMulaiKerjakan = (tugasData) => {
+  const handleMulaiKerjakan = (tugasData: TugasItem) => {
     setSelectedTugas(tugasData);
     setShowConfirmModal(true);
   };
@@ -82,7 +101,11 @@ export default function TugasMasuk() {
   };
 
   // Komponen badge prioritas
-  const BadgePrioritas = ({ sifat }) => {
+  type BadgePrioritasProps = {
+    sifat: 'Segera' | 'Penting' | 'Biasa';
+  };
+
+  const BadgePrioritas = ({ sifat }: BadgePrioritasProps) => {
     const styles = {
       'Segera': 'bg-red-100 text-red-700 border-red-200',
       'Penting': 'bg-amber-100 text-amber-700 border-amber-200',
@@ -102,6 +125,7 @@ export default function TugasMasuk() {
       </span>
     );
   };
+
 
   return (
     <Authenticated>

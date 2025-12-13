@@ -7,22 +7,35 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 
+type SuratItem = {
+    id: number;
+    instruksi: string;
+    tanggal_disposisi: string;
+    tanggal_disposisi_raw: string;
+    sifat_surat: "Sangat Penting" | "Penting" | "Biasa";
+    dari_kepala: string;
+    perihal: string;
+};
+
 export default function TugasProses() {
     const [sort, setSort] = useState("waktu");
     const [openSelesai, setOpenSelesai] = useState(false);
     const [selectedId, setSelectedId] = useState(null);
 
-    const { surat } = usePage().props;
+
+    const { surat } = usePage<{ surat: SuratItem[]; auth: { user: any } }>().props;
 
     const submitSelesai = () => {
-        router.post(route("staf.tugas.selesaikan", selectedId), {}, {
-            onSuccess: () => setOpenSelesai(false)
-        });
+        if (selectedId !== null) {
+            router.post(route("staf.tugas.selesaikan", selectedId), {}, {
+                onSuccess: () => setOpenSelesai(false)
+            });
+        }
     };
 
     const sortedSurat = [...surat].sort((a, b) => {
         if (sort === "waktu") {
-            return new Date(a.tanggal_disposisi_raw) - new Date(b.tanggal_disposisi_raw);
+            return new Date(a.tanggal_disposisi_raw).getTime() - new Date(b.tanggal_disposisi_raw).getTime();
         }
 
         if (sort === "prioritas") {

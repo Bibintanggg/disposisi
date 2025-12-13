@@ -2,14 +2,57 @@ import React, { useState } from 'react';
 import { Search, Filter, Download, Eye, Calendar, Building2, User, FileText, X, Clock, ChevronRight } from 'lucide-react';
 import Authenticated from "@/Layouts/AuthenticatedLayout";
 import { usePage } from '@inertiajs/react';
+import { PageProps } from '@inertiajs/core';
+
+interface StatusAkhir {
+  value: number;
+  label: string;
+}
+
+interface RiwayatDisposisi {
+  judul: string;
+  deskripsi: string;
+  tanggal: string;
+  warna: string;
+}
+
+interface ArsipSurat {
+  id: number;
+  nomor_surat: string;
+  pengirim: string;
+  perihal: string;
+  bidang: string;
+  tanggal_terima: string;
+  disposisi_oleh: string;
+  status_akhir: StatusAkhir;
+  riwayat_disposisi: RiwayatDisposisi[];
+}
+
+interface ArsipStats {
+  total: number;
+  selesai: number;
+  arsip: number;
+}
+
+interface FlashMessage {
+  error?: string;
+  success?: string;
+}
+
+interface ArsipSuratMasukPageProps extends PageProps {
+  arsipSurat: ArsipSurat[];
+  stats: ArsipStats;
+  flash?: FlashMessage;
+}
+
 
 export default function ArsipSuratMasuk() {
-  const { arsipSurat, stats, flash } = usePage().props
+  const { arsipSurat, stats, flash } = usePage<ArsipSuratMasukPageProps>().props;
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedSurat, setSelectedSurat] = useState(null);
+  const [selectedSurat, setSelectedSurat] = useState<ArsipSurat | null>(null);
   const [filters, setFilters] = useState({
-    status_akhir: "",
+    status_akhir: null as number | null,
     bidang: "",
     disposisi_oleh: "",
     tanggal_dari: "",
@@ -22,22 +65,14 @@ export default function ArsipSuratMasuk() {
       item.pengirim.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.perihal.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchStatus = !filters.status_akhir || item.status_akhir === filters.status_akhir;
+    const matchStatus =
+      filters.status_akhir === null ||
+      item.status_akhir.value === filters.status_akhir;
     const matchBidang = !filters.bidang || item.bidang === filters.bidang;
     const matchDisposisi = !filters.disposisi_oleh || item.disposisi_oleh === filters.disposisi_oleh;
 
     return matchSearch && matchStatus && matchBidang && matchDisposisi;
   });
-
-  const resetFilters = () => {
-    setFilters({
-      status_akhir: "",
-      bidang: "",
-      disposisi_oleh: "",
-      tanggal_dari: "",
-      tanggal_sampai: ""
-    });
-  };
 
   const activeFilterCount = Object.values(filters).filter(v => v !== "").length;
 
