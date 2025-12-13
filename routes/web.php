@@ -61,6 +61,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/kepala/lacak-disposisi', [LacakDisposisiController::class, 'index'])->name('kepala.lacak-disposisi');
         Route::get('/kepala/arsip-surat', [ArsipSuratMasukController::class, 'index'])->name('kepala.arsip-surat-masuk');
+        Route::get('/kepala/arsip-surat-masuk/{surat}/download',[ArsipSuratMasukController::class, 'download']
+        )->name('kepala.arsip-surat-masuk.download');
 
         Route::get('/kepala/laporan-kinerja', [LaporanKinerjaController::class, 'index'])->name('kepala.laporan-kinerja');
     });
