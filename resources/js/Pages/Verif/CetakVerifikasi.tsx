@@ -106,13 +106,23 @@ export default function CetakVerifikasi() {
         return statusMap[status as keyof typeof statusMap] || statusMap.pending;
     };
 
-    const getStatusCetakInfo = (statusArsip: number) => {
+    const getStatusCetakInfo = (statusCetak: "belum" | "sudah") => {
         const statusMap = {
-            1: { label: "Belum Dicetak", icon: Printer, color: "text-gray-600 bg-gray-100" },
-            2: { label: "Sudah Dicetak", icon: CheckCircle2, color: "text-blue-600 bg-blue-100" }
+            belum: {
+                label: "Belum Dicetak",
+                icon: Printer,
+                color: "text-gray-600 bg-gray-100",
+            },
+            sudah: {
+                label: "Sudah Dicetak",
+                icon: CheckCircle2,
+                color: "text-blue-600 bg-blue-100",
+            },
         };
-        return statusMap[statusArsip as keyof typeof statusMap] || statusMap[1];
+
+        return statusMap[statusCetak] || statusMap.belum;
     };
+
 
     const getStatusArsipInfo = (statusArsip: number) => {
         const statusMap = {
@@ -361,8 +371,8 @@ export default function CetakVerifikasi() {
                                                 setCatatanVerifikasi(""); // Reset catatan ketika ganti surat
                                             }}
                                             className={`bg-white rounded-xl border-2 p-5 cursor-pointer transition-all duration-200 group hover:shadow-lg ${selectedSurat?.id === surat.id && selectedSurat?.jenis === surat.jenis
-                                                    ? 'border-emerald-500 shadow-lg ring-4 ring-emerald-50'
-                                                    : 'border-gray-200 hover:border-gray-300'
+                                                ? 'border-emerald-500 shadow-lg ring-4 ring-emerald-50'
+                                                : 'border-gray-200 hover:border-gray-300'
                                                 }`}
                                         >
                                             <div className="flex items-start gap-4">
@@ -573,7 +583,7 @@ export default function CetakVerifikasi() {
                                                 <div className="flex-1">
                                                     <p className="text-sm font-semibold text-gray-900">Dicetak</p>
                                                     <p className="text-xs text-gray-500">
-                                                        oleh {selectedSurat.dicetak_oleh || '-'} 
+                                                        oleh {selectedSurat.dicetak_oleh || '-'}
                                                     </p>
                                                 </div>
                                             </div>
@@ -640,7 +650,7 @@ export default function CetakVerifikasi() {
                                         <Printer size={18} />
                                         {processing ? 'Memproses...' : 'Cetak Surat'}
                                     </Button>
-                                    
+
                                 </>
                             )}
 

@@ -487,9 +487,6 @@ export default function Dashboard({
                     <div className="p-6 border-b">
                         <div className="flex items-center justify-between mb-6">
                             <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider">Top Departments</h4>
-                            <Button variant="ghost" size="sm" className="text-xs text-blue-500 hover:text-blue-400 h-auto p-0">
-                                View All
-                            </Button>
                         </div>
                         <div className="space-y-3">
                             {topBidangData.map((bidang, index) => (
