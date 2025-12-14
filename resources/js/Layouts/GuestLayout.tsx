@@ -7,7 +7,7 @@ export default function Guest({ children }: PropsWithChildren) {
         <div className="flex min-h-screen flex-col items-center bg-gray-100 pt-6 sm:justify-center sm:pt-0">
             <div>
                 <Link href="/" className='flex flex-col items-center text-center'>
-                    <p className='text-black font-black text-4xl'>Disposisi GO !</p>
+                    <p className='text-black font-black text-4xl'>Disposisi</p>
                     <p className='text-black font-semibold text-lg'>Login untuk terhubung kedalam aplikasi website surat menyurat</p>
                 </Link>
             </div>

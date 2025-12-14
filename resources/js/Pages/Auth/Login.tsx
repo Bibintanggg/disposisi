@@ -196,8 +196,6 @@ export default function Login({
                                     fontFamily: "'Sora', sans-serif",
                                 }}>
                                     <span className="gradient-text">Disposisi</span>
-                                    <br />
-                                    <span className="text-white">GO!</span>
                                 </h1>
                             </motion.div>
 
@@ -422,7 +420,7 @@ export default function Login({
                                 transition={{ delay: 1 }}
                             >
                                 <p className="text-sm text-gray-500">
-                                    © 2024 Disposisi GO! All rights reserved.
+                                    © 2024 Disposisi All rights reserved.
                                 </p>
                             </motion.div>
                         </motion.div>
