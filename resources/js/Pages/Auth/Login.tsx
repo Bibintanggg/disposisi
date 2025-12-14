@@ -32,7 +32,7 @@ export default function Login({
     return (
         <>
             <Head title="Log in" />
-            
+
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Sans:wght@400;500;700&display=swap');
                 
@@ -95,14 +95,12 @@ export default function Login({
                     left: 100%;
                 }
             `}</style>
-            
+
             <div className="min-h-screen relative overflow-hidden" style={{
-                background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 25%, #fcd34d 50%, #fbbf24 75%, #f59e0b 100%)',
+                background: '#09090b'
             }}>
-                {/* Decorative Background Elements */}
                 <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                    {/* Animated gradient circles */}
-                    <motion.div 
+                    <motion.div
                         className="absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-20"
                         style={{
                             background: 'radial-gradient(circle, #dc2626 0%, transparent 70%)',
@@ -117,8 +115,8 @@ export default function Login({
                             ease: "easeInOut"
                         }}
                     />
-                    
-                    <motion.div 
+
+                    <motion.div
                         className="absolute top-1/3 -left-32 w-80 h-80 rounded-full opacity-20"
                         style={{
                             background: 'radial-gradient(circle, #ea580c 0%, transparent 70%)',
@@ -134,8 +132,8 @@ export default function Login({
                             delay: 1
                         }}
                     />
-                    
-                    <motion.div 
+
+                    <motion.div
                         className="absolute -bottom-24 right-1/4 w-72 h-72 rounded-full opacity-20"
                         style={{
                             background: 'radial-gradient(circle, #b45309 0%, transparent 70%)',
@@ -151,7 +149,7 @@ export default function Login({
                             delay: 2
                         }}
                     />
-                    
+
                     {/* Grid pattern */}
                     <div className="absolute inset-0 opacity-30" style={{
                         backgroundImage: `
@@ -161,10 +159,10 @@ export default function Login({
                         backgroundSize: '50px 50px',
                     }} />
                 </div>
-                
+
                 <div className="relative min-h-screen flex">
                     {/* Left Side - Hero Section */}
-                    <motion.div 
+                    <motion.div
                         className="hidden lg:flex lg:w-1/2 flex-col justify-center px-16 xl:px-24"
                         initial={{ opacity: 0, x: -50 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -177,45 +175,45 @@ export default function Login({
                                 transition={{ delay: 0.2, duration: 0.6 }}
                             >
                                 <div className="flex items-center space-x-2 mb-6">
-                                    <motion.div 
+                                    <motion.div
                                         className="w-2 h-2 rounded-full bg-red-600"
                                         animate={{ opacity: [1, 0.6, 1] }}
                                         transition={{ duration: 2, repeat: Infinity }}
                                     />
-                                    <motion.div 
+                                    <motion.div
                                         className="w-2 h-2 rounded-full bg-orange-600"
                                         animate={{ opacity: [1, 0.6, 1] }}
                                         transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
                                     />
-                                    <motion.div 
+                                    <motion.div
                                         className="w-2 h-2 rounded-full bg-amber-600"
                                         animate={{ opacity: [1, 0.6, 1] }}
                                         transition={{ duration: 2, repeat: Infinity, delay: 0.6 }}
                                     />
                                 </div>
-                                
+
                                 <h1 className="text-6xl xl:text-7xl font-bold mb-6 leading-tight" style={{
                                     fontFamily: "'Sora', sans-serif",
                                 }}>
                                     <span className="gradient-text">Disposisi</span>
                                     <br />
-                                    <span className="text-gray-900">GO!</span>
+                                    <span className="text-white">GO!</span>
                                 </h1>
                             </motion.div>
-                            
-                            <motion.p 
+
+                            <motion.p
                                 className="text-xl text-gray-600 leading-relaxed"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.4, duration: 0.6 }}
                                 style={{ fontFamily: "'DM Sans', sans-serif" }}
                             >
-                                Platform surat menyurat modern untuk 
-                                <span className="font-semibold text-gray-900"> efisiensi maksimal</span> dan 
-                                <span className="font-semibold text-gray-900"> kolaborasi tim</span> yang lebih baik.
+                                Platform surat menyurat modern untuk
+                                <span className="font-semibold text-white"> efisiensi maksimal</span> dan
+                                <span className="font-semibold text-white"> kolaborasi tim</span> yang lebih baik.
                             </motion.p>
-                            
-                            <motion.div 
+
+                            <motion.div
                                 className="space-y-4 pt-4"
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -259,7 +257,7 @@ export default function Login({
                                         whileHover={{ x: 8 }}
                                         transition={{ duration: 0.2 }}
                                     >
-                                        <motion.div 
+                                        <motion.div
                                             className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center flex-shrink-0`}
                                             whileHover={{ scale: 1.1, rotate: 5 }}
                                             transition={{ duration: 0.2 }}
@@ -267,7 +265,7 @@ export default function Login({
                                             {feature.icon}
                                         </motion.div>
                                         <div>
-                                            <h3 className="font-semibold text-gray-900 mb-1">{feature.title}</h3>
+                                            <h3 className="font-semibold text-white mb-1">{feature.title}</h3>
                                             <p className="text-sm text-gray-600">{feature.desc}</p>
                                         </div>
                                     </motion.div>
@@ -275,7 +273,7 @@ export default function Login({
                             </motion.div>
                         </div>
                     </motion.div>
-                    
+
                     {/* Right Side - Login Form */}
                     <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
                         <motion.div
@@ -285,18 +283,18 @@ export default function Login({
                             transition={{ duration: 0.8, delay: 0.2 }}
                         >
                             {/* Mobile Logo */}
-                            <motion.div 
+                            <motion.div
                                 className="lg:hidden text-center mb-8"
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 transition={{ duration: 0.5 }}
                             >
                                 <h1 className="text-4xl font-bold mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>
-                                    <span className="gradient-text">Disposisi GO!</span>
+                                    <span className="gradient-text">Disposisi</span>
                                 </h1>
                                 <p className="text-sm text-gray-600">Masuk untuk melanjutkan</p>
                             </motion.div>
-                            
+
                             <motion.div
                                 className="glass-card rounded-3xl shadow-2xl p-8 md:p-10"
                                 initial={{ scale: 0.95 }}
@@ -304,14 +302,14 @@ export default function Login({
                                 transition={{ duration: 0.5, delay: 0.3 }}
                             >
                                 <div className="mb-8">
-                                    <h2 className="text-3xl font-bold text-gray-900 mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>
-                                        Selamat Datang! 
+                                    <h2 className="text-3xl font-bold text-gray-500 mb-2" style={{ fontFamily: "'Sora', sans-serif" }}>
+                                        Selamat Datang!
                                     </h2>
                                     <p className="text-gray-600">Silakan login untuk mengakses akun Anda</p>
                                 </div>
 
                                 {status && (
-                                    <motion.div 
+                                    <motion.div
                                         className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl"
                                         initial={{ opacity: 0, y: -10 }}
                                         animate={{ opacity: 1, y: 0 }}
@@ -360,7 +358,7 @@ export default function Login({
                                         <InputError message={errors.password} className="mt-2" />
                                     </motion.div>
 
-                                    <motion.div 
+                                    <motion.div
                                         className="flex items-center justify-between"
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
@@ -373,7 +371,7 @@ export default function Login({
                                                 onChange={(e) => setData('remember', e.target.checked as false)}
                                                 className="rounded border-gray-300 text-orange-600 focus:ring-orange-600 transition-all"
                                             />
-                                            <span className="ms-2 text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+                                            <span className="ms-2 text-sm text-gray-600 group-hover:text-white transition-colors">
                                                 Ingat Aku
                                             </span>
                                         </label>
