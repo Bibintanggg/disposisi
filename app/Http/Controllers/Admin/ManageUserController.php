@@ -21,10 +21,10 @@ class ManageUserController extends Controller
             ->whereNotNull('user_id')
             ->distinct('user_id')
             ->count('user_id');
-        
+
         $newUsers = User::whereMonth('created_at', now()->month)
-               ->whereYear('created_at', now()->year)
-               ->count();
+            ->whereYear('created_at', now()->year)
+            ->count();
 
         return Inertia::render('Admin/ManageUser', [
             'users' => User::with('bidang')->get(),
@@ -52,7 +52,7 @@ class ManageUserController extends Controller
         return redirect()->route('admin.manage-user')->with('success', 'User berhasil dibuat');
     }
 
-    public function masterBidang() 
+    public function masterBidang()
     {
         $bidang = Bidang::with('users')->get();
 
@@ -66,5 +66,13 @@ class ManageUserController extends Controller
         Bidang::create($request->validated());
 
         return redirect()->route('admin.master-bidang')->with('success', 'Data bidang berhasil dibuat');
+    }
+
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return redirect()->route('admin.manage-user')->with('success', 'User berhasil dihapus');
     }
 }

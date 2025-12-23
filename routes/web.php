@@ -43,6 +43,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/admin/dashboard', [DashboardAdminController::class, 'index'])->name('admin.dashboard');
         Route::get('/admin/manage-user', [ManageUserController::class, 'index'])->name('admin.manage-user');
         Route::post('/admin/manage-user', [ManageUserController::class, 'store'])->name('admin.manage-user.store');
+        Route::delete('/admin/manage-user/{id}', [ManageUserController::class, 'destroy'])
+            ->name('admin.manage-user.destroy');
 
         Route::get('/admin/master-data', [ManageUserController::class, 'masterBidang'])->name('admin.master-bidang');
         Route::post('/admin/master-data', [ManageUserController::class, 'storeBidang'])->name('admin.master-bidang.store');
@@ -61,7 +63,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/kepala/lacak-disposisi', [LacakDisposisiController::class, 'index'])->name('kepala.lacak-disposisi');
         Route::get('/kepala/arsip-surat', [ArsipSuratMasukController::class, 'index'])->name('kepala.arsip-surat-masuk');
-        Route::get('/kepala/arsip-surat-masuk/{surat}/download',[ArsipSuratMasukController::class, 'download']
+        Route::get(
+            '/kepala/arsip-surat-masuk/{surat}/download',
+            [ArsipSuratMasukController::class, 'download']
         )->name('kepala.arsip-surat-masuk.download');
 
         Route::get('/kepala/laporan-kinerja', [LaporanKinerjaController::class, 'index'])->name('kepala.laporan-kinerja');
@@ -120,11 +124,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('verif/daftar-surat-keluar', [SuratKeluarController::class, 'daftarSuratKeluar'])->name('verif.daftar-surat-keluar');
         Route::delete('verif/input-surat-keluar/{id}', [SuratKeluarController::class, 'destroy'])->name('verif.surat-keluar.destroy');
+        Route::get('/surat-keluar/download/{id}', [SuratKeluarController::class, 'download'])
+            ->name('surat-keluar.download');
 
         Route::get('verif/cetak-verifikasi', [VerifikasiController::class, 'index'])->name('verif.cetak-verifikasi');
         Route::post('/verifikasi/{id}/approve', [VerifikasiController::class, 'approve'])->name('verif.approve');
         Route::post('/verifikasi/{id}/reject', [VerifikasiController::class, 'reject'])->name('verif.reject');
         Route::post('/verifikasi/{id}/print', [VerifikasiController::class, 'print'])->name('verif.print');
+        Route::get('/verifikasi/download/{type}/{id}', [VerifikasiController::class, 'download'])->name('verif.surat.download');
     });
 });
 

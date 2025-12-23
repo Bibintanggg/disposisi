@@ -46,7 +46,7 @@ class DashboardAdminController extends Controller
                     'type' => 'keluar',
                     'nomor' => $item->nomor_surat,
                     'detail' => $item->penerima,
-                    'verifikator' => $item->verifikator?->name ?? '-',
+                    'verifikator' => $item->verifikator?->nama_lengkap ?? '-',
                     'timestamp' => $item->created_at->diffForHumans(),
                     'created_at' => $item->created_at,
                 ];

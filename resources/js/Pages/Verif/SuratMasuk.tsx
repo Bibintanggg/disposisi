@@ -340,7 +340,7 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
                                                 <p className="font-bold text-sm truncate">{s.nomor_surat}</p>
                                                 <p className="text-xs text-gray-500 mt-1">{s.pengirim}</p>
                                             </div>
-                                            <MoreHorizontal size={16} className="text-gray-400 flex-shrink-0" />
+                                            {/* <MoreHorizontal size={16} className="text-gray-400 flex-shrink-0" /> */}
                                         </div>
 
                                         <p className="text-xs text-gray-600 mt-2 line-clamp-2">

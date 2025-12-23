@@ -53,7 +53,7 @@ interface SuratItem {
     tanggal_kirim?: string;
 }
 
-interface CetakPageProps extends PageProps{
+interface CetakPageProps extends PageProps {
     suratMasuk: SuratItem[];
     suratKeluar: SuratItem[];
 }
@@ -547,7 +547,7 @@ export default function CetakVerifikasi() {
                                     <p className="text-sm text-gray-900">{selectedSurat.diajukan_oleh}</p>
                                 </div>
                             </div>
-
+                            {/* 
                             {(selectedSurat.status_verifikasi === 'approved' || selectedSurat.status_verifikasi === 'rejected') && (
                                 <div>
                                     <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Timeline Verifikasi</p>
@@ -591,7 +591,7 @@ export default function CetakVerifikasi() {
                                         )}
                                     </div>
                                 </div>
-                            )}
+                            )} */}
 
                             {/* Form Verifikasi (jika masih pending) */}
                             {selectedSurat.status_verifikasi === 'pending' && (
@@ -660,21 +660,15 @@ export default function CetakVerifikasi() {
                                     size="lg"
                                     variant="outline"
                                     className="w-full gap-2"
+                                    onClick={() => {
+                                        const url = `/verifikasi/download/${selectedSurat.jenis}/${selectedSurat.id}`;
+                                        window.location.href = url;
+                                    }}
                                 >
                                     <Download size={18} />
-                                    Download PDF
+                                    Download File
                                 </Button>
-                            )}
 
-                            {selectedSurat.status_verifikasi === 'rejected' && (
-                                <Button
-                                    size="lg"
-                                    variant="outline"
-                                    className="w-full gap-2"
-                                >
-                                    <Eye size={18} />
-                                    Lihat Detail Lengkap
-                                </Button>
                             )}
                         </div>
                     </div>

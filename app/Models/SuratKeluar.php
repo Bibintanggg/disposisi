@@ -17,6 +17,7 @@ class SuratKeluar extends Model
     protected $fillable = [
         'unit_pengirim_id',
         'user_penanda_tangan_id',
+        'user_verifikator_id',
         'nomor_surat',
         'tanggal_surat',
         'penerima',

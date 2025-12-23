@@ -168,12 +168,6 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                                 </div>
                             </div>
 
-                            <div className="flex gap-2">
-                                <Button variant="outline" size="lg" className="gap-2" onClick={handleExport}>
-                                    <Download size={18} />
-                                    Export
-                                </Button>
-                            </div>
                         </div>
 
                         <div className="grid grid-cols-3 gap-4">
@@ -274,9 +268,6 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                                                                 <StatusIcon size={12} />
                                                                 {statusInfo.label}
                                                             </span>
-                                                            <button className="p-2 hover:bg-gray-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                                                                <MoreVertical size={16} className="text-gray-400" />
-                                                            </button>
                                                         </div>
                                                     </div>
 
@@ -433,7 +424,12 @@ export default function DaftarSuratKeluar({ suratKeluar: initialSuratKeluar, bid
                                             <p className="text-sm font-semibold text-gray-900">{selectedSurat.gambar.split('/').pop()}</p>
                                             <p className="text-xs text-gray-500">PDF Document</p>
                                         </div>
-                                        <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => window.location.href = `/surat-keluar/download/${selectedSurat.id}`}
+                                            className="h-9 w-9 p-0"
+                                        >
                                             <Download size={16} />
                                         </Button>
                                     </div>

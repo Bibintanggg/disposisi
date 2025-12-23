@@ -2,6 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
+import { router } from "@inertiajs/react"
 
 import { MoreHorizontal, Trash2Icon } from "lucide-react"
 
@@ -102,9 +103,17 @@ export const columns: ColumnDef<Payment>[] = [
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem className="text-red-500"
-                            onClick={() => navigator.clipboard.writeText(payment.id)}
+                            onClick={() => {
+                                router.delete(
+                                    route("admin.manage-user.destroy", payment.id),
+                                    {
+                                        preserveScroll: true,
+                                    }
+                                )
+                            }}
+
                         >
-                            <Trash2Icon/>
+                            <Trash2Icon />
                             Hapus Akun
                         </DropdownMenuItem>
                     </DropdownMenuContent>

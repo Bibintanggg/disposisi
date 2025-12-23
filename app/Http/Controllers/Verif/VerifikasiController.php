@@ -183,4 +183,23 @@ class VerifikasiController extends Controller
 
         return redirect()->back()->with('success', 'Surat berhasil dicetak!');
     }
+
+    public function download($type, $id)
+    {
+        if ($type === 'masuk') {
+            $surat = SuratMasuk::findOrFail($id);
+        } elseif ($type === 'keluar') {
+            $surat = SuratKeluar::findOrFail($id);
+        } else {
+            abort(404);
+        }
+
+        $file = storage_path('app/public/' . $surat->gambar);
+
+        if (!file_exists($file)) {
+            abort(404, 'File tidak ditemukan');
+        }
+
+        return response()->download($file);
+    }
 }

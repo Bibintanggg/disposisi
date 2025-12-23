@@ -131,4 +131,17 @@ class SuratKeluarController extends Controller
 
         return redirect()->back()->with('success', 'Surat berhasil dihapus');
     }
+
+    public function download($id)
+    {
+        $surat = SuratKeluar::findOrFail($id);
+        
+        $file = storage_path('app/public/' . $surat->gambar);
+
+        if (!file_exists($file)) {
+            abort(404, 'File tidak ditemukan');
+        }
+
+        return response()->download($file);
+    }
 }
