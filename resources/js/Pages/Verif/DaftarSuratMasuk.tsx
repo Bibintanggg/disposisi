@@ -34,7 +34,7 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
     const [filterStatus, setFilterStatus] = useState("all");
     const [showDetailModal, setShowDetailModal] = useState(false)
 
-    const [selectedSurat, setSelectedSurat] = useState(surat?.[0] ?? null);
+    const [selectedSurat, setSelectedSurat] = useState<SuratMasuk | null>(surat?.[0] ?? null);
     const [viewMode, setViewMode] = useState('list');
 
     const handleSearch = (e: React.FormEvent) => {
@@ -75,13 +75,13 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
         { value: 3, label: 'Diproses', icon: AlertCircle, color: 'text-blue-600 bg-blue-100' }
     ];
 
-    const getJabatanRole = (jabatan: number) => {
+    const getJabatanRole = (jabatan: number | undefined) => {
         switch (jabatan) {
             case 1: return "ADMIN"
             case 2: return "KEPALA"
             case 3: return "STAF"
             case 4: return "VERIFIKATOR"
-            default: "VERIFIKATOR"
+            default: return "VERIFIKATOR"
         }
     }
 
@@ -294,7 +294,7 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                                                         </div>
                                                         <div className="flex items-center gap-1.5">
                                                             <User size={14} />
-                                                            <span>{surat.user_input}</span>
+                                                            <span>{surat.user_input_id}</span>
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-2">

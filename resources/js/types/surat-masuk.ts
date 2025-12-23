@@ -4,7 +4,7 @@ export interface SuratMasuk {
     id: number
     user_input_id: number
     nomor_surat: string
-    users: User[]
+    users?: User
     tanggal_surat: Date
     tanggal_terima: Date
     pengirim: string

@@ -47,7 +47,7 @@ export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: Surat
     const [selectedSurat, setSelectedSurat] = useState<SuratKeluarProps | null>(
         suratKeluar.length > 0 ? suratKeluar[0] : null
     );
-    
+
     const [showDetailModal, setShowDetailModal] = useState(false);
 
     const statusArsipOptions = [
@@ -61,7 +61,7 @@ export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: Surat
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         post(route('verif.surat-keluar.store'), {
             onSuccess: () => {
                 reset();
@@ -80,7 +80,7 @@ export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: Surat
         }
     };
 
-    
+
 
     return (
         <Authenticated>
@@ -326,19 +326,19 @@ export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: Surat
                                         </div>
 
                                         <div className="flex gap-4 pt-6">
-                                            <Button 
-                                                type="submit" 
-                                                size="lg" 
+                                            <Button
+                                                type="submit"
+                                                size="lg"
                                                 className="flex-1 h-12 gap-2 text-base font-semibold bg-purple-600 hover:bg-purple-700"
                                                 disabled={processing}
                                             >
                                                 <Send size={18} />
                                                 {processing ? 'Menyimpan...' : 'Simpan & Kirim Surat'}
                                             </Button>
-                                            <Button 
+                                            <Button
                                                 type="button"
-                                                size="lg" 
-                                                variant="outline" 
+                                                size="lg"
+                                                variant="outline"
                                                 className="gap-2 h-12 text-base font-semibold"
                                                 onClick={handleReset}
                                             >
@@ -400,9 +400,6 @@ export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: Surat
                                                     Kepada: {surat.penerima}
                                                 </p>
                                             </div>
-                                            <button className="p-1.5 rounded-lg hover:bg-gray-100 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <MoreHorizontal size={16} className="text-gray-400" />
-                                            </button>
                                         </div>
 
                                         <p className="text-xs text-gray-600 line-clamp-2 mb-3">
@@ -411,10 +408,12 @@ export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: Surat
 
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-2">
-                                                <div className="flex items-center gap-1 text-xs text-purple-700 bg-purple-100 px-2 py-1 rounded-lg">
-                                                    <Building2 size={12} />
-                                                    <span className="font-medium">{surat.unit_pengirim.nama_bidang}</span>
-                                                </div>
+                                                {surat.unit_pengirim && (
+                                                    <div className="flex items-center gap-1 text-xs text-purple-700 bg-purple-100 px-2 py-1 rounded-lg">
+                                                        <Building2 size={12} />
+                                                        <span className="font-medium">{surat.unit_pengirim.nama_bidang}</span>
+                                                    </div>
+                                                )}
                                                 {surat.gambar && (
                                                     <Paperclip size={14} className="text-gray-400" />
                                                 )}
@@ -445,9 +444,9 @@ export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: Surat
                         <div className="p-4 border-t border-gray-200 bg-gray-50">
                             <div className="flex items-center justify-between mb-2">
                                 <p className="text-xs font-bold text-gray-700 uppercase">Quick Preview</p>
-                                <Button 
-                                    size="sm" 
-                                    variant="ghost" 
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
                                     className="h-8 gap-1"
                                     onClick={() => setShowDetailModal(true)}
                                 >
@@ -458,12 +457,12 @@ export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: Surat
                             <div className="space-y-1.5 text-xs">
                                 <div className="flex justify-between">
                                     <span className="text-gray-500">Unit:</span>
-                                    <span className="font-semibold text-gray-900">{selectedSurat.unit_pengirim.nama_bidang}</span>
+                                    <span className="font-semibold text-gray-900">{selectedSurat.unit_pengirim?.nama_bidang}</span>
                                 </div>
                                 <div className="flex justify-between">
                                     <span className="text-gray-500">Penanda Tangan:</span>
                                     <span className="font-semibold text-gray-900">
-                                        {selectedSurat.user_penanda_tangan.nama_lengkap}
+                                        {selectedSurat.user_penanda_tangan?.nama_lengkap ?? '-'}
                                     </span>
                                 </div>
                                 <div className="flex justify-between">
@@ -517,14 +516,15 @@ export default function SuratKeluar({ suratKeluar, bidangs, users, auth }: Surat
                                         <p className="text-sm font-semibold text-gray-500 mb-1">Unit Pengirim</p>
                                         <div className="flex items-center gap-2">
                                             <Building2 size={16} className="text-purple-600" />
-                                            <p className="text-base text-gray-900">{selectedSurat.unit_pengirim.nama_bidang}</p>
+                                            <p className="text-base text-gray-900">{selectedSurat.unit_pengirim?.nama_bidang || '-'}
+                                            </p>
                                         </div>
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold text-gray-500 mb-1">Penanda Tangan</p>
                                         <div className="flex items-center gap-2">
                                             <PenTool size={16} className="text-purple-600" />
-                                            <p className="text-base text-gray-900">{selectedSurat.user_penanda_tangan.nama_lengkap}</p>
+                                            <p className="text-base text-gray-900">{selectedSurat.user_penanda_tangan?.nama_lengkap || "-"}</p>
                                         </div>
                                     </div>
                                 </div>

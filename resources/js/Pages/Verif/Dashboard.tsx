@@ -5,16 +5,38 @@ import { Mail, Send, Clock, CheckCircle, Calendar, ArrowUp, ArrowDown, Minus, Za
 import { BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { Button } from "@/components/ui/button";
 
-export default function Dashboard({ 
-    stats, 
-    suratBulananData, 
-    sifatSuratData, 
-    verifikasiTrendData, 
-    topBidangData, 
+interface DashboardProps {
+    stats: {
+        suratMasuk: number;
+        suratKeluar: number;
+        pending: number;
+        terverifikasi: number;
+    };
+    suratBulananData: Array<{ bulan: string; total: number }>;
+    sifatSuratData: Array<{ name: string; value: number; percentage: number; color: string }>;
+    verifikasiTrendData: Array<{ hari: string; approved: number; pending: number }>;
+    topBidangData: Array<{ bidang: string; total: number; trend: 'up' | 'down'; change: number }>;
+    recentSurat: Array<{ id: number; jenis: 'masuk' | 'keluar'; nomor: string; pengirim: string; waktu: string; status: 'pending' | 'approved' | 'rejected' }>;
+    performance: {
+        responseTime: number;
+        previousResponseTime?: number;
+        approvalRate: number;
+        previousApprovalRate?: number;
+        activeUsers: number;
+        previousActiveUsers?: number;
+    };
+    debug?: any;
+}
+export default function Dashboard({
+    stats,
+    suratBulananData,
+    sifatSuratData,
+    verifikasiTrendData,
+    topBidangData,
     recentSurat,
     performance,
-    debug 
-}) {
+    debug
+}: DashboardProps) {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [lastUpdate, setLastUpdate] = useState(new Date());
     const [realtimeMetrics, setRealtimeMetrics] = useState({
@@ -38,12 +60,12 @@ export default function Dashboard({
             performance.responseTime,
             performance.previousResponseTime || performance.responseTime * 0.88
         );
-        
+
         const approvalRateChange = calculateChange(
             performance.approvalRate,
             performance.previousApprovalRate || performance.approvalRate * 0.976
         );
-        
+
         const activeUsersChange = calculateChange(
             performance.activeUsers,
             performance.previousActiveUsers || performance.activeUsers * 0.99
@@ -65,7 +87,7 @@ export default function Dashboard({
         };
     }, [performance]);
 
-    const calculateChange = (current, previous) => {
+    const calculateChange = (current: number, previous: number): number => {
         if (previous === 0) return 0;
         const change = ((current - previous) / previous) * 100;
         return Math.round(change * 10) / 10;
@@ -93,7 +115,7 @@ export default function Dashboard({
         // Simulasi perubahan kecil pada metrics secara real-time
         setRealtimeMetrics(prev => {
             const randomFactor = (Math.random() - 0.5) * 0.02; // ±1%
-            
+
             const newResponseTime = Math.max(0.5, prev.responseTime * (1 + (Math.random() - 0.5) * 0.01));
             const newApprovalRate = Math.min(100, Math.max(0, prev.approvalRate * (1 + randomFactor)));
             const newActiveUsers = Math.max(1, Math.round(prev.activeUsers * (1 + (Math.random() - 0.5) * 0.005)));
@@ -113,8 +135,6 @@ export default function Dashboard({
     const refreshData = () => {
         setIsRefreshing(true);
         router.reload({
-            preserveScroll: true,
-            preserveState: false,
             onSuccess: () => {
                 setLastUpdate(new Date());
                 setIsRefreshing(false);
@@ -125,13 +145,14 @@ export default function Dashboard({
         });
     };
 
-    const formatChangeText = (change) => {
+
+    const formatChangeText = (change: number): string => {
         if (change > 0) return `+${change}%`;
         if (change < 0) return `${change}%`;
         return "No change";
     };
 
-    const getChangeIcon = (change, type = 'default') => {
+    const getChangeIcon = (change: number, type: 'default' | 'responseTime' = 'default'): React.ReactNode => {
         if (change > 0) {
             if (type === 'responseTime') {
                 // Untuk response time, lebih rendah lebih baik
@@ -148,7 +169,7 @@ export default function Dashboard({
         return <Minus size={12} className="text-gray-500" strokeWidth={3} />;
     };
 
-    const getChangeTextClass = (change, type = 'default') => {
+    const getChangeTextClass = (change: number, type = 'default'): string => {
         if (change > 0) {
             if (type === 'responseTime') return 'text-red-500';
             return 'text-green-500';
@@ -160,7 +181,7 @@ export default function Dashboard({
     };
 
     // Warna untuk status approval rate
-    const getApprovalRateColor = (rate) => {
+    const getApprovalRateColor = (rate: number): string => {
         if (rate >= 90) return 'text-emerald-500';
         if (rate >= 80) return 'text-green-500';
         if (rate >= 70) return 'text-yellow-500';
@@ -168,7 +189,7 @@ export default function Dashboard({
     };
 
     // Warna untuk response time
-    const getResponseTimeColor = (time) => {
+    const getResponseTimeColor = (time: number): string => {
         if (time <= 2) return 'text-emerald-500';
         if (time <= 4) return 'text-green-500';
         if (time <= 6) return 'text-yellow-500';
@@ -176,7 +197,7 @@ export default function Dashboard({
     };
 
     // Warna untuk active users
-    const getActiveUsersColor = (users) => {
+    const getActiveUsersColor = (users: number): string => {
         if (users >= 200) return 'text-emerald-500';
         if (users >= 150) return 'text-green-500';
         if (users >= 100) return 'text-blue-500';
@@ -194,7 +215,7 @@ export default function Dashboard({
                                 <p className="text-gray-400 text-base">Real-time overview of your mail system</p>
                             </div>
                             <div className="flex items-center gap-3">
-                                <button 
+                                <button
                                     onClick={refreshData}
                                     disabled={isRefreshing}
                                     className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-xl transition-colors disabled:opacity-50"
@@ -304,25 +325,25 @@ export default function Dashboard({
                                     <AreaChart data={suratBulananData}>
                                         <defs>
                                             <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
-                                                <stop offset="95%" stopColor="#3B82F6" stopOpacity={0}/>
+                                                <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
+                                                <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
                                             </linearGradient>
                                         </defs>
                                         <CartesianGrid strokeDasharray="3 3" stroke="#2D3748" strokeOpacity={0.3} />
-                                        <XAxis 
-                                            dataKey="bulan" 
-                                            stroke="#6B7280" 
+                                        <XAxis
+                                            dataKey="bulan"
+                                            stroke="#6B7280"
                                             style={{ fontSize: '14px', fontWeight: 500 }}
                                             tick={{ fill: '#9CA3AF' }}
                                         />
-                                        <YAxis 
-                                            stroke="#6B7280" 
+                                        <YAxis
+                                            stroke="#6B7280"
                                             style={{ fontSize: '14px', fontWeight: 500 }}
                                             tick={{ fill: '#9CA3AF' }}
                                         />
-                                        <Tooltip 
-                                            contentStyle={{ 
-                                                backgroundColor: '#1A1F2E', 
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: '#1A1F2E',
                                                 border: '1px solid #374151',
                                                 borderRadius: '12px',
                                                 fontSize: '14px',
@@ -332,13 +353,13 @@ export default function Dashboard({
                                             itemStyle={{ color: '#fff' }}
                                             labelStyle={{ color: '#9CA3AF' }}
                                         />
-                                        <Area 
-                                            type="monotone" 
-                                            dataKey="total" 
-                                            stroke="#3B82F6" 
+                                        <Area
+                                            type="monotone"
+                                            dataKey="total"
+                                            stroke="#3B82F6"
                                             strokeWidth={3}
-                                            fillOpacity={1} 
-                                            fill="url(#colorTotal)" 
+                                            fillOpacity={1}
+                                            fill="url(#colorTotal)"
                                             name="Total Surat"
                                         />
                                     </AreaChart>
@@ -367,11 +388,11 @@ export default function Dashboard({
                                                 </div>
                                             </div>
                                             <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
-                                                <div 
-                                                    className="h-2.5 rounded-full transition-all duration-500" 
-                                                    style={{ 
+                                                <div
+                                                    className="h-2.5 rounded-full transition-all duration-500"
+                                                    style={{
                                                         width: `${item.percentage}%`,
-                                                        backgroundColor: item.color 
+                                                        backgroundColor: item.color
                                                     }}
                                                 ></div>
                                             </div>
@@ -392,20 +413,20 @@ export default function Dashboard({
                             <ResponsiveContainer width="100%" height={350}>
                                 <BarChart data={verifikasiTrendData} barGap={8}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#2D3748" strokeOpacity={0.3} />
-                                    <XAxis 
-                                        dataKey="hari" 
-                                        stroke="#6B7280" 
+                                    <XAxis
+                                        dataKey="hari"
+                                        stroke="#6B7280"
                                         style={{ fontSize: '14px', fontWeight: 500 }}
                                         tick={{ fill: '#9CA3AF' }}
                                     />
-                                    <YAxis 
-                                        stroke="#6B7280" 
+                                    <YAxis
+                                        stroke="#6B7280"
                                         style={{ fontSize: '14px', fontWeight: 500 }}
                                         tick={{ fill: '#9CA3AF' }}
                                     />
-                                    <Tooltip 
-                                        contentStyle={{ 
-                                            backgroundColor: '#1A1F2E', 
+                                    <Tooltip
+                                        contentStyle={{
+                                            backgroundColor: '#1A1F2E',
                                             border: '1px solid #374151',
                                             borderRadius: '12px',
                                             fontSize: '14px',
@@ -427,7 +448,7 @@ export default function Dashboard({
                 <div className="w-96 bg-[#fafafa] border-l flex flex-col overflow-y-auto">
                     <div className="p-6 border-b">
                         <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-6">
-                            System Performance 
+                            System Performance
                         </h4>
                         <div className="space-y-4">
                             <div className="bg-white rounded-xl p-5 border hover:border-blue-500 transition-colors">
@@ -501,11 +522,10 @@ export default function Dashboard({
                                                 <p className="text-xs text-gray-500">{bidang.total} surat</p>
                                             </div>
                                         </div>
-                                        <div className={`flex items-center gap-1 px-2 py-1 rounded-lg ${
-                                            bidang.trend === 'up' 
-                                                ? 'bg-green-500/10 text-green-500' 
-                                                : 'bg-red-500/10 text-red-500'
-                                        }`}>
+                                        <div className={`flex items-center gap-1 px-2 py-1 rounded-lg ${bidang.trend === 'up'
+                                            ? 'bg-green-500/10 text-green-500'
+                                            : 'bg-red-500/10 text-red-500'
+                                            }`}>
                                             {bidang.trend === 'up' ? (
                                                 <ArrowUp size={12} strokeWidth={3} />
                                             ) : (
@@ -530,11 +550,10 @@ export default function Dashboard({
                                 <div key={surat.id} className="bg-white rounded-xl p-4 border hover:border-gray-300 transition-colors">
                                     <div className="flex items-start justify-between mb-3">
                                         <div className="flex items-center gap-2">
-                                            <span className={`px-2 py-1 rounded-md text-xs font-bold ${
-                                                surat.jenis === 'masuk' 
-                                                    ? 'bg-blue-500/20 text-blue-400' 
-                                                    : 'bg-purple-500/20 text-purple-400'
-                                            }`}>
+                                            <span className={`px-2 py-1 rounded-md text-xs font-bold ${surat.jenis === 'masuk'
+                                                ? 'bg-blue-500/20 text-blue-400'
+                                                : 'bg-purple-500/20 text-purple-400'
+                                                }`}>
                                                 {surat.jenis === 'masuk' ? 'IN' : 'OUT'}
                                             </span>
                                             <p className="text-sm font-bold text-black">{surat.nomor}</p>
@@ -543,14 +562,12 @@ export default function Dashboard({
                                     </div>
                                     <p className="text-xs text-gray-400 mb-3">{surat.pengirim}</p>
                                     <div className="flex items-center justify-between">
-                                        <span className={`text-xs px-2.5 py-1 rounded-lg font-semibold ${
-                                            surat.status === 'pending' ? 'bg-orange-500/20 text-orange-400' :
+                                        <span className={`text-xs px-2.5 py-1 rounded-lg font-semibold ${surat.status === 'pending' ? 'bg-orange-500/20 text-orange-400' :
                                             surat.status === 'approved' ? 'bg-emerald-500/20 text-emerald-400' :
-                                            'bg-blue-500/20 text-blue-400'
-                                        }`}>
+                                                'bg-blue-500/20 text-blue-400'
+                                            }`}>
                                             {surat.status}
                                         </span>
-                                        <Eye className="text-gray-600 hover:text-gray-400 cursor-pointer" size={16} />
                                     </div>
                                 </div>
                             ))}

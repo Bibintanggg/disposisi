@@ -15,5 +15,7 @@ export interface SuratKeluarProps {
     tanggal_kirim: Date
     status_arsip: number
 
-    unit_pengirim?: Bidang;
+    unit_pengirim?: Bidang
+    user_penanda_tangan?: User
+
 }

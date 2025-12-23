@@ -42,19 +42,9 @@ const USER_JABATAN = {
 const navTeam = {
   teams: [
     {
-      name: "SIDISPOSISI",
+      name: "DISPOSISI",
       logo: GalleryVerticalEnd,
       plan: "Pengelola Surat",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
     },
   ],
 }

@@ -68,7 +68,6 @@ export default function InputSuratMasuk({ surat, auth }: SuratMasukProps) {
         e.preventDefault();
 
         post(route("verif.input-surat-masuk.store"), {
-            data,
             forceFormData: true,
             onError: (errors) => {
                 console.log('Validation errors:', errors);
