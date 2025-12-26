@@ -22,6 +22,7 @@ type RiwayatItem = {
     tanggal_selesai: string;
     durasi: string;
     pengirim: string;
+    has_file: boolean;
 };
 
 interface RiwayatPageProps extends PageProps {
@@ -179,12 +180,17 @@ export default function RiwayatTugasSelesai() {
 
                                         <Button
                                             onClick={() => handleLihatSurat(d.id)}
+                                            disabled={!d.has_file}
                                             variant="outline"
                                             size="sm"
-                                            className="rounded-xl flex items-center gap-2"
+                                            className={`rounded-xl flex items-center gap-2
+        ${!d.has_file && 'opacity-50 cursor-not-allowed'}
+    `}
                                         >
-                                            <FileText size={16} /> Surat Asli
+                                            <FileText size={16} />
+                                            {d.has_file ? 'Surat Asli' : 'Tidak Ada File'}
                                         </Button>
+
                                     </td>
                                 </tr>
                             ))}
@@ -230,12 +236,18 @@ export default function RiwayatTugasSelesai() {
                             <div className="pt-4 border-t">
                                 <Button
                                     onClick={() => handleLihatSurat(selectedLaporan.id)}
-                                    className="w-full flex items-center justify-center gap-2"
+                                    disabled={!selectedLaporan.has_file}
+                                    className={`w-full flex items-center justify-center gap-2
+            ${!selectedLaporan.has_file && 'opacity-50 cursor-not-allowed'}
+        `}
                                 >
                                     <ExternalLink size={16} />
-                                    Lihat Surat Asli
+                                    {selectedLaporan.has_file
+                                        ? 'Lihat Surat Asli'
+                                        : 'Tidak Ada File Surat'}
                                 </Button>
                             </div>
+
                         </div>
                     )}
 

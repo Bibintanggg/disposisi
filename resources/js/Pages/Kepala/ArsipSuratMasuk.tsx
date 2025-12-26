@@ -26,6 +26,7 @@ interface ArsipSurat {
   disposisi_oleh: string;
   status_akhir: StatusAkhir;
   riwayat_disposisi: RiwayatDisposisi[];
+  file_path?: string;
 }
 
 interface ArsipStats {
@@ -215,12 +216,23 @@ export default function ArsipSuratMasuk() {
                         >
                           <Eye className="w-4 h-4 inline" />
                         </button>
-                        <a
-                          href={route('kepala.arsip-surat-masuk.download', surat.id)}
-                          className="text-gray-600 hover:text-gray-800"
-                        >
-                          <Download className="w-4 h-4 inline" />
-                        </a>
+                        {surat.file_path ? (
+                          <a
+                            href={route('kepala.arsip-surat-masuk.download', surat.id)}
+                            className="text-gray-600 hover:text-gray-800"
+                            title="Unduh file surat"
+                          >
+                            <Download className="w-4 h-4 inline" />
+                          </a>
+                        ) : (
+                          <span
+                            className="text-gray-300 cursor-not-allowed"
+                            title="File surat belum tersedia"
+                          >
+                            <Download className="w-4 h-4 inline" />
+                          </span>
+                        )}
+
 
                       </td>
                     </tr>

@@ -36,7 +36,7 @@ class TugasDiprosesController extends Controller
                     'tanggal_disposisi' => Carbon::parse($item->disposisi->tanggal_disposisi)
                         ->translatedFormat('d M Y'),
                     'tanggal_disposisi_raw' => $item->disposisi->tanggal_disposisi,
-
+                    'has_file' => !empty($surat->gambar),
                 ];
             });
         return Inertia::render('Staf/TugasProses', [

@@ -10,6 +10,7 @@ use App\Models\SuratKeluar;
 use App\Models\SuratMasuk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class VerifikasiController extends Controller
@@ -194,12 +195,16 @@ class VerifikasiController extends Controller
             abort(404);
         }
 
-        $file = storage_path('app/public/' . $surat->gambar);
-
-        if (!file_exists($file)) {
-            abort(404, 'File tidak ditemukan');
+        if (empty($surat->gambar)) {
+            return redirect()->back()->with('error', 'File belum diupload');
         }
 
-        return response()->download($file);
+        $path = 'public/' . $surat->gambar;
+
+        if (!Storage::exists($path)) {
+            return redirect()->back()->with('error', 'File tidak ditemukan');
+        }
+
+        return Storage::download($path);
     }
 }

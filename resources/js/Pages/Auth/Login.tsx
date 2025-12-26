@@ -420,7 +420,7 @@ export default function Login({
                                 transition={{ delay: 1 }}
                             >
                                 <p className="text-sm text-gray-500">
-                                    © 2024 Disposisi All rights reserved.
+                                    © 2025 Disposisi All rights reserved.
                                 </p>
                             </motion.div>
                         </motion.div>

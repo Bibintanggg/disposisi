@@ -15,6 +15,7 @@ type SuratItem = {
     sifat_surat: "Sangat Penting" | "Penting" | "Biasa";
     dari_kepala: string;
     perihal: string;
+    has_file: boolean;
 };
 
 export default function TugasProses() {
@@ -50,6 +51,14 @@ export default function TugasProses() {
 
         return 0;
     });
+
+    const lihatSurat = (id: number) => {
+        router.visit(route('staf.tugas.lihat-surat', id), {
+            onError: (errors) => {
+                alert('File surat tidak ditemukan atau sudah dihapus.');
+            }
+        });
+    };
 
 
     return (
@@ -116,10 +125,13 @@ export default function TugasProses() {
                                     <Button
                                         className="gap-2"
                                         variant="outline"
-                                        onClick={() => window.open(route('staf.tugas.lihat-surat', item.id), "_blank")}
+                                        disabled={!item.has_file}
+                                        onClick={() => lihatSurat(item.id)}
                                     >
-                                        <Eye size={16} /> Lihat Surat Asli
+                                        <Eye size={16} />
+                                        {item.has_file ? 'Lihat Surat Asli' : 'Tidak Ada File'}
                                     </Button>
+
                                     <div className="flex gap-2">
                                         <Button
                                             className="gap-1 bg-green-600 text-white hover:bg-green-700"

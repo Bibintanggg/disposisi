@@ -17,6 +17,7 @@ type Tugas = {
     perihal: string;
     dari_kepala: string;
     instruksi: string;
+    has_file: boolean;
 };
 
 interface LaporanPageProps extends PageProps {
@@ -91,9 +92,15 @@ export default function LaporanTindakLanjut() {
     };
 
     const handleLihatSurat = () => {
-        window.open(route('staf.laporan-tindak.lihat-surat'), "_blank");
+        router.visit(
+            route('staf.laporan-tindak.lihat-surat', tugas.id),
+            {
+                onError: () => {
+                    alert('File surat tidak ditemukan atau sudah dihapus.');
+                }
+            }
+        );
     };
-
 
     return (
         <Authenticated>
@@ -123,11 +130,17 @@ export default function LaporanTindakLanjut() {
                             <h2 className="text-lg font-semibold text-gray-900">Informasi Tugas</h2>
                             <button
                                 onClick={handleLihatSurat}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
+                                disabled={!tugas.has_file}
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition
+        ${tugas.has_file
+                                        ? 'text-gray-700 bg-gray-50 border-gray-300 hover:bg-gray-100'
+                                        : 'text-gray-400 bg-gray-100 border-gray-200 cursor-not-allowed'
+                                    }`}
                             >
                                 <Eye className="w-4 h-4" />
-                                Lihat Surat Asli
+                                {tugas.has_file ? 'Lihat Surat Asli' : 'Tidak Ada File'}
                             </button>
+
                         </div>
 
                         <div className="space-y-4">

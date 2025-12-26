@@ -12,6 +12,8 @@ type TugasItem = {
   instruksi: string;
   sifat_surat: 'Segera' | 'Penting' | 'Biasa';
   tanggal_disposisi: string;
+  file_pth: string | null;
+  has_file: boolean;
 };
 
 interface TugasPageProps extends PageProps {
@@ -312,13 +314,30 @@ export default function TugasMasuk() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => window.open(route('staf.tugas-masuk.lihat-surat', tugas.id), "_blank")}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                            >
-                              <Eye className="w-4 h-4" />
-                              Lihat Surat
-                            </button>
+                            {tugas.has_file ? (
+                              <button
+                                onClick={() =>
+                                  window.open(
+                                    route('staf.tugas-masuk.lihat-surat', tugas.id),
+                                    "_blank"
+                                  )
+                                }
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                              >
+                                <Eye className="w-4 h-4" />
+                                Lihat Surat
+                              </button>
+                            ) : (
+                              <button
+                                disabled
+                                title="File surat belum tersedia"
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-400 bg-gray-100 border border-gray-200 rounded-lg cursor-not-allowed"
+                              >
+                                <Eye className="w-4 h-4" />
+                                Tidak Ada File
+                              </button>
+                            )}
+
                             <button
                               onClick={() => handleMulaiKerjakan(tugas)}
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"

@@ -11,10 +11,14 @@ export default function SuratRow({ surat, onDisposisi }: SuratRowProps) {
     // Hapus konversi yang kompleks, langsung gunakan sifat_surat
     const badge = sifatSuratBadge(surat.sifat_surat);
 
-    const calculateWaitingDays = (tanggalTerima: Date) => {
+    const calculateWaitingDays = (tanggalTerima: string) => {
         const now = new Date();
+        const terimaDate = new Date(tanggalTerima);
+
+        if (isNaN(terimaDate.getTime())) return 0;
+
         return Math.floor(
-            (now.getTime() - tanggalTerima.getTime()) / (1000 * 60 * 60 * 24)
+            (now.getTime() - terimaDate.getTime()) / (1000 * 60 * 60 * 24)
         );
     };
 
@@ -26,7 +30,7 @@ export default function SuratRow({ surat, onDisposisi }: SuratRowProps) {
             year: "numeric",
         }).format(new Date(dateString));
 
-    const waitingDays = calculateWaitingDays(surat.tanggal_terima);
+    const waitingDays = calculateWaitingDays(surat.tanggal_terima.toString());
 
     return (
         <tr

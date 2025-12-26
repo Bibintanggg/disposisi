@@ -272,9 +272,6 @@ export default function DaftarSuratMasuk({ surat }: DaftarSuratMasukProps) {
                                                             <StatusIcon size={12} />
                                                             {statusInfo.label}
                                                         </span>
-                                                        <button className="p-2 hover:bg-gray-100 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <MoreVertical size={16} className="text-gray-400" />
-                                                        </button>
                                                     </div>
                                                 </div>
 

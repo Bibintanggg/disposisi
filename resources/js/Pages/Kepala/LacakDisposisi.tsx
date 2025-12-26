@@ -482,18 +482,6 @@ export default function LacakDisposisi() {
               <p className="text-gray-500 max-w-md mx-auto">Coba ubah kata kunci pencarian atau sesuaikan filter untuk menemukan data yang Anda cari</p>
             </div>
           )}
-
-          {/* Pagination (Optional) */}
-          {filteredData.length > 0 && (
-            <div className="p-5 border-t border-gray-200 flex items-center justify-between">
-              <div className="text-sm text-gray-600">Halaman 1 dari 1</div>
-              <div className="flex items-center gap-2">
-                <button className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Sebelumnya</button>
-                <button className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">1</button>
-                <button className="px-3 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Selanjutnya</button>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Detail Modal - Light Mode */}

@@ -7,6 +7,7 @@ use App\Http\Enum\StatusAkhir;
 use App\Models\SuratMasuk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -117,17 +118,15 @@ class ArsipSuratMasukController extends Controller
             );
         }
 
-        $path = $surat->gambar;
-
-        if (!Storage::disk('public')->exists($path)) {
+        if (!Storage::disk('public')->exists($surat->gambar)) {
             return Redirect::back()->with(
                 'error',
                 'File surat tidak ditemukan atau sudah dihapus.'
             );
         }
 
-        return Storage::disk('public')->download(
-            $path,
+        return Response::download(
+            Storage::disk('public')->path($surat->gambar),
             'Surat-' . $surat->nomor_surat . '.pdf'
         );
     }

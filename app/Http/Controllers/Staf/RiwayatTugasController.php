@@ -62,6 +62,7 @@ class RiwayatTugasController extends Controller
                 'tanggal_selesai' => $item->tanggal_selesai,
                 'durasi' => $durasiString,
                 'pengirim' => $item->disposisi->pengirim->nama_lengkap ?? '-',
+                'has_file' => !empty($item->disposisi->suratMasuk->gambar),
             ];
         });
 
